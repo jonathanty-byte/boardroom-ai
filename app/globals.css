@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dbz-orange: #FF6B00;
+  --color-dbz-blue: #1A73E8;
+  --color-dbz-purple: #7B2D8E;
+  --color-dbz-green: #2D8E4E;
+  --color-dbz-red: #E8341A;
+  --color-dbz-gold: #FFD700;
+  --color-surface: #0a0a1a;
+  --color-surface-light: #12122a;
+  --color-surface-card: #1a1a3a;
+  --color-border: #2a2a5a;
+  --font-retro: "Press Start 2P", monospace;
+  --font-terminal: "VT323", monospace;
+}
+
+body {
+  background-color: var(--color-surface);
+  color: #e0e0f0;
+  font-family: var(--font-terminal), monospace;
+  font-size: 18px;
+}
+
+/* Pixel border utility */
+.pixel-border {
+  border: 3px solid var(--color-border);
+  box-shadow:
+    inset -2px -2px 0 0 #16162e,
+    inset 2px 2px 0 0 #3a3a6a;
+}
+
+/* Pulsing glow animation for analyzing members */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 107, 0, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(255, 107, 0, 0.6), 0 0 40px rgba(255, 107, 0, 0.2); }
+}
+
+.analyzing-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Verdict flash animation */
+@keyframes verdict-flash {
+  0% { transform: scale(1.3); opacity: 0; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.verdict-appear {
+  animation: verdict-flash 0.4s ease-out forwards;
+}
+
+/* Cursor blink for streaming text */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: "▊";
+  animation: blink 0.8s step-end infinite;
+  color: var(--color-dbz-orange);
+}
+
+/* Scanline overlay */
+.scanlines::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  z-index: 50;
+}
