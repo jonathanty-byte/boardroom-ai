@@ -8,7 +8,7 @@ import type {
   Round2Result,
 } from "./types";
 
-const DEFAULT_MODEL = "anthropic/claude-sonnet-4-5-20250514";
+const DEFAULT_MODEL = "anthropic/claude-sonnet-4.6";
 
 export class StreamingAgentRunner {
   private model: string;

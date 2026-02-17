@@ -1,23 +1,23 @@
 export const RECOMMENDED_MODELS = [
   {
-    id: "anthropic/claude-sonnet-4-5-20250514",
-    name: "Claude Sonnet 4.5",
+    id: "anthropic/claude-sonnet-4.6",
+    name: "Claude Sonnet 4.6",
     description: "Recommended - best quality/price",
   },
   {
-    id: "anthropic/claude-haiku-3-5-20241022",
-    name: "Claude Haiku 3.5",
-    description: "Budget - fast and cheap",
+    id: "anthropic/claude-opus-4.5",
+    name: "Claude Opus 4.5",
+    description: "Premium - highest quality",
   },
   {
-    id: "openai/gpt-4o",
-    name: "GPT-4o",
-    description: "Alternative - OpenAI",
-  },
-  {
-    id: "google/gemini-2.0-flash-001",
-    name: "Gemini 2.0 Flash",
+    id: "google/gemini-3-flash-preview",
+    name: "Gemini 3 Flash",
     description: "Budget - very fast",
+  },
+  {
+    id: "google/gemini-3-pro-preview",
+    name: "Gemini 3 Pro",
+    description: "Alternative - Google",
   },
 ];
 
