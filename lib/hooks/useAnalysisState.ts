@@ -3,7 +3,10 @@
 import type {
   BoardMemberRole,
   BoardroomReport,
+  DebateHistory,
+  DebateTurn,
   FrictionPoint,
+  ModeratorAction,
   Round1Output,
   Round2Response,
   SSEEvent,
@@ -32,11 +35,24 @@ export interface DebateState {
   result: Round2Response | null;
 }
 
+// V0.2: Multi-turn debate thread state
+export interface DebateThreadState {
+  frictionIndex: number;
+  status: "waiting" | "in_progress" | "resolved";
+  moderatorActions: ModeratorAction[];
+  turns: Array<{ turn: DebateTurn; status: "streaming" | "complete" }>;
+  currentSpeaker: BoardMemberRole | null;
+  currentStreamedText: string;
+  outcome: DebateHistory["outcome"] | null;
+  outcomeSummary: string;
+}
+
 export interface AnalysisState {
   phase: AnalysisPhase;
   members: Record<BoardMemberRole, MemberState>;
   frictions: FrictionPoint[];
   debates: Record<BoardMemberRole, DebateState>;
+  debateThreads: DebateThreadState[];
   synthesis: Synthesis | null;
   report: BoardroomReport | null;
   error: string | null;
@@ -65,6 +81,7 @@ export const initialState: AnalysisState = {
   members: createInitialMemberState(),
   frictions: [],
   debates: createInitialDebateState(),
+  debateThreads: [],
   synthesis: null,
   report: null,
   error: null,
@@ -104,6 +121,7 @@ function handleSSEEvent(state: AnalysisState, event: SSEEvent): AnalysisState {
         ROUND1_RUNNING: "round1",
         IDENTIFYING_FRICTIONS: "frictions",
         ROUND2_RUNNING: "round2",
+        DEBATE_RUNNING: "round2",
         SYNTHESIZING: "synthesis",
       };
       return { ...state, phase: phaseMap[event.state] ?? state.phase };
@@ -140,6 +158,7 @@ function handleSSEEvent(state: AnalysisState, event: SSEEvent): AnalysisState {
     case "frictions_detected":
       return { ...state, frictions: event.frictions };
 
+    // Legacy Round 2 events (backward compat)
     case "debate_chunk": {
       const debate = state.debates[event.role];
       return {
@@ -168,6 +187,44 @@ function handleSSEEvent(state: AnalysisState, event: SSEEvent): AnalysisState {
         },
       };
 
+    // V0.2 debate events
+    case "moderator_action":
+      return updateDebateThread(state, event.frictionIndex, (thread) => ({
+        ...thread,
+        status: "in_progress",
+        moderatorActions: [...thread.moderatorActions, event.action],
+      }));
+
+    case "debate_turn_start":
+      return updateDebateThread(state, event.frictionIndex, (thread) => ({
+        ...thread,
+        status: "in_progress",
+        currentSpeaker: event.speaker,
+        currentStreamedText: "",
+      }));
+
+    case "debate_turn_chunk":
+      return updateDebateThread(state, event.frictionIndex, (thread) => ({
+        ...thread,
+        currentStreamedText: thread.currentStreamedText + event.chunk,
+      }));
+
+    case "debate_turn_complete":
+      return updateDebateThread(state, event.frictionIndex, (thread) => ({
+        ...thread,
+        turns: [...thread.turns, { turn: event.turn, status: "complete" as const }],
+        currentSpeaker: null,
+        currentStreamedText: "",
+      }));
+
+    case "debate_resolved":
+      return updateDebateThread(state, event.frictionIndex, (thread) => ({
+        ...thread,
+        status: "resolved",
+        outcome: event.history.outcome,
+        outcomeSummary: event.history.outcomeSummary,
+      }));
+
     case "synthesis_complete":
       return { ...state, synthesis: event.synthesis };
 
@@ -180,6 +237,33 @@ function handleSSEEvent(state: AnalysisState, event: SSEEvent): AnalysisState {
     default:
       return state;
   }
+}
+
+function updateDebateThread(
+  state: AnalysisState,
+  frictionIndex: number,
+  updater: (thread: DebateThreadState) => DebateThreadState,
+): AnalysisState {
+  const threads = [...state.debateThreads];
+  // Ensure thread exists for this friction index
+  while (threads.length <= frictionIndex) {
+    threads.push(createEmptyThread(threads.length));
+  }
+  threads[frictionIndex] = updater(threads[frictionIndex]);
+  return { ...state, debateThreads: threads };
+}
+
+function createEmptyThread(frictionIndex: number): DebateThreadState {
+  return {
+    frictionIndex,
+    status: "waiting",
+    moderatorActions: [],
+    turns: [],
+    currentSpeaker: null,
+    currentStreamedText: "",
+    outcome: null,
+    outcomeSummary: "",
+  };
 }
 
 export function useAnalysisState() {
