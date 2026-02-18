@@ -21,17 +21,17 @@ const SOURCE_LABELS: Record<CEOFollowUpQuestion["source"], string> = {
 
 interface CEOFollowUpProps {
   questions: CEOFollowUpQuestion[];
-  onReanalyze: (enrichedVision: string) => void;
+  onFinalize: (ceoAnswers: string) => void;
+  disabled?: boolean;
 }
 
-export function CEOFollowUp({ questions, onReanalyze }: CEOFollowUpProps) {
+export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProps) {
   const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [submitted, setSubmitted] = useState(false);
 
   const filledCount = Object.values(answers).filter((a) => a.trim().length > 0).length;
 
   const handleSubmit = () => {
-    const parts = ["## CEO Answers to Board Questions\n"];
+    const parts: string[] = [];
     for (const q of questions) {
       const answer = answers[q.id]?.trim();
       if (answer) {
@@ -39,24 +39,8 @@ export function CEOFollowUp({ questions, onReanalyze }: CEOFollowUpProps) {
         parts.push(`A: ${answer}\n`);
       }
     }
-    setSubmitted(true);
-    onReanalyze(parts.join("\n"));
+    onFinalize(parts.join("\n"));
   };
-
-  if (submitted) {
-    return (
-      <div className="pixel-border p-4">
-        <div className="text-center">
-          <div className="stat-label text-[var(--color-dbz-gold)] mb-2">
-            REANALYSIS IN PROGRESS
-          </div>
-          <p className="font-[family-name:var(--font-terminal)] text-base text-gray-400 animate-pulse">
-            The board is reconvening with your answers...
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="pixel-border p-4">
@@ -103,6 +87,7 @@ export function CEOFollowUp({ questions, onReanalyze }: CEOFollowUpProps) {
                 rows={2}
                 placeholder="Your answer..."
                 value={answers[q.id] ?? ""}
+                disabled={disabled}
                 onChange={(e) =>
                   setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))
                 }
@@ -116,13 +101,13 @@ export function CEOFollowUp({ questions, onReanalyze }: CEOFollowUpProps) {
       <div className="mt-4 text-center">
         <RetroButton
           onClick={handleSubmit}
-          disabled={filledCount === 0}
+          disabled={filledCount === 0 || disabled}
           variant="primary"
         >
-          DEEPEN ANALYSIS ({filledCount}/{questions.length})
+          GET FINAL VERDICT ({filledCount}/{questions.length})
         </RetroButton>
         <p className="font-[family-name:var(--font-terminal)] text-[10px] text-gray-600 mt-2">
-          Answer at least 1 question to relaunch with enriched context
+          Answer at least 1 question — the board will deliver a definitive verdict
         </p>
       </div>
     </div>

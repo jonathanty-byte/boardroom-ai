@@ -2,7 +2,7 @@
 export { boardMembers, getMemberConfig } from "./board-members";
 
 // CEO follow-up
-export { extractCEOFollowUp } from "./ceo-followup";
+export { extractCEOFollowUp, runFinalVerdictFlow } from "./ceo-followup";
 
 // V0.2 debate modules
 export { analyzeConvergence } from "./convergence";
@@ -27,6 +27,7 @@ export type {
   BoardMemberConfig,
   BoardMemberRole,
   BoardroomReport,
+  CEOFinalVerdict,
   CEOFollowUpQuestion,
   CcoVerdict,
   CfoVerdict,

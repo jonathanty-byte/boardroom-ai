@@ -3,6 +3,7 @@
 import type {
   BoardMemberRole,
   BoardroomReport,
+  CEOFinalVerdict,
   CEOFollowUpQuestion,
   DebateHistory,
   DebateTurn,
@@ -56,6 +57,8 @@ export interface AnalysisState {
   debateThreads: DebateThreadState[];
   synthesis: Synthesis | null;
   ceoFollowUp: CEOFollowUpQuestion[];
+  finalVerdict: CEOFinalVerdict | null;
+  finalVerdictStreaming: string;
   report: BoardroomReport | null;
   error: string | null;
 }
@@ -86,6 +89,8 @@ export const initialState: AnalysisState = {
   debateThreads: [],
   synthesis: null,
   ceoFollowUp: [],
+  finalVerdict: null,
+  finalVerdictStreaming: "",
   report: null,
   error: null,
 };
@@ -233,6 +238,15 @@ function handleSSEEvent(state: AnalysisState, event: SSEEvent): AnalysisState {
 
     case "ceo_followup":
       return { ...state, ceoFollowUp: event.questions };
+
+    case "final_verdict_start":
+      return { ...state, finalVerdictStreaming: "", finalVerdict: null };
+
+    case "final_verdict_chunk":
+      return { ...state, finalVerdictStreaming: state.finalVerdictStreaming + event.chunk };
+
+    case "final_verdict_complete":
+      return { ...state, finalVerdict: event.verdict, finalVerdictStreaming: "", phase: "complete" };
 
     case "analysis_complete":
       return { ...state, phase: "complete", report: event.report };

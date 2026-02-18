@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import type { BoardMemberRole } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
-import { useRef } from "react";
 import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { BoardRoom } from "@/components/board/BoardRoom";
 import { CEOFollowUp } from "@/components/board/CEOFollowUp";
+import { FinalVerdict } from "@/components/board/FinalVerdict";
 import { ExportButton } from "@/components/report/ExportButton";
 import { ShareImage } from "@/components/report/ShareImage";
 import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
@@ -33,25 +34,20 @@ const MEMBER_AVATARS: Record<BoardMemberRole, string> = {
 
 export default function Home() {
   const { apiKey, saveKey, loaded, hasKey } = useApiKey();
-  const { state, analyze, reset } = useBoardroomAnalysis();
-
-  // Store last submit params for re-analysis
-  const contentRef = useRef("");
-  const modelRef = useRef("");
+  const { state, analyze, finalize, reset } = useBoardroomAnalysis();
+  const [finalizing, setFinalizing] = useState(false);
 
   const isRunning = state.phase !== "idle" && state.phase !== "complete" && state.phase !== "error";
 
   const handleSubmit = (content: string, ceoVision: string, model: string) => {
     if (!apiKey) return;
-    contentRef.current = content;
-    modelRef.current = model;
     analyze(content, apiKey, ceoVision, model);
   };
 
-  const handleReanalyze = (enrichedVision: string) => {
-    if (!apiKey) return;
-    reset();
-    analyze(contentRef.current, apiKey, enrichedVision, modelRef.current);
+  const handleFinalize = (ceoAnswers: string) => {
+    if (!apiKey || !state.report) return;
+    setFinalizing(true);
+    finalize(state.report, ceoAnswers, apiKey, state.report.debates ? undefined : undefined);
   };
 
   if (!loaded) return null;
@@ -66,7 +62,7 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-4">
           {state.phase !== "idle" && (
-            <RetroButton onClick={reset} variant="secondary">
+            <RetroButton onClick={() => { reset(); setFinalizing(false); }} variant="secondary">
               NEW ANALYSIS
             </RetroButton>
           )}
@@ -160,10 +156,24 @@ export default function Home() {
         />
       )}
 
-      {/* CEO Follow-Up Questions */}
-      {state.phase === "complete" && state.ceoFollowUp.length > 0 && (
+      {/* CEO Follow-Up Questions (only when not finalizing yet) */}
+      {state.phase === "complete" && state.ceoFollowUp.length > 0 && !state.finalVerdict && (
         <div className="w-full max-w-5xl mt-6">
-          <CEOFollowUp questions={state.ceoFollowUp} onReanalyze={handleReanalyze} />
+          <CEOFollowUp
+            questions={state.ceoFollowUp}
+            onFinalize={handleFinalize}
+            disabled={finalizing}
+          />
+        </div>
+      )}
+
+      {/* Final Verdict (streaming or complete) */}
+      {(state.finalVerdict || state.finalVerdictStreaming) && (
+        <div className="w-full max-w-5xl mt-6">
+          <FinalVerdict
+            verdict={state.finalVerdict}
+            streamedText={state.finalVerdictStreaming}
+          />
         </div>
       )}
 
@@ -190,7 +200,7 @@ export default function Home() {
           <p className="font-[family-name:var(--font-terminal)] text-base text-red-300">
             {state.error}
           </p>
-          <RetroButton onClick={reset} variant="secondary" className="mt-4">
+          <RetroButton onClick={() => { reset(); setFinalizing(false); }} variant="secondary" className="mt-4">
             RETRY
           </RetroButton>
         </div>

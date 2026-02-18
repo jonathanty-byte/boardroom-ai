@@ -152,6 +152,15 @@ export interface CEOFollowUpQuestion {
   frictionIndex?: number;
 }
 
+/** Final verdict produced after CEO answers follow-up questions. */
+export interface CEOFinalVerdict {
+  collectiveVerdict: CollectiveVerdict;
+  reasoning: string;
+  keyActions: string[];
+  risks: string[];
+  nextSteps: string[];
+}
+
 // SSE event types for streaming to frontend
 export type SSEEvent =
   | { type: "state_change"; state: string }
@@ -174,5 +183,8 @@ export type SSEEvent =
   | { type: "debate_resolved"; frictionIndex: number; history: DebateHistory }
   | { type: "synthesis_complete"; synthesis: Synthesis }
   | { type: "ceo_followup"; questions: CEOFollowUpQuestion[] }
+  | { type: "final_verdict_start" }
+  | { type: "final_verdict_chunk"; chunk: string }
+  | { type: "final_verdict_complete"; verdict: CEOFinalVerdict }
   | { type: "analysis_complete"; report: BoardroomReport }
   | { type: "error"; message: string };

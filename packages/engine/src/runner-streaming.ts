@@ -3,6 +3,8 @@ import { MODERATOR_CONFIG, MODERATOR_SYSTEM_PROMPT } from "./moderator";
 import type {
   BoardMemberConfig,
   BoardMemberRole,
+  CEOFinalVerdict,
+  CollectiveVerdict,
   DebateTurn,
   ModeratorAction,
   Round1Output,
@@ -306,6 +308,73 @@ export class StreamingAgentRunner {
     }
     // Fallback: return as-is (will fail lookup gracefully)
     return lower as BoardMemberRole;
+  }
+
+  async runFinalVerdictStreaming(
+    contextPrompt: string,
+    onChunk: (chunk: string) => void,
+  ): Promise<CEOFinalVerdict> {
+    const client = this.createClient();
+    let fullText = "";
+
+    const systemPrompt = `You are the Final Arbiter of the BoardRoom AI board.
+You have access to the full deliberation: Round 1 analyses, debate outcomes, and the CEO's answers to follow-up questions.
+
+Your job is to DECIDE. No more debate. Be pragmatic and actionable.
+
+You MUST respond with valid JSON:
+{
+  "collectiveVerdict": "GO" | "GO_WITH_CHANGES" | "RETHINK",
+  "reasoning": "2-3 paragraphs explaining the final decision, weighing all perspectives and CEO input",
+  "keyActions": ["Concrete action 1", "Concrete action 2", ...],
+  "risks": ["Acknowledged risk 1", "Risk 2", ...],
+  "nextSteps": ["Immediate next step 1", "Step 2", ...]
+}
+Respond ONLY with JSON. No markdown fences, no preamble.`;
+
+    const stream = await client.chat.completions.create({
+      model: this.model,
+      max_tokens: 2048,
+      temperature: 0.6,
+      stream: true,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: contextPrompt },
+      ],
+    });
+
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) {
+        fullText += delta;
+        onChunk(delta);
+      }
+    }
+
+    return this.parseFinalVerdict(fullText);
+  }
+
+  parseFinalVerdict(raw: string): CEOFinalVerdict {
+    const cleaned = this.extractJSON(raw);
+
+    try {
+      const parsed = JSON.parse(cleaned) as Record<string, unknown>;
+      return {
+        collectiveVerdict: (parsed.collectiveVerdict as CollectiveVerdict) ?? "RETHINK",
+        reasoning: (parsed.reasoning as string) ?? "",
+        keyActions: Array.isArray(parsed.keyActions) ? (parsed.keyActions as string[]) : [],
+        risks: Array.isArray(parsed.risks) ? (parsed.risks as string[]) : [],
+        nextSteps: Array.isArray(parsed.nextSteps) ? (parsed.nextSteps as string[]) : [],
+      };
+    } catch {
+      return {
+        collectiveVerdict: "RETHINK",
+        reasoning: raw.slice(0, 500),
+        keyActions: [],
+        risks: ["Could not parse final verdict"],
+        nextSteps: [],
+      };
+    }
   }
 
   parseDebateTurn(raw: string, config: BoardMemberConfig, turnNumber: number): DebateTurn {
