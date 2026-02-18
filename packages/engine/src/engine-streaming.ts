@@ -1,8 +1,15 @@
 import { boardMembers } from "./board-members";
+import { flattenDebatesToRound2, runDebateForFriction } from "./debate-engine";
 import { identifyFrictions } from "./friction";
 import { StreamingAgentRunner } from "./runner-streaming";
 import { synthesize } from "./synthesis";
-import type { AnalysisInput, BoardroomReport, Round1Result, Round2Result, SSEEvent } from "./types";
+import type {
+  AnalysisInput,
+  BoardroomReport,
+  DebateHistory,
+  Round1Result,
+  SSEEvent,
+} from "./types";
 
 /**
  * Streaming BoardRoom AI Decision Engine.
@@ -40,46 +47,27 @@ export async function runAnalysis(
     const frictions = identifyFrictions(round1Results);
     send({ type: "frictions_detected", frictions });
 
-    // Round 2: debate on frictions
-    const round2Results: Round2Result[] = [];
+    // Debate phase: multi-turn moderated debate per friction
+    const debateHistories: DebateHistory[] = [];
 
     if (frictions.length > 0) {
-      send({ type: "state_change", state: "ROUND2_RUNNING" });
+      send({ type: "state_change", state: "DEBATE_RUNNING" });
 
-      for (const friction of frictions) {
-        const debatePromises = friction.members.map((role) => {
-          const member = boardMembers.find((m) => m.role === role)!;
-          const ownResult = round1Results.find((r) => r.output.role === role)!;
-
-          const ownVerdict = [
-            `Your verdict: ${ownResult.output.verdict}`,
-            ownResult.output.analysis.slice(0, 500),
-          ].join("\n");
-
-          const adversaries = friction.members
-            .filter((r) => r !== role)
-            .map((advRole) => {
-              const adv = round1Results.find((r) => r.output.role === advRole)!;
-              return `[${adv.output.name} - ${adv.output.verdict}]\n${adv.output.analysis.slice(0, 500)}`;
-            })
-            .join("\n\n");
-
-          return runner.runRound2Streaming(member, ownVerdict, adversaries, (role, chunk) => {
-            send({ type: "debate_chunk", role, chunk });
-          });
-        });
-
-        const results = await Promise.all(debatePromises);
-        for (const r of results) {
-          send({
-            type: "debate_complete",
-            role: r.output.role,
-            result: r.output,
-          });
-        }
-        round2Results.push(...results);
+      for (let i = 0; i < frictions.length; i++) {
+        const history = await runDebateForFriction(
+          runner,
+          frictions[i],
+          i,
+          round1Results,
+          boardMembers,
+          send,
+        );
+        debateHistories.push(history);
       }
     }
+
+    // Convert to legacy Round2Result[] for synthesis backward compat
+    const round2Results = flattenDebatesToRound2(debateHistories);
 
     // Synthesis
     send({ type: "state_change", state: "SYNTHESIZING" });
@@ -97,6 +85,7 @@ export async function runAnalysis(
       round2: round2Results,
       synthesis,
       totalDurationMs,
+      debates: debateHistories.length > 0 ? debateHistories : undefined,
     };
 
     send({ type: "analysis_complete", report });

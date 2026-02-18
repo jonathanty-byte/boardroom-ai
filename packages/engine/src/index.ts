@@ -1,11 +1,21 @@
-// Types
-
 // Config
 export { boardMembers, getMemberConfig } from "./board-members";
+
+// V0.2 debate modules
+export { analyzeConvergence } from "./convergence";
+export { flattenDebatesToRound2, runDebateForFriction } from "./debate-engine";
 export { runAnalysis } from "./engine-streaming";
 
 // Engine functions
 export { identifyFrictions } from "./friction";
+export {
+  MAX_DEBATE_TURNS,
+  MODERATOR_CONFIG,
+  buildDebateSystemPrompt,
+  buildDebateTurnPrompt,
+  buildModeratorNextActionPrompt,
+  buildModeratorOpeningPrompt,
+} from "./moderator";
 export { StreamingAgentRunner } from "./runner-streaming";
 export { synthesize } from "./synthesis";
 export type {
