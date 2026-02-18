@@ -140,6 +140,7 @@ export default function Home() {
           members={state.members}
           frictions={state.frictions}
           debates={state.debates}
+          debateThreads={state.debateThreads}
           synthesis={state.synthesis}
           phase={state.phase}
         />

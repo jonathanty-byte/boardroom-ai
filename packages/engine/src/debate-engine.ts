@@ -1,5 +1,14 @@
-import type { BoardMemberConfig } from "./types";
+import { analyzeConvergence } from "./convergence";
+import {
+  buildDebateSystemPrompt,
+  buildDebateTurnPrompt,
+  buildModeratorNextActionPrompt,
+  buildModeratorOpeningPrompt,
+  MAX_DEBATE_TURNS,
+} from "./moderator";
+import type { StreamingAgentRunner } from "./runner-streaming";
 import type {
+  BoardMemberConfig,
   DebateHistory,
   DebateTurn,
   FrictionPoint,
@@ -8,15 +17,6 @@ import type {
   Round2Result,
   SSEEvent,
 } from "./types";
-import { analyzeConvergence } from "./convergence";
-import {
-  MAX_DEBATE_TURNS,
-  buildDebateSystemPrompt,
-  buildDebateTurnPrompt,
-  buildModeratorNextActionPrompt,
-  buildModeratorOpeningPrompt,
-} from "./moderator";
-import type { StreamingAgentRunner } from "./runner-streaming";
 
 /**
  * Run a multi-turn moderated debate for a single friction point.
@@ -174,9 +174,6 @@ async function runSingleTurn(
 
   const systemPrompt = buildDebateSystemPrompt(config.name, config.title);
   const userPrompt = buildDebateTurnPrompt(
-    config.role,
-    config.name,
-    config.title,
     ownResult.output.verdict,
     ownResult.output.analysis,
     turns,
@@ -214,7 +211,8 @@ export function flattenDebatesToRound2(histories: DebateHistory[]): Round2Result
     for (const [role, turn] of lastTurnBySpeaker) {
       results.push({
         output: turnToRound2Response(role, turn),
-        durationMs: history.totalTurns > 0 ? Math.round(history.durationMs / history.totalTurns) : 0,
+        durationMs:
+          history.totalTurns > 0 ? Math.round(history.durationMs / history.totalTurns) : 0,
       });
     }
   }

@@ -34,18 +34,22 @@ function createMockRunner(moderatorSequence: Array<ReturnType<typeof makeModerat
 
   return {
     runModeratorStreaming: vi.fn(async () => {
-      const action = moderatorSequence[moderatorCallIndex] ?? makeModeratorAction({ action: "DECLARE_IMPASSE", reasoning: "Fallback" });
+      const action =
+        moderatorSequence[moderatorCallIndex] ??
+        makeModeratorAction({ action: "DECLARE_IMPASSE", reasoning: "Fallback" });
       moderatorCallIndex++;
       return action;
     }),
 
-    runDebateTurnStreaming: vi.fn(async (config: BoardMemberConfig, _sys: string, _user: string, turnNumber: number) => {
-      return makeDebateTurn({
-        turnNumber,
-        speaker: config.role,
-        content: `${config.name} argues at turn ${turnNumber}.`,
-      });
-    }),
+    runDebateTurnStreaming: vi.fn(
+      async (config: BoardMemberConfig, _sys: string, _user: string, turnNumber: number) => {
+        return makeDebateTurn({
+          turnNumber,
+          speaker: config.role,
+          content: `${config.name} argues at turn ${turnNumber}.`,
+        });
+      },
+    ),
   };
 }
 
@@ -62,9 +66,17 @@ describe("runDebateForFriction", () => {
 
     const runner = createMockRunner([
       // Opening: ask cpo
-      makeModeratorAction({ action: "ASK_QUESTION", targetMember: "cpo", question: "Defend your GO." }),
+      makeModeratorAction({
+        action: "ASK_QUESTION",
+        targetMember: "cpo",
+        question: "Defend your GO.",
+      }),
       // After turn 1: declare convergence
-      makeModeratorAction({ action: "DECLARE_CONVERGENCE", reasoning: "Members agree", convergenceSummary: "Phased launch agreed" }),
+      makeModeratorAction({
+        action: "DECLARE_CONVERGENCE",
+        reasoning: "Members agree",
+        convergenceSummary: "Phased launch agreed",
+      }),
     ]);
 
     const history = await runDebateForFriction(
@@ -86,7 +98,11 @@ describe("runDebateForFriction", () => {
     const send = (e: { type: string }) => events.push(e);
 
     const runner = createMockRunner([
-      makeModeratorAction({ action: "ASK_QUESTION", targetMember: "cfo", question: "Piccolo, respond." }),
+      makeModeratorAction({
+        action: "ASK_QUESTION",
+        targetMember: "cfo",
+        question: "Piccolo, respond.",
+      }),
       makeModeratorAction({ action: "DECLARE_IMPASSE", reasoning: "Positions hardened" }),
     ]);
 
@@ -110,7 +126,11 @@ describe("runDebateForFriction", () => {
     // Always ask questions — never declare convergence/impasse
     const runner = createMockRunner(
       Array(10).fill(
-        makeModeratorAction({ action: "ASK_QUESTION", targetMember: "cpo", question: "Argue more." }),
+        makeModeratorAction({
+          action: "ASK_QUESTION",
+          targetMember: "cpo",
+          question: "Argue more.",
+        }),
       ),
     );
 
@@ -133,24 +153,21 @@ describe("runDebateForFriction", () => {
 
     const runner = createMockRunner([
       makeModeratorAction({ action: "ASK_QUESTION", targetMember: "cpo", question: "Go." }),
-      makeModeratorAction({ action: "DECLARE_CONVERGENCE", reasoning: "Done", convergenceSummary: "Agreed" }),
+      makeModeratorAction({
+        action: "DECLARE_CONVERGENCE",
+        reasoning: "Done",
+        convergenceSummary: "Agreed",
+      }),
     ]);
 
-    await runDebateForFriction(
-      runner as any,
-      friction,
-      0,
-      round1Results,
-      mockConfigs,
-      send,
-    );
+    await runDebateForFriction(runner as any, friction, 0, round1Results, mockConfigs, send);
 
     expect(eventTypes).toEqual([
-      "moderator_action",       // Opening
-      "debate_turn_start",      // Turn 1 start
-      "debate_turn_complete",   // Turn 1 complete
-      "moderator_action",       // Next action (convergence)
-      "debate_resolved",        // Resolution
+      "moderator_action", // Opening
+      "debate_turn_start", // Turn 1 start
+      "debate_turn_complete", // Turn 1 complete
+      "moderator_action", // Next action (convergence)
+      "debate_resolved", // Resolution
     ]);
   });
 
@@ -161,7 +178,11 @@ describe("runDebateForFriction", () => {
     const runner = createMockRunner([
       makeModeratorAction({ action: "ASK_QUESTION", targetMember: "cpo", question: "Q1" }),
       makeModeratorAction({ action: "ASK_QUESTION", targetMember: "cfo", question: "Q2" }),
-      makeModeratorAction({ action: "DECLARE_CONVERGENCE", reasoning: "Done", convergenceSummary: "Agreed" }),
+      makeModeratorAction({
+        action: "DECLARE_CONVERGENCE",
+        reasoning: "Done",
+        convergenceSummary: "Agreed",
+      }),
     ]);
 
     const history = await runDebateForFriction(
@@ -182,9 +203,7 @@ describe("runDebateForFriction", () => {
 describe("flattenDebatesToRound2", () => {
   it("maps CONCESSION to CONCEDE", () => {
     const history = makeDebateHistory({
-      turns: [
-        makeDebateTurn({ speaker: "cpo", type: "CONCESSION", positionShift: "REVERSED" }),
-      ],
+      turns: [makeDebateTurn({ speaker: "cpo", type: "CONCESSION", positionShift: "REVERSED" })],
     });
     const results = flattenDebatesToRound2([history]);
     expect(results).toHaveLength(1);
@@ -194,9 +213,7 @@ describe("flattenDebatesToRound2", () => {
 
   it("maps SOFTENED to COMPROMISE", () => {
     const history = makeDebateHistory({
-      turns: [
-        makeDebateTurn({ speaker: "cfo", type: "RESPONSE", positionShift: "SOFTENED" }),
-      ],
+      turns: [makeDebateTurn({ speaker: "cfo", type: "RESPONSE", positionShift: "SOFTENED" })],
     });
     const results = flattenDebatesToRound2([history]);
     expect(results[0].output.position).toBe("COMPROMISE");
@@ -204,9 +221,7 @@ describe("flattenDebatesToRound2", () => {
 
   it("maps UNCHANGED to MAINTAIN", () => {
     const history = makeDebateHistory({
-      turns: [
-        makeDebateTurn({ speaker: "cpo", type: "CHALLENGE", positionShift: "UNCHANGED" }),
-      ],
+      turns: [makeDebateTurn({ speaker: "cpo", type: "CHALLENGE", positionShift: "UNCHANGED" })],
     });
     const results = flattenDebatesToRound2([history]);
     expect(results[0].output.position).toBe("MAINTAIN");
@@ -215,9 +230,24 @@ describe("flattenDebatesToRound2", () => {
   it("takes last turn per speaker when multiple turns exist", () => {
     const history = makeDebateHistory({
       turns: [
-        makeDebateTurn({ turnNumber: 1, speaker: "cpo", positionShift: "UNCHANGED", content: "First argument" }),
-        makeDebateTurn({ turnNumber: 2, speaker: "cfo", positionShift: "UNCHANGED", content: "Counter" }),
-        makeDebateTurn({ turnNumber: 3, speaker: "cpo", positionShift: "SOFTENED", content: "I soften" }),
+        makeDebateTurn({
+          turnNumber: 1,
+          speaker: "cpo",
+          positionShift: "UNCHANGED",
+          content: "First argument",
+        }),
+        makeDebateTurn({
+          turnNumber: 2,
+          speaker: "cfo",
+          positionShift: "UNCHANGED",
+          content: "Counter",
+        }),
+        makeDebateTurn({
+          turnNumber: 3,
+          speaker: "cpo",
+          positionShift: "SOFTENED",
+          content: "I soften",
+        }),
       ],
     });
     const results = flattenDebatesToRound2([history]);

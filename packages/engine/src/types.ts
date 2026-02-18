@@ -152,7 +152,12 @@ export type SSEEvent =
   | { type: "debate_complete"; role: BoardMemberRole; result: Round2Response }
   // V0.2 debate events
   | { type: "moderator_action"; frictionIndex: number; action: ModeratorAction }
-  | { type: "debate_turn_start"; frictionIndex: number; turnNumber: number; speaker: BoardMemberRole }
+  | {
+      type: "debate_turn_start";
+      frictionIndex: number;
+      turnNumber: number;
+      speaker: BoardMemberRole;
+    }
   | { type: "debate_turn_chunk"; frictionIndex: number; speaker: BoardMemberRole; chunk: string }
   | { type: "debate_turn_complete"; frictionIndex: number; turn: DebateTurn }
   | { type: "debate_resolved"; frictionIndex: number; history: DebateHistory }

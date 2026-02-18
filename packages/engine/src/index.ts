@@ -9,12 +9,12 @@ export { runAnalysis } from "./engine-streaming";
 // Engine functions
 export { identifyFrictions } from "./friction";
 export {
-  MAX_DEBATE_TURNS,
-  MODERATOR_CONFIG,
   buildDebateSystemPrompt,
   buildDebateTurnPrompt,
   buildModeratorNextActionPrompt,
   buildModeratorOpeningPrompt,
+  MAX_DEBATE_TURNS,
+  MODERATOR_CONFIG,
 } from "./moderator";
 export { StreamingAgentRunner } from "./runner-streaming";
 export { synthesize } from "./synthesis";

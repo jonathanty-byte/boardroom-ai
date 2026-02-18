@@ -123,9 +123,6 @@ export function buildModeratorNextActionPrompt(
 
 /** Build the debate prompt for a specific board member when the moderator asks them a question. */
 export function buildDebateTurnPrompt(
-  memberRole: BoardMemberRole,
-  memberName: string,
-  memberTitle: string,
   ownVerdict: string,
   ownAnalysis: string,
   turns: DebateTurn[],
@@ -133,10 +130,7 @@ export function buildDebateTurnPrompt(
   addressedTo: BoardMemberRole[],
 ): string {
   const debateHistory = turns
-    .map(
-      (t) =>
-        `[Turn ${t.turnNumber}] ${t.speaker.toUpperCase()} (${t.type}): ${t.content}`,
-    )
+    .map((t) => `[Turn ${t.turnNumber}] ${t.speaker.toUpperCase()} (${t.type}): ${t.content}`)
     .join("\n\n");
 
   return [
@@ -163,9 +157,6 @@ export function buildDebateTurnPrompt(
 }
 
 /** Build the system prompt for a member during a debate turn. */
-export function buildDebateSystemPrompt(
-  memberName: string,
-  memberTitle: string,
-): string {
+export function buildDebateSystemPrompt(memberName: string, memberTitle: string): string {
   return `You are ${memberName}, ${memberTitle} of the BoardRoom AI board. You are in a heated boardroom debate. You argue like your career depends on it. Be specific, cite numbers, quote other members directly. No pleasantries. Respond ONLY with valid JSON.`;
 }

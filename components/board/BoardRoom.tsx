@@ -2,7 +2,8 @@
 
 import type { BoardMemberRole, FrictionPoint, Synthesis } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
-import type { DebateState, MemberState } from "@/lib/hooks/useAnalysisState";
+import type { DebateState, DebateThreadState, MemberState } from "@/lib/hooks/useAnalysisState";
+import { DebateThread } from "./DebateThread";
 import { MemberCard } from "./MemberCard";
 import { VerdictBadge } from "./VerdictBadge";
 
@@ -10,13 +11,21 @@ interface BoardRoomProps {
   members: Record<BoardMemberRole, MemberState>;
   frictions: FrictionPoint[];
   debates: Record<BoardMemberRole, DebateState>;
+  debateThreads: DebateThreadState[];
   synthesis: Synthesis | null;
   phase: string;
 }
 
 const ROLES: BoardMemberRole[] = ["cpo", "cmo", "cfo", "cro", "cco", "cto"];
 
-export function BoardRoom({ members, frictions, debates, synthesis, phase }: BoardRoomProps) {
+export function BoardRoom({
+  members,
+  frictions,
+  debates,
+  debateThreads,
+  synthesis,
+  phase,
+}: BoardRoomProps) {
   return (
     <div className="w-full max-w-5xl flex flex-col gap-6">
       {/* Phase tracker */}
@@ -67,8 +76,22 @@ export function BoardRoom({ members, frictions, debates, synthesis, phase }: Boa
         </div>
       )}
 
-      {/* Round 2 Debates - Clash style */}
-      {Object.values(debates).some((d) => d.status !== "waiting") && (
+      {/* Multi-turn Debate (V0.2) or Legacy Round 2 */}
+      {debateThreads.length > 0 ? (
+        <div className="pixel-border p-4">
+          <div className="stat-label mb-3 text-[var(--color-dbz-purple)]">MULTI-TURN DEBATE</div>
+          {debateThreads.map((thread) => (
+            <DebateThread
+              key={thread.frictionIndex}
+              thread={thread}
+              frictionDescription={
+                frictions[thread.frictionIndex]?.description ??
+                `Friction #${thread.frictionIndex + 1}`
+              }
+            />
+          ))}
+        </div>
+      ) : Object.values(debates).some((d) => d.status !== "waiting") ? (
         <div className="pixel-border p-4">
           <div className="stat-label mb-3 text-[var(--color-dbz-purple)]">
             ROUND 2 — CONTRADICTORY DEBATE
@@ -104,7 +127,7 @@ export function BoardRoom({ members, frictions, debates, synthesis, phase }: Boa
             })}
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Synthesis - Final results */}
       {synthesis && (

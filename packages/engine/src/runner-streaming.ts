@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { MODERATOR_CONFIG, MODERATOR_SYSTEM_PROMPT } from "./moderator";
 import type {
   BoardMemberConfig,
   BoardMemberRole,
@@ -9,7 +10,6 @@ import type {
   Round2Response,
   Round2Result,
 } from "./types";
-import { MODERATOR_CONFIG, MODERATOR_SYSTEM_PROMPT } from "./moderator";
 
 const DEFAULT_MODEL = "deepseek/deepseek-v3.2";
 

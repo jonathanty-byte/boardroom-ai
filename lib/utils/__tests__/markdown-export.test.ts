@@ -1,6 +1,8 @@
 import type { BoardroomReport } from "@boardroom/engine";
 import { describe, expect, it } from "vitest";
 import {
+  makeDebateHistory,
+  makeDebateTurn,
   makeFriction,
   makeRound1Result,
   makeRound2Result,
@@ -125,5 +127,60 @@ describe("formatBoardroomReport", () => {
     const md = formatBoardroomReport(report);
 
     expect(md).toContain("15.0s");
+  });
+
+  it("includes multi-turn debate section when debates exist", () => {
+    const report = makeReport({
+      debates: [
+        makeDebateHistory({
+          friction: makeFriction({ description: "Vegeta vs Piccolo on unit economics" }),
+          moderatorOpening: "Let's settle this disagreement.",
+          turns: [
+            makeDebateTurn({
+              speaker: "cpo",
+              type: "CHALLENGE",
+              content: "The market validates my position.",
+              addressedTo: ["cfo"],
+              positionShift: "UNCHANGED",
+            }),
+            makeDebateTurn({
+              speaker: "cfo",
+              type: "CONCESSION",
+              content: "I accept a phased approach.",
+              addressedTo: ["cpo"],
+              positionShift: "SOFTENED",
+            }),
+          ],
+          outcome: "CONVERGED",
+          outcomeSummary: "Both agreed on phased launch.",
+        }),
+      ],
+    });
+    const md = formatBoardroomReport(report);
+
+    expect(md).toContain("## Multi-Turn Debate");
+    expect(md).toContain("Vegeta vs Piccolo on unit economics");
+    expect(md).toContain("Let's settle this disagreement.");
+    expect(md).toContain("**Vegeta** [CHALLENGE");
+    expect(md).toContain("The market validates my position.");
+    expect(md).toContain("**Piccolo** [CONCESSION");
+    expect(md).toContain("*Position: SOFTENED*");
+    expect(md).toContain("**Resolution:** Both agreed on phased launch.");
+  });
+
+  it("uses legacy round 2 format when no debates field", () => {
+    const report = makeReport({
+      round2: [
+        makeRound2Result({
+          role: "cpo",
+          position: "MAINTAIN",
+          argument: "Legacy argument.",
+        }),
+      ],
+    });
+    const md = formatBoardroomReport(report);
+
+    expect(md).toContain("## Round 2 — Contradictory Debate");
+    expect(md).not.toContain("## Multi-Turn Debate");
   });
 });

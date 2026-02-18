@@ -57,10 +57,7 @@ describe("analyzeConvergence", () => {
   });
 
   it("calculates turnsRemaining correctly", () => {
-    const turns = [
-      makeDebateTurn({ turnNumber: 1 }),
-      makeDebateTurn({ turnNumber: 2 }),
-    ];
+    const turns = [makeDebateTurn({ turnNumber: 1 }), makeDebateTurn({ turnNumber: 2 })];
     const signals = analyzeConvergence(turns, 5);
     expect(signals.turnsRemaining).toBe(3);
   });

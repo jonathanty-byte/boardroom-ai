@@ -73,8 +73,42 @@ export function formatBoardroomReport(report: BoardroomReport): string {
     }
   }
 
-  // Round 2
-  if (report.round2.length > 0) {
+  // Multi-turn debates (V0.2)
+  if (report.debates && report.debates.length > 0) {
+    lines.push("---");
+    lines.push("");
+    lines.push("## Multi-Turn Debate");
+    lines.push("");
+
+    for (const debate of report.debates) {
+      lines.push(`### ${debate.friction.description}`);
+      lines.push(`*Outcome: ${debate.outcome} (${debate.totalTurns} turns)*`);
+      lines.push("");
+      lines.push(`**Moderator:** ${debate.moderatorOpening}`);
+      lines.push("");
+
+      for (const turn of debate.turns) {
+        const name = BOARD_MEMBER_NAMES[turn.speaker];
+        const addressed =
+          turn.addressedTo.length > 0
+            ? ` → ${turn.addressedTo.map((r) => BOARD_MEMBER_NAMES[r]).join(", ")}`
+            : "";
+        lines.push(`**${name}** [${turn.type}${addressed}]:`);
+        if (turn.quotedFrom) {
+          lines.push(`> ${turn.quotedFrom}`);
+        }
+        lines.push(turn.content);
+        if (turn.positionShift !== "UNCHANGED") {
+          lines.push(`*Position: ${turn.positionShift}*`);
+        }
+        lines.push("");
+      }
+
+      lines.push(`**Resolution:** ${debate.outcomeSummary}`);
+      lines.push("");
+    }
+  } else if (report.round2.length > 0) {
+    // Legacy Round 2 format
     lines.push("---");
     lines.push("");
     lines.push("## Round 2 — Contradictory Debate");

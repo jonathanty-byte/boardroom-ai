@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { buildModeratorNextActionPrompt, buildModeratorOpeningPrompt } from "../src/moderator";
 import { StreamingAgentRunner } from "../src/runner-streaming";
-import {
-  buildModeratorNextActionPrompt,
-  buildModeratorOpeningPrompt,
-} from "../src/moderator";
 import { makeDebateTurn, makeFriction, makeRound1Result } from "./fixtures";
 
 // Create a runner instance to test parsing methods (no API calls)
@@ -45,7 +42,8 @@ describe("parseModeratorResponse", () => {
   });
 
   it("handles markdown fences around JSON", () => {
-    const raw = '```json\n{"action":"ASK_QUESTION","targetMember":"cfo","question":"Piccolo, respond.","reasoning":"Testing"}\n```';
+    const raw =
+      '```json\n{"action":"ASK_QUESTION","targetMember":"cfo","question":"Piccolo, respond.","reasoning":"Testing"}\n```';
     const result = runner.parseModeratorResponse(raw);
     expect(result.action).toBe("ASK_QUESTION");
     expect(result.targetMember).toBe("cfo");
@@ -96,9 +94,7 @@ describe("parseDebateTurn", () => {
   });
 
   it("throws on completely invalid JSON", () => {
-    expect(() => runner.parseDebateTurn("not json {{{", config, 1)).toThrow(
-      /invalid JSON/,
-    );
+    expect(() => runner.parseDebateTurn("not json {{{", config, 1)).toThrow(/invalid JSON/);
   });
 });
 
@@ -122,9 +118,7 @@ describe("buildModeratorNextActionPrompt", () => {
       makeRound1Result({ role: "cpo" }),
       makeRound1Result({ role: "cfo", name: "Piccolo" }),
     ];
-    const turns = [
-      makeDebateTurn({ turnNumber: 1, speaker: "cpo", content: "Market is ready." }),
-    ];
+    const turns = [makeDebateTurn({ turnNumber: 1, speaker: "cpo", content: "Market is ready." })];
     const signals = {
       hasPositionShift: false,
       allUnchanged: false,

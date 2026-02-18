@@ -17,23 +17,17 @@ export interface ConvergenceSignals {
   argumentsRepeating: boolean;
 }
 
-export function analyzeConvergence(
-  turns: DebateTurn[],
-  maxTurns: number,
-): ConvergenceSignals {
+export function analyzeConvergence(turns: DebateTurn[], maxTurns: number): ConvergenceSignals {
   const hasPositionShift = turns.some(
     (t) => t.positionShift === "SOFTENED" || t.positionShift === "REVERSED",
   );
 
   const lastTwo = turns.slice(-2);
-  const allUnchanged =
-    lastTwo.length >= 2 && lastTwo.every((t) => t.positionShift === "UNCHANGED");
+  const allUnchanged = lastTwo.length >= 2 && lastTwo.every((t) => t.positionShift === "UNCHANGED");
 
   const concessionCount = turns.filter(
     (t) =>
-      t.type === "CONCESSION" ||
-      t.positionShift === "SOFTENED" ||
-      t.positionShift === "REVERSED",
+      t.type === "CONCESSION" || t.positionShift === "SOFTENED" || t.positionShift === "REVERSED",
   ).length;
 
   const turnsRemaining = maxTurns - turns.length;
@@ -50,9 +44,7 @@ function detectRepetition(turns: DebateTurn[]): boolean {
   const latestWords = latest.content.toLowerCase().split(/\s+/);
   if (latestWords.length === 0) return false;
 
-  const sameSpeakerPrevious = turns
-    .slice(0, -1)
-    .filter((t) => t.speaker === latest.speaker);
+  const sameSpeakerPrevious = turns.slice(0, -1).filter((t) => t.speaker === latest.speaker);
 
   for (const prev of sameSpeakerPrevious) {
     const words = new Set(prev.content.toLowerCase().split(/\s+/));
