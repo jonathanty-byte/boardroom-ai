@@ -19,6 +19,15 @@ const MEMBER_COLORS: Record<BoardMemberRole, string> = {
   cto: "#00BCD4",
 };
 
+const MEMBER_AVATARS: Record<BoardMemberRole, string> = {
+  cpo: "/avatars/vegeta.svg",
+  cmo: "/avatars/bulma.svg",
+  cfo: "/avatars/piccolo.svg",
+  cro: "/avatars/whis.svg",
+  cco: "/avatars/gohan.svg",
+  cto: "/avatars/trunks.svg",
+};
+
 export default function Home() {
   const { apiKey, saveKey, loaded, hasKey } = useApiKey();
   const { state, analyze, reset } = useComexAnalysis();
@@ -92,15 +101,14 @@ export default function Home() {
               {(["cpo", "cmo", "cfo", "cro", "cco", "cto"] as const).map((role) => (
                 <div key={role} className="char-card p-3 text-center opacity-60 hover:opacity-100 transition-opacity">
                   <div
-                    className="w-10 h-10 mx-auto pixel-border-sm flex items-center justify-center mb-2"
+                    className="w-16 h-16 mx-auto pixel-border-sm overflow-hidden mb-2"
                     style={{ borderColor: MEMBER_COLORS[role] }}
                   >
-                    <span
-                      className="text-[10px] font-bold"
-                      style={{ color: MEMBER_COLORS[role] }}
-                    >
-                      {BOARD_MEMBER_NAMES[role][0]}
-                    </span>
+                    <img
+                      src={MEMBER_AVATARS[role]}
+                      alt={BOARD_MEMBER_NAMES[role]}
+                      className="w-full h-full"
+                    />
                   </div>
                   <div className="text-[8px] font-bold" style={{ color: MEMBER_COLORS[role] }}>
                     {BOARD_MEMBER_NAMES[role]}
