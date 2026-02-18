@@ -1,7 +1,7 @@
 "use client";
 
+import type { SSEEvent } from "@boardroom/engine";
 import { useCallback } from "react";
-import type { SSEEvent } from "@/lib/engine/types";
 import { useAnalysisState } from "./useAnalysisState";
 
 export function useBoardroomAnalysis() {

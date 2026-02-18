@@ -1,5 +1,5 @@
-import { runAnalysis } from "@/lib/engine/engine-streaming";
-import type { SSEEvent } from "@/lib/engine/types";
+import type { SSEEvent } from "@boardroom/engine";
+import { runAnalysis } from "@boardroom/engine";
 
 export const runtime = "edge";
 

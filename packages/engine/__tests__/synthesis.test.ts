@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { synthesize } from "../synthesis";
+import { synthesize } from "../src/synthesis";
 import { makeFriction, makeRound1Result, makeRound2Result } from "./fixtures";
 
 describe("synthesize", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { identifyFrictions } from "../friction";
-import type { BoardMemberRole } from "../types";
+import { identifyFrictions } from "../src/friction";
+import type { BoardMemberRole } from "../src/types";
 import { makeRound1Result } from "./fixtures";
 
 describe("identifyFrictions", () => {

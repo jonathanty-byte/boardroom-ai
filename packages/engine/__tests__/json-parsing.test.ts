@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { StreamingAgentRunner } from "../runner-streaming";
-import type { BoardMemberConfig } from "../types";
+import { StreamingAgentRunner } from "../src/runner-streaming";
+import type { BoardMemberConfig } from "../src/types";
 
 const runner = new StreamingAgentRunner("fake-key-for-testing");
 

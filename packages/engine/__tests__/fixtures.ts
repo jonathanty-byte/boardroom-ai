@@ -1,4 +1,4 @@
-import type { BoardMemberRole, FrictionPoint, Round1Result, Round2Result } from "../types";
+import type { BoardMemberRole, FrictionPoint, Round1Result, Round2Result } from "../src/types";
 
 export function makeRound1Result(
   overrides: Partial<Round1Result["output"]> & { durationMs?: number } = {},

@@ -1,5 +1,5 @@
-import type { BoardroomReport } from "@/lib/engine/types";
-import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@/lib/engine/types";
+import type { BoardroomReport } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 
 export function formatBoardroomReport(report: BoardroomReport): string {
   const lines: string[] = [];

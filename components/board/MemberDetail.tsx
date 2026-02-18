@@ -1,7 +1,7 @@
 "use client";
 
-import type { BoardMemberRole, Round1Output } from "@/lib/engine/types";
-import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@/lib/engine/types";
+import type { BoardMemberRole, Round1Output } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 import { VerdictBadge } from "./VerdictBadge";
 
 interface MemberDetailProps {

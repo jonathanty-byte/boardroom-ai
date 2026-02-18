@@ -1,9 +1,9 @@
 "use client";
 
+import type { BoardMemberRole } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 import { useState } from "react";
 import { StreamingText } from "@/components/analysis/StreamingText";
-import type { BoardMemberRole } from "@/lib/engine/types";
-import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@/lib/engine/types";
 import type { MemberState } from "@/lib/hooks/useAnalysisState";
 import { MemberDetail } from "./MemberDetail";
 import { VerdictBadge } from "./VerdictBadge";

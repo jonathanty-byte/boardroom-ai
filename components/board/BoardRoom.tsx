@@ -1,7 +1,7 @@
 "use client";
 
-import type { BoardMemberRole, FrictionPoint, Synthesis } from "@/lib/engine/types";
-import { BOARD_MEMBER_NAMES } from "@/lib/engine/types";
+import type { BoardMemberRole, FrictionPoint, Synthesis } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import type { DebateState, MemberState } from "@/lib/hooks/useAnalysisState";
 import { MemberCard } from "./MemberCard";
 import { VerdictBadge } from "./VerdictBadge";

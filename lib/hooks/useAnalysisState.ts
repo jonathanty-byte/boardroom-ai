@@ -1,6 +1,5 @@
 "use client";
 
-import { useReducer } from "react";
 import type {
   BoardMemberRole,
   BoardroomReport,
@@ -9,7 +8,8 @@ import type {
   Round2Response,
   SSEEvent,
   Synthesis,
-} from "@/lib/engine/types";
+} from "@boardroom/engine";
+import { useReducer } from "react";
 
 export type AnalysisPhase =
   | "idle"

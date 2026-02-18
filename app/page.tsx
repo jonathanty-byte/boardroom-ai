@@ -1,13 +1,13 @@
 "use client";
 
+import type { BoardMemberRole } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { BoardRoom } from "@/components/board/BoardRoom";
 import { ExportButton } from "@/components/report/ExportButton";
 import { ShareImage } from "@/components/report/ShareImage";
 import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
 import { RetroButton } from "@/components/ui/RetroButton";
-import type { BoardMemberRole } from "@/lib/engine/types";
-import { BOARD_MEMBER_NAMES } from "@/lib/engine/types";
 import { useApiKey } from "@/lib/hooks/useApiKey";
 import { useBoardroomAnalysis } from "@/lib/hooks/useBoardroomAnalysis";
 

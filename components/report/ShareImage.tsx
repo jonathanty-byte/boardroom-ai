@@ -1,10 +1,10 @@
 "use client";
 
+import type { BoardMemberRole, BoardroomReport } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 import html2canvas from "html2canvas";
 import { useCallback, useRef } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
-import type { BoardMemberRole, BoardroomReport } from "@/lib/engine/types";
-import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@/lib/engine/types";
 import { getVerdictColor } from "@/lib/utils/constants";
 
 interface ShareImageProps {

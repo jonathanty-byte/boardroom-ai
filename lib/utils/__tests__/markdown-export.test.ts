@@ -1,6 +1,10 @@
+import type { BoardroomReport } from "@boardroom/engine";
 import { describe, expect, it } from "vitest";
-import { makeFriction, makeRound1Result, makeRound2Result } from "@/lib/engine/__tests__/fixtures";
-import type { BoardroomReport } from "@/lib/engine/types";
+import {
+  makeFriction,
+  makeRound1Result,
+  makeRound2Result,
+} from "@/packages/engine/__tests__/fixtures";
 import { formatBoardroomReport } from "../markdown-export";
 
 function makeReport(overrides: Partial<BoardroomReport> = {}): BoardroomReport {
