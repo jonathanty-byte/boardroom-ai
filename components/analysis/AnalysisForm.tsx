@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
-import { RECOMMENDED_MODELS } from "@/lib/utils/constants";
+import { EXAMPLE_BRIEFING, EXAMPLE_CEO_VISION, RECOMMENDED_MODELS } from "@/lib/utils/constants";
 
 interface AnalysisFormProps {
   onSubmit: (content: string, ceoVision: string, model: string) => void;
@@ -71,9 +71,22 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
         </div>
       </div>
 
+      {/* Try an example */}
+      {!content.trim() && (
+        <RetroButton
+          variant="secondary"
+          onClick={() => {
+            setContent(EXAMPLE_BRIEFING);
+            setCeoVision(EXAMPLE_CEO_VISION);
+          }}
+        >
+          TRY AN EXAMPLE
+        </RetroButton>
+      )}
+
       {/* Submit */}
       <RetroButton type="submit" disabled={disabled || !content.trim()}>
-        ⚔ LAUNCH BOARDROOM ANALYSIS ⚔
+        LAUNCH BOARDROOM ANALYSIS
       </RetroButton>
     </form>
   );

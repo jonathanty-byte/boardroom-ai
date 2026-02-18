@@ -3,6 +3,7 @@
 import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { BoardRoom } from "@/components/board/BoardRoom";
 import { ExportButton } from "@/components/report/ExportButton";
+import { ShareImage } from "@/components/report/ShareImage";
 import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
 import { RetroButton } from "@/components/ui/RetroButton";
 import type { BoardMemberRole } from "@/lib/engine/types";
@@ -69,11 +70,27 @@ export default function Home() {
       {state.phase === "idle" && (
         <div className="flex flex-col items-center gap-8">
           {/* Hero */}
-          <div className="text-center max-w-2xl">
-            <h2 className="rpg-title text-sm text-white mb-4">SUBMIT YOUR DECISION TO THE BOARD</h2>
-            <p className="font-[family-name:var(--font-terminal)] text-lg text-gray-400 leading-relaxed">
-              6 AI board members will analyze your project independently, detect disagreements,
-              debate contradictions, and deliver a structured BoardRoom decision report.
+          <div className="text-center max-w-2xl pixel-border p-6">
+            <h2 className="rpg-title text-sm text-[var(--color-dbz-orange)] mb-4">
+              SUBMIT YOUR DECISION TO THE BOARD
+            </h2>
+            <p className="font-[family-name:var(--font-terminal)] text-xl text-gray-300 leading-relaxed mb-3">
+              6 AI executives debate your strategy.
+              <br />
+              Real friction. Real compromise.
+              <br />
+              One structured decision report.
+            </p>
+            <p className="font-[family-name:var(--font-terminal)] text-base text-gray-500">
+              Built by{" "}
+              <a
+                href="https://github.com/jonathanty-byte"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] transition-colors"
+              >
+                Jonathan Ty
+              </a>
             </p>
           </div>
 
@@ -134,7 +151,10 @@ export default function Home() {
           <div className="rpg-title text-[10px] text-[var(--color-dbz-green)]">
             ANALYSIS COMPLETE — {(state.report.totalDurationMs / 1000).toFixed(1)}s
           </div>
-          <ExportButton report={state.report} />
+          <div className="flex gap-3">
+            <ExportButton report={state.report} />
+            <ShareImage report={state.report} />
+          </div>
         </div>
       )}
 
