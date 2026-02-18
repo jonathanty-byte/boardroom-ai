@@ -3,7 +3,7 @@
 **Plateforme d'Analyse Strategique Multi-Agents IA**
 
 - **Date :** 18 fevrier 2026
-- **Version :** 0.1.0
+- **Version :** 0.2.0
 - **Auteur :** Jonathan Ty
 - **Repo :** github.com/jonathanty-byte/boardroom-ai
 - **Production :** boardroom-ai.vercel.app
@@ -41,10 +41,19 @@ OpenRouter API (openrouter.ai/api/v1)
 Detection de frictions (code, pas de LLM)
     |
     v
-Debats Round 2 (LLM, membres en friction)
+Moderateur IA (LLM) — identifie les axes de tension
     |
     v
+Debat multi-tour (3-5 tours par friction, LLM)
+    |  Convergence automatique ou max tours
+    v
 Synthese (code)
+    |
+    v
+CEO Follow-Up Questions (heuristique, pas de LLM)
+    |  Si debates non resolus → questions au CEO
+    v
+[Optionnel] Final Arbiter (LLM) — verdict definitif apres reponses CEO
     |
     v
 Rapport BoardRoom Report final
@@ -61,8 +70,16 @@ Rapport BoardRoom Report final
 | Client LLM | openai (SDK) | 6.22.0 |
 | Provider LLM | OpenRouter | — |
 | Modele par defaut | DeepSeek V3.2 | — |
+| Linting | Biome | 2.4.2 |
+| Tests | Vitest | 4.0.18 |
 | Hebergement | Vercel | — |
 | Langage | TypeScript | 5.9.3 |
+
+### Monorepo
+
+Le projet utilise des npm workspaces :
+- **`packages/engine`** (`@boardroom/engine`) : moteur d'analyse pur TypeScript, zero dependance framework
+- **Racine** : app Next.js qui consomme le moteur via SSE
 
 ### Modeles disponibles
 
@@ -88,8 +105,6 @@ Rapport BoardRoom Report final
 
 ### Verdicts par role
 
-Chaque membre rend un verdict specifique a son domaine :
-
 - **CPO/CMO :** `GO` | `GO_WITH_CHANGES` | `RETHINK`
 - **CFO :** `VIABLE` | `VIABLE_WITH_ADJUSTMENTS` | `NOT_VIABLE`
 - **CRO :** `VALIDATED` | `NEEDS_RESEARCH` | `HYPOTHESIS_ONLY`
@@ -106,7 +121,7 @@ Chaque membre produit :
 
 ---
 
-## 4. Pipeline d'analyse (etat actuel)
+## 4. Pipeline d'analyse (V0.2)
 
 ### Phase 1 — Round 1 : Analyses independantes
 
@@ -127,30 +142,65 @@ Chaque membre produit :
 - Comparaison par paires (15 paires pour 6 membres)
 - **Friction declenchee** si ecart de sentiment >= 1.5
 - **Fallback** : si aucune friction naturelle, force un debat entre les 2 membres les plus divergents
+- Supporte les frictions multi-membres (union-find grouping)
 
-### Phase 3 — Round 2 : Reactions au debat
+### Phase 3 — Moderateur IA + Debat multi-tour
 
-- Uniquement pour les membres impliques dans des frictions
-- Chaque membre recoit :
-  - Son propre verdict Round 1
-  - Les positions adverses des autres membres
-- Reponse possible : `MAINTAIN` | `CONCEDE` | `COMPROMISE`
-- **Duree typique :** 5-15 secondes
+**Le moderateur** est un 7eme appel LLM :
+- Lit toutes les analyses Round 1
+- Identifie les axes de tension (pas juste les verdicts, mais les arguments sous-jacents)
+- Formule des questions precises pour chaque friction
+- Decide qui parle a chaque tour
+- Detecte la convergence ou declare l'impasse
+
+**Le debat multi-tour** (par friction) :
+- Max 5 tours par friction
+- Types de tours : `CHALLENGE`, `RESPONSE`, `COUNTER`, `CONCESSION`, `INTERVENTION`
+- Position shifts : `UNCHANGED`, `SOFTENED`, `REVERSED`
+- Citation directe des arguments adverses (`quotedFrom`)
+- Arret : convergence detectee OU max tours atteint
+
+**Outcomes possibles :**
+- `CONVERGED` : consensus atteint
+- `MAX_TURNS_REACHED` : pas de consensus apres 5 tours
+- `IMPASSE` : positions maintenues, aucun mouvement
 
 ### Phase 4 — Synthese
 
 - **Consensus** : Recommandations partagees (extraites des Round 1)
-- **Compromis** : Frictions resolues par concession ou compromis
+- **Compromis** : Frictions resolues par convergence dans le debat
 - **Impasses** : Frictions non resolues (le CEO doit decider)
 - **Verdict collectif** : Moyenne des sentiments → `GO` | `GO_WITH_CHANGES` | `RETHINK`
 
+### Phase 5 — CEO Follow-Up Questions (conditionnel)
+
+Active uniquement si des debats finissent en IMPASSE ou MAX_TURNS_REACHED :
+- **Extraction heuristique** (pas de LLM) des challenges Round 1 des membres impliques
+- 1 question contextuelle par debat non resolu basee sur l'outcomeSummary
+- Deduplication par prefixe (20 chars)
+- Max 5 questions, priorisees : IMPASSE > MAX_TURNS_REACHED
+- Retourne `[]` si tous les debats convergent → pas de questions
+
+### Phase 6 — Final Arbiter (conditionnel)
+
+Quand le CEO repond aux questions :
+- Un seul appel LLM "Final Arbiter" avec tout le contexte :
+  - Analyses Round 1 completes
+  - Historique des debats
+  - Reponses du CEO
+- System prompt pragmatique : "Your job is to DECIDE. No more debate."
+- Produit : verdict collectif, reasoning, key actions, risks, next steps
+- Streaming en temps reel
+
+**Important :** Le Final Arbiter ne relance PAS le pipeline. C'est un verdict definitif qui tranche.
+
 ### Cout estime par analyse
 
-| Modele | Cout estime |
-|--------|------------|
-| DeepSeek V3.2 | ~$0.01 |
-| Claude Sonnet 4.6 | ~$0.30 |
-| Claude Opus 4.5 | ~$0.50 |
+| Modele | Cout Round 1+Debat | Cout avec Final Arbiter |
+|--------|-------------------|------------------------|
+| DeepSeek V3.2 | ~$0.03-0.05 | ~$0.05-0.07 |
+| Claude Sonnet 4.6 | ~$0.75-1.20 | ~$1.00-1.50 |
+| Claude Opus 4.5 | ~$1.20-1.80 | ~$1.50-2.30 |
 
 ---
 
@@ -167,15 +217,19 @@ Chaque membre produit :
 
 | Composant | Fichier | Description |
 |-----------|---------|-------------|
-| Page principale | `app/page.tsx` | Hero, form, board, rapport, footer |
+| Page principale | `app/page.tsx` | Hero, form, board, CEO follow-up, final verdict, rapport, footer |
 | Formulaire | `AnalysisForm.tsx` | Textarea briefing + CEO vision + select modele |
 | Cle API | `ApiKeyInput.tsx` | BYOK OpenRouter avec localStorage |
-| Salle du board | `BoardRoom.tsx` | Grille 2x3 des membres + phase tracker |
+| Salle du board | `BoardRoom.tsx` | Grille 2x3 des membres + phase tracker + frictions + debats + synthese |
 | Carte membre | `MemberCard.tsx` | Avatar SVG + streaming + verdict + detail modal |
 | Detail membre | `MemberDetail.tsx` | Analyse complete, challenges, verdict details |
 | Badge verdict | `VerdictBadge.tsx` | Badge colore avec glow (vert/orange/rouge) |
 | Texte streaming | `StreamingText.tsx` | Texte en temps reel avec curseur clignotant |
+| Thread debat | `DebateThread.tsx` | UI conversation style chat pour debats multi-tour |
+| CEO Follow-Up | `CEOFollowUp.tsx` | Questions du board + reponses CEO + bouton "GET FINAL VERDICT" |
+| Final Verdict | `FinalVerdict.tsx` | Verdict final avec reasoning, actions, risques, next steps |
 | Export | `ExportButton.tsx` | Telecharger rapport BoardRoom Report en Markdown |
+| Share Image | `ShareImage.tsx` | Generer image de partage du rapport |
 | Bouton retro | `RetroButton.tsx` | Bouton gradient or/orange avec effet 3D |
 
 ### Avatars
@@ -188,18 +242,34 @@ Chaque membre produit :
 - gohan.svg (CCO — aura rouge)
 - trunks.svg (CTO — aura cyan)
 
-### Protocole SSE (9 types d'evenements)
+### Protocole SSE
+
+**Endpoint `/api/analyze`** (15 types d'evenements) :
 
 ```
-state_change      → Met a jour la phase (round1, frictions, round2, synthesis)
-member_chunk      → Texte streaming par membre (Round 1)
-member_complete   → Resultat parse d'un membre (Round 1)
-frictions_detected → Frictions identifiees
-debate_chunk      → Texte streaming par membre (Round 2)
-debate_complete   → Resultat parse d'un debat (Round 2)
-synthesis_complete → Synthese finale
-analysis_complete  → Rapport BoardRoom Report complet
-error             → Message d'erreur
+state_change          → Met a jour la phase (round1, frictions, round2, synthesis)
+member_chunk          → Texte streaming par membre (Round 1)
+member_complete       → Resultat parse d'un membre (Round 1)
+frictions_detected    → Frictions identifiees
+moderator_action      → Action du moderateur (question posee)
+debate_turn_start     → Debut d'un tour de debat (speaker annonce)
+debate_turn_chunk     → Texte streaming du debatteur
+debate_turn_complete  → Tour de debat complet (avec turn data)
+debate_resolved       → Debat termine (outcome + summary)
+debate_chunk          → [Legacy] Texte streaming Round 2
+debate_complete       → [Legacy] Resultat Round 2
+synthesis_complete    → Synthese finale
+ceo_followup          → Questions CEO extraites (si debats non resolus)
+analysis_complete     → Rapport BoardRoom Report complet
+error                 → Message d'erreur
+```
+
+**Endpoint `/api/finalize`** (3 types d'evenements) :
+
+```
+final_verdict_start    → Debut du streaming du verdict final
+final_verdict_chunk    → Texte streaming du Final Arbiter
+final_verdict_complete → Verdict final parse (CEOFinalVerdict)
 ```
 
 ### Export BoardRoom Report
@@ -210,164 +280,41 @@ Le rapport final est exportable en Markdown avec la structure :
 - Verdict collectif
 - Analyses detaillees Round 1 (6 sections)
 - Points de friction
-- Debats Round 2
+- Debats multi-tour (V0.2) ou Round 2 legacy
 - Synthese (consensus, compromis, impasses)
+- CEO Follow-Up Questions + CEO Answers (si applicable)
+- Final Verdict + Key Actions + Risks + Next Steps (si applicable)
 
 ---
 
-## 6. Limites de l'architecture actuelle
+## 6. Workflow utilisateur
 
-### Pas de vrai debat inter-agents
+### Cas 1 — Brief detaille (pas de questions)
 
-L'architecture actuelle repose sur des **monologues paralleles** :
+1. CEO soumet briefing + vision + modele
+2. Round 1 : 6 analyses en parallele (streaming)
+3. Frictions detectees
+4. Debats multi-tour (streaming)
+5. Synthese generee
+6. → Tous les debats convergent → **pas de questions CEO**
+7. "ANALYSIS COMPLETE" + boutons Export/Share
 
-1. **Round 1 :** 6 appels LLM isoles — aucun agent ne voit les reponses des autres
-2. **Friction :** Detection par code — comparaison mathematique des verdicts
-3. **Round 2 :** 6 reactions isolees a des resumes — pas d'echange direct
+### Cas 2 — Brief vague (questions CEO + Final Verdict)
 
-**Ce qui manque :**
-- Pas de conversation multi-tour entre agents
-- Pas de citation/reponse directe aux arguments des autres
-- Pas de convergence progressive par echange
-- Un seul tour de reaction (Round 2) au lieu de plusieurs rounds de debat
-
-### Comparaison avec un vrai debat
-
-| Aspect | Architecture actuelle | Vrai debat multi-agents |
-|--------|----------------------|------------------------|
-| Interaction | Aucune (parallele) | Directe (sequentielle) |
-| Tours | 2 (analyse + reaction) | 4-6 (attaque/defense/compromise) |
-| Contexte partage | Resume des positions | Historique complet du debat |
-| Convergence | Synthese par code | Emergence naturelle |
-| Cout (DeepSeek) | ~$0.01 | ~$0.05 |
-| Latence | 20-40s | 60-120s |
+1-5. Identique au Cas 1
+6. Des debats finissent en IMPASSE/MAX_TURNS_REACHED
+7. Questions extractees, affichees au CEO
+8. CEO repond dans les textareas
+9. Clique "GET FINAL VERDICT"
+10. Final Arbiter streame le verdict definitif
+11. "ANALYSIS COMPLETE" + boutons Export/Share (rapport inclut Q&A + verdict)
 
 ---
 
-## 7. Feature a venir : Moteur de debat multi-agents
+## 7. Roadmap
 
-### Objectif
+### V0.1 — MVP fonctionnel ✅
 
-Remplacer le pipeline lineaire (Round 1 → Friction → Round 2 → Synthese) par un **vrai systeme de debat conversationnel** ou les agents interagissent directement, citent les arguments des autres, et convergent naturellement vers un consensus ou une impasse.
-
-### Architecture cible
-
-```
-Round 1 (inchange — 6 analyses paralleles)
-    |
-    v
-Moderateur IA (nouveau)
-    |  Analyse les 6 positions
-    |  Identifie les 2-3 points de tension cles
-    |  Formule des questions ciblees pour chaque membre
-    v
-Debat Multi-Tour (nouveau)
-    |
-    |  Tour 1 : Le moderateur pose une question a Membre A
-    |  Tour 2 : Membre B repond a l'argument de A
-    |  Tour 3 : Membre A contre-argumente
-    |  Tour 4 : Membre C intervient sur un point specifique
-    |  ... (max 4-5 tours par friction)
-    |
-    |  Arret quand : convergence detectee OU max tours atteint
-    v
-Synthese (enrichie par l'historique du debat)
-```
-
-### Le role du Moderateur
-
-Un 7eme appel LLM avec un system prompt dedie :
-- Lit toutes les analyses Round 1
-- Identifie les axes de tension (pas juste les verdicts, mais les arguments sous-jacents)
-- Formule des questions precises : "Vegeta, tu dis que le scope est trop large, mais Trunks estime que c'est faisable en 40h. Que reponds-tu a son estimation ?"
-- Decide qui parle a chaque tour
-- Detecte la convergence ou declare l'impasse
-
-### Format d'un tour de debat
-
-```typescript
-interface DebateTurn {
-  turnNumber: number;
-  speaker: BoardMemberRole;
-  addressedTo: BoardMemberRole[];
-  type: "CHALLENGE" | "RESPONSE" | "COUNTER" | "CONCESSION" | "INTERVENTION";
-  content: string;          // L'argument (2-4 phrases)
-  quotedFrom?: string;      // Citation directe de l'argument auquel il repond
-  positionShift?: "UNCHANGED" | "SOFTENED" | "REVERSED";
-}
-```
-
-### Contexte cumule
-
-A chaque tour, l'agent recoit :
-1. Son analyse Round 1
-2. **L'historique complet du debat** (tous les tours precedents)
-3. La question du moderateur
-
-Cela permet des reponses comme :
-> "Piccolo mentionne un cout unitaire de 0.15EUR mais omet les economies d'echelle au-dela de 10K utilisateurs. Mon estimation inclut une reduction de 40% du cout API avec le batching."
-
-### Conditions d'arret
-
-Le debat s'arrete quand :
-- Un agent fait une `CONCESSION` explicite
-- Le moderateur detecte un `COMPROMISE` possible
-- Le maximum de tours est atteint (4-5 par friction)
-- Tous les agents maintiennent leurs positions (impasse declaree)
-
-### Impact sur les couts
-
-| Scenario | Appels LLM | Tokens output | Cout DeepSeek | Cout Sonnet |
-|----------|-----------|---------------|---------------|-------------|
-| Actuel (2 rounds) | ~12 | ~20K | $0.01 | $0.30 |
-| Debat 3 tours/friction, 2 frictions | ~25 | ~50K | $0.03 | $0.75 |
-| Debat 5 tours/friction, 3 frictions | ~40 | ~80K | $0.05 | $1.20 |
-| Debat intense + moderateur | ~50 | ~120K | $0.07 | $1.80 |
-
-**Conclusion :** Avec DeepSeek V3.2, meme un debat intense reste sous $0.10 par analyse. C'est le modele qui rend cette feature economiquement viable.
-
-### Changements techniques requis
-
-| Composant | Modification |
-|-----------|-------------|
-| `lib/engine/types.ts` | Ajouter `DebateTurn`, `ModeratorDecision`, `DebateHistory` |
-| `lib/engine/moderator.ts` | **Nouveau** — Logique du moderateur |
-| `lib/engine/debate-engine.ts` | **Nouveau** — Boucle de debat multi-tour |
-| `lib/engine/engine-streaming.ts` | Remplacer Round 2 lineaire par boucle de debat |
-| `lib/hooks/useAnalysisState.ts` | Ajouter etats pour l'historique du debat |
-| `components/board/DebateThread.tsx` | **Nouveau** — UI conversation style chat |
-| SSE events | Ajouter `debate_turn`, `moderator_question`, `debate_resolved` |
-
-### UX du debat
-
-Le debat serait affiche comme un **thread de conversation** :
-
-```
-MODERATEUR: Vegeta, tu recommandes de geler le dev pour faire des interviews
-utilisateur. Bulma dit que le marche n'attendra pas. Que reponds-tu ?
-
-VEGETA [CHALLENGE → BULMA]: Lancer sans validation c'est construire sur du
-sable. Les "20 interviews" prennent 2 semaines, pas 6 mois. Le marche peut
-attendre 14 jours.
-
-BULMA [COUNTER → VEGETA]: 14 jours c'est optimiste. Recruter 20 utilisateurs
-qualifies pour des interviews prend minimum 3-4 semaines. Pendant ce temps,
-[concurrent X] lance sa v2.
-
-PICCOLO [INTERVENTION]: Le vrai risque n'est ni le timing ni la validation —
-c'est le burn rate. A 3.2K/mois de couts fixes, chaque semaine de retard
-coute 800EUR. La question est : est-ce que les interviews reduisent le risque
-de pivot de plus de 800EUR/semaine ?
-
-VEGETA [CONCESSION → PICCOLO]: Point valide. Je revise ma position : lancer un
-MVP minimal en parallele des interviews, budget max 2 semaines de dev.
-```
-
----
-
-## 8. Roadmap
-
-### V0.1 (actuel) — MVP fonctionnel
 - [x] 6 agents IA independants avec streaming
 - [x] Detection de frictions par scoring de sentiment
 - [x] Round 2 reactions (1 tour)
@@ -378,23 +325,31 @@ MVP minimal en parallele des interviews, budget max 2 semaines de dev.
 - [x] BYOK OpenRouter
 - [x] Deploy Vercel
 
-### V0.2 — Moteur de debat
-- [ ] Agent moderateur
-- [ ] Debat multi-tour (3-5 tours par friction)
-- [ ] Historique de conversation cumule
-- [ ] Detection de convergence automatique
-- [ ] UI thread de conversation
-- [ ] Nouveaux SSE events (debate_turn, moderator_question)
+### V0.2 — Moteur de debat + CEO Loop ✅
+
+- [x] Agent moderateur LLM
+- [x] Debat multi-tour (3-5 tours par friction)
+- [x] Historique de conversation cumule
+- [x] Detection de convergence automatique
+- [x] UI thread de conversation (DebateThread)
+- [x] Frictions multi-membres (union-find)
+- [x] CEO Follow-Up Questions (extraction heuristique)
+- [x] Final Arbiter (verdict definitif apres reponses CEO)
+- [x] Export enrichi (Q&A + verdict final)
+- [x] Role normalization + CTO prompt tuning
 
 ### V0.3 — Polish et viralite
+
 - [ ] OG image dynamique (verdict + board members)
 - [ ] Partage de rapport par lien unique
 - [ ] Animations d'entree des personnages
 - [ ] Son retro 8-bit (optionnel, mutable)
 - [ ] Mode sombre/clair
 - [ ] Responsive mobile
+- [ ] Prompt tuning iteratif (moderateur + membres)
 
 ### V1.0 — Produit
+
 - [ ] Historique des analyses (localStorage)
 - [ ] Templates de briefing (pitch deck, feature spec, business case)
 - [ ] Personnalisation des membres du board (swap personas)
@@ -403,45 +358,80 @@ MVP minimal en parallele des interviews, budget max 2 semaines de dev.
 
 ---
 
-## 9. Structure du projet
+## 8. Structure du projet
 
 ```
 boardroom-ai/
 ├── app/
 │   ├── layout.tsx                  # Fonts (Press Start 2P, VT323), metadata
-│   ├── page.tsx                    # Page principale
+│   ├── page.tsx                    # Page principale (orchestration UI complete)
 │   ├── globals.css                 # Theme RPG pixel art complet
-│   └── api/analyze/route.ts        # SSE endpoint (Edge Runtime)
+│   └── api/
+│       ├── analyze/route.ts        # SSE endpoint principal (Edge Runtime)
+│       └── finalize/route.ts       # SSE endpoint Final Arbiter (Edge Runtime)
 ├── components/
 │   ├── board/
 │   │   ├── BoardRoom.tsx           # Grille 2x3 + phase tracker + frictions + debats + synthese
 │   │   ├── MemberCard.tsx          # Carte personnage avec avatar, streaming, verdict
 │   │   ├── MemberDetail.tsx        # Modal analyse complete
-│   │   └── VerdictBadge.tsx        # Badge verdict colore avec glow
+│   │   ├── VerdictBadge.tsx        # Badge verdict colore avec glow
+│   │   ├── DebateThread.tsx        # Thread de debat style chat (V0.2)
+│   │   ├── CEOFollowUp.tsx         # Questions board → CEO + reponses + bouton verdict
+│   │   └── FinalVerdict.tsx        # Verdict final (streaming + complete)
 │   ├── analysis/
 │   │   ├── AnalysisForm.tsx        # Formulaire briefing + CEO vision + modele
 │   │   └── StreamingText.tsx       # Texte temps reel avec curseur
 │   ├── report/
-│   │   └── ExportButton.tsx        # Telecharger BoardRoom Report.md
+│   │   ├── ExportButton.tsx        # Telecharger BoardRoom Report.md
+│   │   └── ShareImage.tsx          # Generer image de partage
 │   ├── settings/
 │   │   └── ApiKeyInput.tsx         # BYOK OpenRouter + localStorage
 │   └── ui/
 │       └── RetroButton.tsx         # Bouton RPG gradient
 ├── lib/
-│   ├── engine/
-│   │   ├── types.ts                # Tous les types TypeScript
-│   │   ├── board-members.ts        # 6 configs + system prompts detailles
-│   │   ├── runner-streaming.ts     # Client OpenRouter streaming + JSON parsing
-│   │   ├── engine-streaming.ts     # Orchestrateur pipeline complet
-│   │   ├── friction.ts             # Detection frictions (sentiment scoring)
-│   │   └── synthesis.ts            # Synthese + verdict collectif
 │   ├── hooks/
-│   │   ├── useBoardroomAnalysis.ts  # Hook SSE principal
-│   │   ├── useAnalysisState.ts     # Reducer etat analyse (9 actions)
+│   │   ├── useBoardroomAnalysis.ts # Hook SSE principal (analyze + finalize)
+│   │   ├── useAnalysisState.ts     # Reducer etat analyse (15+ actions SSE)
 │   │   └── useApiKey.ts            # Hook localStorage cle API
 │   └── utils/
 │       ├── constants.ts            # Modeles, couleurs verdicts
 │       └── markdown-export.ts      # Generateur rapport BoardRoom Report
+├── packages/
+│   └── engine/                     # @boardroom/engine — moteur pur TypeScript
+│       ├── src/
+│       │   ├── types.ts            # Tous les types (Board, Debate, CEO, SSE, Report)
+│       │   ├── board-members.ts    # 6 configs + system prompts detailles
+│       │   ├── runner-streaming.ts # Client OpenRouter streaming + JSON parsing + Final Arbiter
+│       │   ├── engine-streaming.ts # Orchestrateur pipeline complet (Round 1 → CEO Follow-Up)
+│       │   ├── friction.ts         # Detection frictions (sentiment scoring + union-find)
+│       │   ├── moderator.ts        # Agent moderateur (analyse tensions + formulation questions)
+│       │   ├── debate-engine.ts    # Boucle de debat multi-tour
+│       │   ├── convergence.ts      # Detection de convergence (position shifts)
+│       │   ├── ceo-followup.ts     # Extraction questions CEO + orchestration Final Arbiter
+│       │   ├── synthesis.ts        # Synthese + verdict collectif
+│       │   └── index.ts            # Exports publics
+│       └── __tests__/
+│           ├── fixtures.ts         # Donnees de test partagees
+│           ├── friction.test.ts
+│           ├── synthesis.test.ts
+│           ├── json-parsing.test.ts
+│           ├── moderator.test.ts
+│           ├── convergence.test.ts
+│           ├── debate-engine.test.ts
+│           └── ceo-followup.test.ts
 └── public/
-    └── avatars/                    # 6 SVG pixel art (vegeta, bulma, piccolo, whis, gohan, trunks)
+    └── avatars/                    # 6 SVG pixel art
 ```
+
+---
+
+## 9. Tests
+
+84 tests (8 fichiers) couvrant :
+- Friction detection (scoring, paires, fallback, multi-membres)
+- Synthesis (consensus, compromis, impasses, verdict collectif)
+- JSON parsing (extraction depuis streams LLM)
+- Moderator (formulation questions, identification tensions)
+- Convergence detection (position shifts, seuils)
+- Debate engine (boucle multi-tour, arret, outcomes)
+- CEO follow-up (extraction heuristique, dedup, priorisation, limites)
