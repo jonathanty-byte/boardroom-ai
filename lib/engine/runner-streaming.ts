@@ -8,7 +8,7 @@ import type {
   Round2Result,
 } from "./types";
 
-const DEFAULT_MODEL = "anthropic/claude-sonnet-4.6";
+const DEFAULT_MODEL = "deepseek/deepseek-v3.2";
 
 export class StreamingAgentRunner {
   private model: string;

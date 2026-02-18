@@ -38,7 +38,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
         >
           <div className="flex items-center gap-3">
             <img
-              src={`/avatars/${role === "cpo" ? "vegeta" : role === "cmo" ? "bulma" : role === "cfo" ? "piccolo" : role === "cro" ? "whis" : role === "cco" ? "gohan" : "trunks"}.png`}
+              src={`/avatars/${role === "cpo" ? "vegeta" : role === "cmo" ? "bulma" : role === "cfo" ? "piccolo" : role === "cro" ? "whis" : role === "cco" ? "gohan" : "trunks"}.svg`}
               alt={BOARD_MEMBER_NAMES[role]}
               className="w-10 h-10 pixel-border-sm"
               onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}

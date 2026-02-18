@@ -23,12 +23,12 @@ const MEMBER_COLORS: Record<BoardMemberRole, string> = {
 };
 
 const MEMBER_AVATARS: Record<BoardMemberRole, string> = {
-  cpo: "/avatars/vegeta.png",
-  cmo: "/avatars/bulma.png",
-  cfo: "/avatars/piccolo.png",
-  cro: "/avatars/whis.png",
-  cco: "/avatars/gohan.png",
-  cto: "/avatars/trunks.png",
+  cpo: "/avatars/vegeta.svg",
+  cmo: "/avatars/bulma.svg",
+  cfo: "/avatars/piccolo.svg",
+  cro: "/avatars/whis.svg",
+  cco: "/avatars/gohan.svg",
+  cto: "/avatars/trunks.svg",
 };
 
 export function MemberCard({ role, state }: MemberCardProps) {

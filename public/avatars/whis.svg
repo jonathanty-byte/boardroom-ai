@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
+  <!-- Background -->
+  <rect width="64" height="64" fill="#1a1a38"/>
+  <!-- Hair (tall, white-blue) -->
+  <rect x="22" y="0" width="20" height="4" fill="#b0c4de"/>
+  <rect x="20" y="2" width="24" height="4" fill="#b0c4de"/>
+  <rect x="24" y="0" width="16" height="2" fill="#d0e0f0"/>
+  <rect x="18" y="4" width="28" height="6" fill="#b0c4de"/>
+  <rect x="20" y="6" width="24" height="4" fill="#c0d0e8"/>
+  <!-- Hair swirl detail -->
+  <rect x="30" y="2" width="4" height="2" fill="#d0e0f0"/>
+  <rect x="28" y="4" width="8" height="2" fill="#d0e0f0"/>
+  <!-- Face (pale, ethereal) -->
+  <rect x="18" y="10" width="28" height="24" fill="#e8e0f8"/>
+  <rect x="16" y="14" width="2" height="16" fill="#e8e0f8"/>
+  <rect x="46" y="14" width="2" height="16" fill="#e8e0f8"/>
+  <!-- Eyes (calm, violet) -->
+  <rect x="22" y="18" width="8" height="6" fill="white"/>
+  <rect x="34" y="18" width="8" height="6" fill="white"/>
+  <rect x="26" y="18" width="4" height="6" fill="#9C27B0"/>
+  <rect x="38" y="18" width="4" height="6" fill="#9C27B0"/>
+  <rect x="26" y="20" width="2" height="2" fill="#4A148C"/>
+  <rect x="40" y="20" width="2" height="2" fill="#4A148C"/>
+  <!-- Gentle eyebrows -->
+  <rect x="22" y="16" width="8" height="2" fill="#8080a0"/>
+  <rect x="34" y="16" width="8" height="2" fill="#8080a0"/>
+  <!-- Nose -->
+  <rect x="30" y="24" width="4" height="2" fill="#d0c8e0"/>
+  <!-- Mouth (serene smile) -->
+  <rect x="28" y="28" width="8" height="2" fill="#c0a8c8"/>
+  <rect x="26" y="28" width="2" height="2" fill="#e8e0f8"/>
+  <rect x="36" y="28" width="2" height="2" fill="#e8e0f8"/>
+  <!-- Neck -->
+  <rect x="26" y="34" width="12" height="4" fill="#e8e0f8"/>
+  <!-- Outfit (dark blue/purple divine attendant) -->
+  <rect x="14" y="38" width="36" height="20" fill="#303060"/>
+  <rect x="22" y="38" width="20" height="4" fill="#303060"/>
+  <!-- Collar ring -->
+  <rect x="24" y="36" width="16" height="2" fill="#4a4a8a"/>
+  <rect x="24" y="38" width="16" height="2" fill="#6a6aaa"/>
+  <!-- Staff ring on collar -->
+  <rect x="30" y="36" width="4" height="4" fill="#FFD700"/>
+  <!-- Purple aura (divine) -->
+  <rect x="4" y="6" width="2" height="44" fill="#9C27B0" opacity="0.25"/>
+  <rect x="58" y="6" width="2" height="44" fill="#9C27B0" opacity="0.25"/>
+  <rect x="2" y="16" width="2" height="28" fill="#9C27B0" opacity="0.15"/>
+  <rect x="60" y="16" width="2" height="28" fill="#9C27B0" opacity="0.15"/>
+</svg>

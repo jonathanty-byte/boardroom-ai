@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
+  <!-- Background -->
+  <rect width="64" height="64" fill="#1a1a38"/>
+  <!-- Hair (turquoise bob) -->
+  <rect x="14" y="4" width="36" height="8" fill="#00bcd4"/>
+  <rect x="12" y="8" width="4" height="20" fill="#00bcd4"/>
+  <rect x="48" y="8" width="4" height="20" fill="#00bcd4"/>
+  <rect x="16" y="4" width="32" height="4" fill="#26c6da"/>
+  <rect x="14" y="6" width="4" height="4" fill="#00acc1"/>
+  <rect x="46" y="6" width="4" height="4" fill="#00acc1"/>
+  <!-- Bangs -->
+  <rect x="18" y="8" width="28" height="4" fill="#00bcd4"/>
+  <rect x="20" y="10" width="8" height="2" fill="#26c6da"/>
+  <rect x="36" y="10" width="8" height="2" fill="#26c6da"/>
+  <!-- Face -->
+  <rect x="16" y="12" width="32" height="22" fill="#fce4c8"/>
+  <rect x="14" y="16" width="2" height="14" fill="#fce4c8"/>
+  <rect x="48" y="16" width="2" height="14" fill="#fce4c8"/>
+  <!-- Eyes (big, expressive) -->
+  <rect x="20" y="18" width="10" height="6" fill="white"/>
+  <rect x="34" y="18" width="10" height="6" fill="white"/>
+  <rect x="24" y="18" width="4" height="6" fill="#2196F3"/>
+  <rect x="38" y="18" width="4" height="6" fill="#2196F3"/>
+  <rect x="26" y="20" width="2" height="2" fill="#1a1a2e"/>
+  <rect x="40" y="20" width="2" height="2" fill="#1a1a2e"/>
+  <!-- Eyelashes -->
+  <rect x="20" y="16" width="2" height="2" fill="#1a1a2e"/>
+  <rect x="28" y="16" width="2" height="2" fill="#1a1a2e"/>
+  <rect x="34" y="16" width="2" height="2" fill="#1a1a2e"/>
+  <rect x="42" y="16" width="2" height="2" fill="#1a1a2e"/>
+  <!-- Nose -->
+  <rect x="30" y="24" width="4" height="2" fill="#e8c8a8"/>
+  <!-- Mouth (smile) -->
+  <rect x="26" y="28" width="12" height="2" fill="#e88090"/>
+  <rect x="28" y="30" width="8" height="2" fill="#fce4c8"/>
+  <!-- Blush -->
+  <rect x="18" y="26" width="4" height="2" fill="#ffb0b0" opacity="0.5"/>
+  <rect x="42" y="26" width="4" height="2" fill="#ffb0b0" opacity="0.5"/>
+  <!-- Neck -->
+  <rect x="26" y="34" width="12" height="4" fill="#fce4c8"/>
+  <!-- Outfit (red scarf/top) -->
+  <rect x="14" y="38" width="36" height="18" fill="#e91e63"/>
+  <rect x="22" y="36" width="20" height="4" fill="#e91e63"/>
+  <!-- Scarf detail -->
+  <rect x="28" y="36" width="8" height="2" fill="#f44336"/>
+  <!-- Earrings -->
+  <rect x="14" y="22" width="2" height="4" fill="#FFD700"/>
+  <rect x="48" y="22" width="2" height="4" fill="#FFD700"/>
+  <!-- Blue aura -->
+  <rect x="6" y="10" width="2" height="36" fill="#2196F3" opacity="0.3"/>
+  <rect x="56" y="10" width="2" height="36" fill="#2196F3" opacity="0.3"/>
+</svg>

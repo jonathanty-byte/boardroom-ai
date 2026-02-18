@@ -1,23 +1,23 @@
 export const RECOMMENDED_MODELS = [
   {
+    id: "deepseek/deepseek-v3.2",
+    name: "DeepSeek V3.2",
+    description: "Default - excellent quality, very affordable",
+  },
+  {
     id: "anthropic/claude-sonnet-4.6",
     name: "Claude Sonnet 4.6",
-    description: "Recommended - best quality/price",
+    description: "Premium - best reasoning",
   },
   {
     id: "anthropic/claude-opus-4.5",
     name: "Claude Opus 4.5",
-    description: "Premium - highest quality",
+    description: "Ultra - highest quality",
   },
   {
     id: "google/gemini-3-flash-preview",
     name: "Gemini 3 Flash",
     description: "Budget - very fast",
-  },
-  {
-    id: "google/gemini-3-pro-preview",
-    name: "Gemini 3 Pro",
-    description: "Alternative - Google",
   },
 ];
 
