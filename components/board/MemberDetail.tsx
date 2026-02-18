@@ -44,7 +44,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
               onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
             <div>
-              <h2 className="text-[11px] font-bold" style={{ color }}>
+              <h2 className="text-sm font-bold" style={{ color }}>
                 {BOARD_MEMBER_NAMES[role]}
               </h2>
               <p className="stat-label">{BOARD_MEMBER_TITLES[role]}</p>
@@ -52,7 +52,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
           </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-white text-[10px] px-2 py-1 pixel-border-sm"
+            className="text-gray-500 hover:text-white text-xs px-3 py-1.5 pixel-border-sm"
           >
             CLOSE
           </button>
@@ -69,7 +69,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
           {/* Analysis */}
           <div className="dialogue-box p-4">
             <div className="stat-label mb-2" style={{ color }}>ANALYSIS</div>
-            <p className="font-[family-name:var(--font-terminal)] text-base text-gray-200 whitespace-pre-wrap leading-relaxed">
+            <p className="font-[family-name:var(--font-terminal)] text-lg text-gray-200 whitespace-pre-wrap leading-relaxed">
               {result.analysis}
             </p>
           </div>
@@ -84,7 +84,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
                 {result.challenges.map((c, i) => (
                   <div
                     key={i}
-                    className="dialogue-box p-3 font-[family-name:var(--font-terminal)] text-sm text-gray-300"
+                    className="dialogue-box p-3 font-[family-name:var(--font-terminal)] text-base text-gray-300"
                     style={{ borderLeftColor: "var(--color-dbz-red)", borderLeftWidth: "4px" }}
                   >
                     {c}
@@ -104,7 +104,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
                     <span className="stat-label" style={{ color }}>
                       {key.replace(/([A-Z])/g, " $1").trim().toUpperCase()}
                     </span>
-                    <span className="font-[family-name:var(--font-terminal)] text-sm text-gray-300">
+                    <span className="font-[family-name:var(--font-terminal)] text-base text-gray-300">
                       {value}
                     </span>
                   </div>

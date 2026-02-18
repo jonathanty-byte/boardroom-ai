@@ -176,7 +176,7 @@ body {
     inset 2px 2px 0 0 #7a7ada,
     inset -2px -2px 0 0 #2a2a5a;
   font-family: var(--font-terminal), monospace;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
 }
 
@@ -193,7 +193,7 @@ body {
 
 /* ── HP/Status Bar Labels ── */
 .stat-label {
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: #8888aa;
