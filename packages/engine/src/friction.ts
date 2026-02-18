@@ -23,7 +23,7 @@ const VERDICT_SENTIMENT: Record<string, number> = {
   UNREALISTIC: -1,
 };
 
-function getSentiment(verdict: string): number {
+export function getSentiment(verdict: string): number {
   return VERDICT_SENTIMENT[verdict] ?? 0;
 }
 
@@ -42,63 +42,110 @@ function areContradictory(a: string, b: string): boolean {
 }
 
 export function identifyFrictions(round1: Round1Result[]): FrictionPoint[] {
-  const frictions: FrictionPoint[] = [];
-
+  // Step 1: Find all strongly contradictory pairs (gap >= 1.5)
+  const contradictoryPairs: Array<[number, number]> = [];
   for (let i = 0; i < round1.length; i++) {
     for (let j = i + 1; j < round1.length; j++) {
-      const a = round1[i].output;
-      const b = round1[j].output;
-
-      if (areContradictory(a.verdict, b.verdict)) {
-        const existing = frictions.find(
-          (f) => f.members.includes(a.role) && f.members.includes(b.role),
-        );
-
-        if (!existing) {
-          frictions.push({
-            description: `${a.name} (${a.verdict}) vs ${b.name} (${b.verdict})`,
-            members: [a.role, b.role],
-            positions: {
-              [a.role]: `${a.verdict}: ${a.verdictDetails.recommandationConcrete ?? a.verdictDetails.pointFort ?? a.analysis.slice(0, 200)}`,
-              [b.role]: `${b.verdict}: ${b.verdictDetails.recommandationConcrete ?? b.verdictDetails.pointFort ?? b.analysis.slice(0, 200)}`,
-            },
-          });
-        }
+      if (areContradictory(round1[i].output.verdict, round1[j].output.verdict)) {
+        contradictoryPairs.push([i, j]);
       }
     }
   }
 
-  // If still no frictions, pick the two most divergent members
-  if (frictions.length === 0 && round1.length >= 2) {
-    let maxGap = 0;
-    let bestPair: [number, number] = [0, 1];
+  if (contradictoryPairs.length > 0) {
+    // Merge connected pairs into multi-member frictions via union-find
+    const components = findConnectedComponents(contradictoryPairs, round1.length);
+    return components.map((indices) => buildGroupFriction(indices.map((i) => round1[i])));
+  }
 
+  // Step 2: Fallback — collect ALL members involved in max-gap pairs
+  if (round1.length >= 2) {
+    let maxGap = 0;
     for (let i = 0; i < round1.length; i++) {
       for (let j = i + 1; j < round1.length; j++) {
         const gap = Math.abs(
           getSentiment(round1[i].output.verdict) - getSentiment(round1[j].output.verdict),
         );
-        if (gap > maxGap) {
-          maxGap = gap;
-          bestPair = [i, j];
-        }
+        if (gap > maxGap) maxGap = gap;
       }
     }
 
-    // Only force a friction if there's at least some divergence
     if (maxGap > 0) {
-      const a = round1[bestPair[0]].output;
-      const b = round1[bestPair[1]].output;
-      frictions.push({
-        description: `${a.name} (${a.verdict}) vs ${b.name} (${b.verdict})`,
-        members: [a.role, b.role],
-        positions: {
-          [a.role]: `${a.verdict}: ${a.verdictDetails.recommandationConcrete ?? a.verdictDetails.pointFort ?? a.analysis.slice(0, 200)}`,
-          [b.role]: `${b.verdict}: ${b.verdictDetails.recommandationConcrete ?? b.verdictDetails.pointFort ?? b.analysis.slice(0, 200)}`,
-        },
-      });
+      // Collect all unique members in any max-gap pair
+      const memberIndices = new Set<number>();
+      for (let i = 0; i < round1.length; i++) {
+        for (let j = i + 1; j < round1.length; j++) {
+          const gap = Math.abs(
+            getSentiment(round1[i].output.verdict) - getSentiment(round1[j].output.verdict),
+          );
+          if (gap === maxGap) {
+            memberIndices.add(i);
+            memberIndices.add(j);
+          }
+        }
+      }
+
+      return [buildGroupFriction([...memberIndices].map((i) => round1[i]))];
     }
   }
 
-  return frictions;
+  return [];
+}
+
+/** Union-find to merge connected contradiction pairs into groups. */
+function findConnectedComponents(
+  pairs: Array<[number, number]>,
+  n: number,
+): number[][] {
+  const parent = Array.from({ length: n }, (_, i) => i);
+
+  function find(x: number): number {
+    if (parent[x] !== x) parent[x] = find(parent[x]);
+    return parent[x];
+  }
+
+  for (const [i, j] of pairs) {
+    parent[find(i)] = find(j);
+  }
+
+  // Group only members that are in at least one pair
+  const inPair = new Set(pairs.flat());
+  const groups = new Map<number, number[]>();
+  for (const idx of inPair) {
+    const root = find(idx);
+    if (!groups.has(root)) groups.set(root, []);
+    groups.get(root)!.push(idx);
+  }
+
+  return [...groups.values()];
+}
+
+/** Build a friction from a group of results, sorted by sentiment for readable description. */
+function buildGroupFriction(results: Round1Result[]): FrictionPoint {
+  // Sort: most positive first, most negative last
+  const sorted = [...results].sort(
+    (a, b) => getSentiment(b.output.verdict) - getSentiment(a.output.verdict),
+  );
+
+  // Build "positive side vs negative side" description
+  const midpoint = getSentiment(sorted[0].output.verdict) + getSentiment(sorted[sorted.length - 1].output.verdict);
+  const highSide = sorted.filter((r) => getSentiment(r.output.verdict) * 2 > midpoint);
+  const lowSide = sorted.filter((r) => getSentiment(r.output.verdict) * 2 <= midpoint);
+
+  // Fallback: just split in half if grouping fails
+  const left = highSide.length > 0 ? highSide : sorted.slice(0, Math.ceil(sorted.length / 2));
+  const right = lowSide.length > 0 ? lowSide : sorted.slice(Math.ceil(sorted.length / 2));
+
+  const formatSide = (side: Round1Result[]) =>
+    side.map((r) => `${r.output.name} (${r.output.verdict})`).join(", ");
+
+  const description = `${formatSide(left)} vs ${formatSide(right)}`;
+
+  const members = sorted.map((r) => r.output.role);
+  const positions: Record<string, string> = {};
+  for (const r of sorted) {
+    positions[r.output.role] = `${r.output.verdict}: ${r.output.verdictDetails.recommandationConcrete ?? r.output.verdictDetails.pointFort ?? r.output.analysis.slice(0, 200)}`;
+  }
+
+  return { description, members, positions };
 }
