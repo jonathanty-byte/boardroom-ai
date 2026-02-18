@@ -156,13 +156,13 @@ export default function Home() {
         />
       )}
 
-      {/* CEO Follow-Up Questions (only when not finalizing yet) */}
-      {state.phase === "complete" && state.ceoFollowUp.length > 0 && !state.finalVerdict && (
+      {/* CEO Follow-Up Questions — always visible once they exist */}
+      {state.phase === "complete" && state.ceoFollowUp.length > 0 && (
         <div className="w-full max-w-5xl mt-6">
           <CEOFollowUp
             questions={state.ceoFollowUp}
             onFinalize={handleFinalize}
-            disabled={finalizing}
+            disabled={finalizing || !!state.finalVerdict}
           />
         </div>
       )}
@@ -177,8 +177,10 @@ export default function Home() {
         </div>
       )}
 
-      {/* Complete state */}
+      {/* Complete state — wait for final verdict if follow-up questions exist */}
       {state.phase === "complete" && state.report && (
+        state.ceoFollowUp.length === 0 || state.finalVerdict
+      ) && (
         <div className="mt-6 flex flex-col items-center gap-4">
           <div className="rpg-title text-[10px] text-[var(--color-dbz-green)]">
             ANALYSIS COMPLETE — {(state.report.totalDurationMs / 1000).toFixed(1)}s

@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { useAnalysisState } from "./useAnalysisState";
 
 export function useBoardroomAnalysis() {
-  const { state, start, reset, handleEvent } = useAnalysisState();
+  const { state, start, reset, startFinalize, handleEvent } = useAnalysisState();
 
   const streamSSE = useCallback(
     async (url: string, body: Record<string, unknown>) => {
@@ -79,6 +79,7 @@ export function useBoardroomAnalysis() {
 
   const finalize = useCallback(
     async (report: BoardroomReport, ceoAnswers: string, apiKey: string, model?: string) => {
+      startFinalize(ceoAnswers);
       try {
         await streamSSE("/api/finalize", { report, ceoAnswers, apiKey, model });
       } catch (err) {
@@ -88,7 +89,7 @@ export function useBoardroomAnalysis() {
         });
       }
     },
-    [handleEvent, streamSSE],
+    [startFinalize, handleEvent, streamSSE],
   );
 
   return { state, analyze, finalize, reset };

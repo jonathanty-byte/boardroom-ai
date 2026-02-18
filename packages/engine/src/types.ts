@@ -97,6 +97,8 @@ export interface BoardroomReport {
   totalDurationMs: number;
   debates?: DebateHistory[];
   ceoFollowUp?: CEOFollowUpQuestion[];
+  finalVerdict?: CEOFinalVerdict;
+  ceoAnswers?: string;
 }
 
 export interface BoardMemberConfig {

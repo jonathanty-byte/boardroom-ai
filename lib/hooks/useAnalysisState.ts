@@ -95,7 +95,11 @@ export const initialState: AnalysisState = {
   error: null,
 };
 
-type Action = { type: "RESET" } | { type: "START" } | { type: "SSE_EVENT"; event: SSEEvent };
+type Action =
+  | { type: "RESET" }
+  | { type: "START" }
+  | { type: "FINALIZE_START"; ceoAnswers: string }
+  | { type: "SSE_EVENT"; event: SSEEvent };
 
 function reducer(state: AnalysisState, action: Action): AnalysisState {
   switch (action.type) {
@@ -112,6 +116,17 @@ function reducer(state: AnalysisState, action: Action): AnalysisState {
         phase: "round1",
         members: createInitialMemberState(),
         debates: createInitialDebateState(),
+      };
+
+    case "FINALIZE_START":
+      return {
+        ...state,
+        finalVerdictStreaming: "",
+        finalVerdict: null,
+        // Store CEO answers in report for export
+        report: state.report
+          ? { ...state.report, ceoAnswers: action.ceoAnswers }
+          : state.report,
       };
 
     case "SSE_EVENT":
@@ -246,7 +261,15 @@ function handleSSEEvent(state: AnalysisState, event: SSEEvent): AnalysisState {
       return { ...state, finalVerdictStreaming: state.finalVerdictStreaming + event.chunk };
 
     case "final_verdict_complete":
-      return { ...state, finalVerdict: event.verdict, finalVerdictStreaming: "", phase: "complete" };
+      return {
+        ...state,
+        finalVerdict: event.verdict,
+        finalVerdictStreaming: "",
+        // Update report with final verdict so export includes it
+        report: state.report
+          ? { ...state.report, finalVerdict: event.verdict }
+          : state.report,
+      };
 
     case "analysis_complete":
       return { ...state, phase: "complete", report: event.report };
@@ -293,6 +316,7 @@ export function useAnalysisState() {
     state,
     start: () => dispatch({ type: "START" }),
     reset: () => dispatch({ type: "RESET" }),
+    startFinalize: (ceoAnswers: string) => dispatch({ type: "FINALIZE_START", ceoAnswers }),
     handleEvent: (event: SSEEvent) => dispatch({ type: "SSE_EVENT", event }),
   };
 }

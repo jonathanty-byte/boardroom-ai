@@ -148,19 +148,52 @@ export function formatBoardroomReport(report: BoardroomReport): string {
     lines.push("");
   }
 
-  // CEO Follow-Up Questions
+  // CEO Follow-Up Questions & Answers
   if (report.ceoFollowUp && report.ceoFollowUp.length > 0) {
     lines.push("---");
     lines.push("");
     lines.push("## CEO Follow-Up Questions");
-    lines.push("");
-    lines.push("The board identified unresolved questions requiring CEO input:");
     lines.push("");
     for (const q of report.ceoFollowUp) {
       const name = BOARD_MEMBER_NAMES[q.fromMember as BoardMemberRole] ?? q.fromMember;
       lines.push(`${q.id}. **${name}** (${q.source === "challenge" ? "Round 1" : "Debate"}): ${q.question}`);
     }
     lines.push("");
+
+    if (report.ceoAnswers) {
+      lines.push("### CEO Answers");
+      lines.push("");
+      lines.push(report.ceoAnswers);
+      lines.push("");
+    }
+  }
+
+  // Final Verdict (after CEO input)
+  if (report.finalVerdict) {
+    lines.push("---");
+    lines.push("");
+    lines.push(`## Final Verdict: **${report.finalVerdict.collectiveVerdict}**`);
+    lines.push("");
+    lines.push(report.finalVerdict.reasoning);
+    lines.push("");
+
+    if (report.finalVerdict.keyActions.length > 0) {
+      lines.push("### Key Actions");
+      report.finalVerdict.keyActions.forEach((a) => lines.push(`- ${a}`));
+      lines.push("");
+    }
+
+    if (report.finalVerdict.risks.length > 0) {
+      lines.push("### Acknowledged Risks");
+      report.finalVerdict.risks.forEach((r) => lines.push(`- ${r}`));
+      lines.push("");
+    }
+
+    if (report.finalVerdict.nextSteps.length > 0) {
+      lines.push("### Next Steps");
+      report.finalVerdict.nextSteps.forEach((s) => lines.push(`- ${s}`));
+      lines.push("");
+    }
   }
 
   lines.push("");
