@@ -89,10 +89,11 @@ export function formatBoardroomReport(report: BoardroomReport): string {
 
       for (const turn of debate.turns) {
         const name = BOARD_MEMBER_NAMES[turn.speaker];
+        const addressedNames = turn.addressedTo
+          .map((r) => BOARD_MEMBER_NAMES[r] ?? r.toUpperCase())
+          .filter(Boolean);
         const addressed =
-          turn.addressedTo.length > 0
-            ? ` → ${turn.addressedTo.map((r) => BOARD_MEMBER_NAMES[r]).join(", ")}`
-            : "";
+          addressedNames.length > 0 ? ` → ${addressedNames.join(", ")}` : "";
         lines.push(`**${name}** [${turn.type}${addressed}]:`);
         if (turn.quotedFrom) {
           lines.push(`> ${turn.quotedFrom}`);

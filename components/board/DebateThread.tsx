@@ -120,8 +120,8 @@ export function DebateThread({ thread, frictionDescription }: DebateThreadProps)
         );
       })}
 
-      {/* Currently streaming turn */}
-      {thread.currentSpeaker && thread.currentStreamedText && (
+      {/* Currently streaming turn or thinking indicator */}
+      {thread.currentSpeaker && (
         <div className="flex gap-3 mb-3">
           <div
             className="w-1 flex-shrink-0 rounded-sm animate-pulse"
@@ -134,8 +134,29 @@ export function DebateThread({ thread, frictionDescription }: DebateThreadProps)
             >
               {BOARD_MEMBER_NAMES[thread.currentSpeaker] ?? thread.currentSpeaker}
             </span>
-            <p className="font-[family-name:var(--font-terminal)] text-base text-gray-400">
-              <span className="cursor-blink">{thread.currentStreamedText.slice(-300)}</span>
+            {thread.currentStreamedText ? (
+              <p className="font-[family-name:var(--font-terminal)] text-base text-gray-400">
+                <span className="cursor-blink">{thread.currentStreamedText.slice(-300)}</span>
+              </p>
+            ) : (
+              <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse">
+                is thinking...
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Moderator thinking indicator (between turns, no speaker active, not resolved) */}
+      {!thread.currentSpeaker && !thread.outcome && thread.status === "in_progress" && thread.turns.length > 0 && (
+        <div className="flex gap-3 mb-3">
+          <div className="w-1 flex-shrink-0 rounded-sm bg-[var(--color-dbz-gold)] animate-pulse" />
+          <div className="flex-1 min-w-0">
+            <span className="text-[10px] font-bold text-[var(--color-dbz-gold)] tracking-wider">
+              MODERATOR
+            </span>
+            <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse">
+              Evaluating arguments...
             </p>
           </div>
         </div>

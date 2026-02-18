@@ -76,6 +76,23 @@ export function BoardRoom({
         </div>
       )}
 
+      {/* Debate transition indicator */}
+      {phase === "round2" && debateThreads.length === 0 && frictions.length > 0 && (
+        <div className="pixel-border p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-6 bg-[var(--color-dbz-gold)] rounded-sm animate-pulse" />
+            <div>
+              <span className="text-[10px] font-bold text-[var(--color-dbz-gold)] tracking-wider">
+                MODERATOR
+              </span>
+              <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse">
+                Analyzing friction points...
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Multi-turn Debate (V0.2) or Legacy Round 2 */}
       {debateThreads.length > 0 ? (
         <div className="pixel-border p-4">

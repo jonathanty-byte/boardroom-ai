@@ -55,6 +55,61 @@ describe("parseModeratorResponse", () => {
     expect(result.action).toBe("DECLARE_IMPASSE");
     expect(result.reasoning).toContain("could not be parsed");
   });
+
+  it("normalizes uppercase role to lowercase", () => {
+    const raw = JSON.stringify({
+      action: "ASK_QUESTION",
+      targetMember: "CFO",
+      question: "Piccolo, defend your numbers.",
+      reasoning: "Testing uppercase",
+    });
+    const result = runner.parseModeratorResponse(raw);
+    expect(result.targetMember).toBe("cfo");
+  });
+
+  it("normalizes member name to role", () => {
+    const raw = JSON.stringify({
+      action: "ASK_QUESTION",
+      targetMember: "Piccolo",
+      question: "Defend your numbers.",
+      reasoning: "Testing name",
+    });
+    const result = runner.parseModeratorResponse(raw);
+    expect(result.targetMember).toBe("cfo");
+  });
+
+  it("normalizes mixed case name to role", () => {
+    const raw = JSON.stringify({
+      action: "ASK_QUESTION",
+      targetMember: "VEGETA",
+      question: "Defend your position.",
+      reasoning: "Testing name uppercase",
+    });
+    const result = runner.parseModeratorResponse(raw);
+    expect(result.targetMember).toBe("cpo");
+  });
+
+  it("normalizes name with parenthetical title", () => {
+    const raw = JSON.stringify({
+      action: "ASK_QUESTION",
+      targetMember: "Trunks (CTO)",
+      question: "Defend your feasibility claim.",
+      reasoning: "Testing parenthetical",
+    });
+    const result = runner.parseModeratorResponse(raw);
+    expect(result.targetMember).toBe("cto");
+  });
+
+  it("normalizes full title to role", () => {
+    const raw = JSON.stringify({
+      action: "ASK_QUESTION",
+      targetMember: "Chief Financial Officer",
+      question: "Show me the numbers.",
+      reasoning: "Testing title",
+    });
+    const result = runner.parseModeratorResponse(raw);
+    expect(result.targetMember).toBe("cfo");
+  });
 });
 
 describe("parseDebateTurn", () => {

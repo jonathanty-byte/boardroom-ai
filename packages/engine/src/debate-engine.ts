@@ -74,8 +74,9 @@ export async function runDebateForFriction(
     );
     if (firstTurn) {
       turns.push(firstTurn);
-      turnNumber++;
     }
+    // Always increment to avoid infinite loop even if turn failed
+    turnNumber++;
   }
 
   // Step 3: Debate loop — moderator decides next action each iteration
@@ -122,8 +123,9 @@ export async function runDebateForFriction(
       );
       if (turn) {
         turns.push(turn);
-        turnNumber++;
       }
+      // Always increment to avoid infinite loop even if turn failed
+      turnNumber++;
     } else {
       // No target member specified — break to avoid infinite loop
       break;

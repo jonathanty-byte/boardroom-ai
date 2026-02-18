@@ -251,7 +251,9 @@ export class StreamingAgentRunner {
       const parsed = JSON.parse(cleaned) as Record<string, unknown>;
       return {
         action: (parsed.action as ModeratorAction["action"]) ?? "DECLARE_IMPASSE",
-        targetMember: parsed.targetMember as BoardMemberRole | undefined,
+        targetMember: parsed.targetMember
+          ? this.normalizeRole(String(parsed.targetMember))
+          : undefined,
         question: parsed.question as string | undefined,
         reasoning: (parsed.reasoning as string) ?? "",
         convergenceSummary: parsed.convergenceSummary as string | undefined,
@@ -265,6 +267,47 @@ export class StreamingAgentRunner {
     }
   }
 
+  /** Normalize a role string from LLM output (handles "CFO", "Piccolo", "Trunks (CTO)", etc.) */
+  normalizeRole(input: string): BoardMemberRole {
+    // Strip parenthetical content and extra whitespace: "Trunks (CTO)" → "trunks"
+    const lower = input
+      .replace(/\s*\(.*?\)\s*/g, "")
+      .toLowerCase()
+      .trim();
+    const VALID_ROLES: BoardMemberRole[] = ["cpo", "cmo", "cfo", "cro", "cco", "cto"];
+    // Direct match (e.g., "cfo", "CFO")
+    if (VALID_ROLES.includes(lower as BoardMemberRole)) {
+      return lower as BoardMemberRole;
+    }
+    // Name-to-role mapping
+    const NAME_MAP: Record<string, BoardMemberRole> = {
+      vegeta: "cpo",
+      bulma: "cmo",
+      piccolo: "cfo",
+      whis: "cro",
+      gohan: "cco",
+      trunks: "cto",
+      // Common title variations
+      "chief product officer": "cpo",
+      "chief marketing officer": "cmo",
+      "chief financial officer": "cfo",
+      "chief research officer": "cro",
+      "chief creative officer": "cco",
+      "chief technology officer": "cto",
+    };
+    if (NAME_MAP[lower]) {
+      return NAME_MAP[lower];
+    }
+    // Substring match: check if any name is contained in the input
+    for (const [name, role] of Object.entries(NAME_MAP)) {
+      if (lower.includes(name)) {
+        return role;
+      }
+    }
+    // Fallback: return as-is (will fail lookup gracefully)
+    return lower as BoardMemberRole;
+  }
+
   parseDebateTurn(raw: string, config: BoardMemberConfig, turnNumber: number): DebateTurn {
     const cleaned = this.extractJSON(raw);
 
@@ -274,7 +317,7 @@ export class StreamingAgentRunner {
         turnNumber,
         speaker: config.role,
         addressedTo: Array.isArray(parsed.addressedTo)
-          ? (parsed.addressedTo as BoardMemberRole[])
+          ? (parsed.addressedTo as string[]).map((r) => this.normalizeRole(r))
           : [],
         type: (parsed.type as DebateTurn["type"]) ?? "RESPONSE",
         content: (parsed.content as string) ?? "",
