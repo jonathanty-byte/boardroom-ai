@@ -44,7 +44,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
               onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
             />
             <div>
-              <h2 className="text-sm font-bold" style={{ color }}>
+              <h2 className="text-[11px] font-bold" style={{ color }}>
                 {BOARD_MEMBER_NAMES[role]}
               </h2>
               <p className="stat-label">{BOARD_MEMBER_TITLES[role]}</p>
@@ -52,7 +52,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
           </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-white text-xs px-3 py-1.5 pixel-border-sm"
+            className="text-gray-500 hover:text-white text-[10px] px-2 py-1 pixel-border-sm"
           >
             CLOSE
           </button>

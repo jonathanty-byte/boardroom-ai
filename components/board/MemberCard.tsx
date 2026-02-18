@@ -71,13 +71,13 @@ export function MemberCard({ role, state }: MemberCardProps) {
 
           {/* Name + Role */}
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-bold truncate" style={{ color }}>
+            <div className="text-[10px] font-bold truncate" style={{ color }}>
               {name}
             </div>
             <div className="stat-label truncate">
               {role.toUpperCase()}
             </div>
-            <div className="text-xs text-gray-500 truncate font-[family-name:var(--font-terminal)]">
+            <div className="text-[7px] text-gray-500 truncate">
               {title}
             </div>
           </div>
@@ -99,7 +99,7 @@ export function MemberCard({ role, state }: MemberCardProps) {
         {/* Content Area */}
         {state.status === "waiting" && (
           <div className="flex-1 flex items-center justify-center">
-            <span className="text-xs text-gray-600 tracking-widest uppercase">
+            <span className="text-[8px] text-gray-600 tracking-widest uppercase">
               Standby
             </span>
           </div>
@@ -118,10 +118,10 @@ export function MemberCard({ role, state }: MemberCardProps) {
         {isComplete && state.result && (
           <div className="flex-1 flex flex-col gap-2">
             <VerdictBadge verdict={state.result.verdict} />
-            <p className="text-gray-400 line-clamp-3 font-[family-name:var(--font-terminal)] text-base leading-snug">
-              {state.result.analysis.slice(0, 150)}...
+            <p className="text-gray-400 line-clamp-3 font-[family-name:var(--font-terminal)] text-base leading-tight">
+              {state.result.analysis.slice(0, 120)}...
             </p>
-            <span className="text-xs text-gray-500 tracking-wider mt-auto">
+            <span className="text-[7px] text-gray-600 tracking-wider mt-auto">
               CLICK TO INSPECT
             </span>
           </div>

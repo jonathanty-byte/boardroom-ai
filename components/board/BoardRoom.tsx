@@ -48,7 +48,7 @@ export function BoardRoom({
             <span className="friction-spark text-[var(--color-dbz-red)] text-sm">
               ⚡
             </span>
-            <span className="text-sm text-[var(--color-dbz-red)] font-bold tracking-wider">
+            <span className="text-[10px] text-[var(--color-dbz-red)] font-bold tracking-wider">
               FRICTION DETECTED
             </span>
             <span className="friction-spark text-[var(--color-dbz-red)] text-sm">
@@ -58,12 +58,12 @@ export function BoardRoom({
           <div className="space-y-3">
             {frictions.map((f, i) => (
               <div key={i} className="dialogue-box p-3">
-                <div className="text-sm text-[var(--color-dbz-gold)] font-bold mb-3">
+                <div className="text-[10px] text-[var(--color-dbz-gold)] font-bold mb-2">
                   {f.description}
                 </div>
                 {Object.entries(f.positions).map(([role, pos]) => (
-                  <div key={role} className="text-gray-400 pl-4 border-l-2 border-gray-700 mb-2 font-[family-name:var(--font-terminal)] text-base">
-                    <span className="text-white font-bold">{BOARD_MEMBER_NAMES[role as BoardMemberRole]}</span>: {pos}
+                  <div key={role} className="text-gray-400 pl-3 border-l-2 border-gray-700 mb-1 font-[family-name:var(--font-terminal)] text-base">
+                    <span className="text-white">{BOARD_MEMBER_NAMES[role as BoardMemberRole]}</span>: {pos}
                   </div>
                 ))}
               </div>
@@ -83,24 +83,24 @@ export function BoardRoom({
               const debate = debates[role];
               return (
                 <div key={role} className="dialogue-box p-3">
-                  <div className="text-sm font-bold text-white mb-2">
+                  <div className="text-[10px] font-bold text-white mb-1">
                     {BOARD_MEMBER_NAMES[role]}
                   </div>
                   {debate.status === "debating" && (
-                    <div className="font-[family-name:var(--font-terminal)] text-lg text-gray-400">
+                    <div className="font-[family-name:var(--font-terminal)] text-base text-gray-400">
                       <span className="cursor-blink">
                         {debate.streamedText.slice(-200)}
                       </span>
                     </div>
                   )}
                   {debate.result && (
-                    <div className="flex flex-col gap-2">
-                      <VerdictBadge verdict={debate.result.position} animated={true} size="md" />
-                      <p className="font-[family-name:var(--font-terminal)] text-lg text-gray-300 mt-1">
+                    <div className="flex flex-col gap-1">
+                      <VerdictBadge verdict={debate.result.position} animated={true} size="sm" />
+                      <p className="font-[family-name:var(--font-terminal)] text-base text-gray-300 mt-1">
                         {debate.result.argument}
                       </p>
                       {debate.result.condition && (
-                        <p className="font-[family-name:var(--font-terminal)] text-base text-gray-500 italic">
+                        <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 italic">
                           Condition: {debate.result.condition}
                         </p>
                       )}
@@ -135,7 +135,7 @@ export function BoardRoom({
               <div className="dialogue-box p-3">
                 <div className="stat-label mb-2 text-[var(--color-dbz-green)]">CONSENSUS</div>
                 {synthesis.consensus.map((c, i) => (
-                  <p key={i} className="font-[family-name:var(--font-terminal)] text-base text-gray-300 mb-2">
+                  <p key={i} className="font-[family-name:var(--font-terminal)] text-base text-gray-300 mb-1">
                     {c}
                   </p>
                 ))}
@@ -146,7 +146,7 @@ export function BoardRoom({
               <div className="dialogue-box p-3">
                 <div className="stat-label mb-2 text-[var(--color-dbz-gold)]">COMPROMISES</div>
                 {synthesis.compromises.map((c, i) => (
-                  <p key={i} className="font-[family-name:var(--font-terminal)] text-base text-gray-300 mb-2">
+                  <p key={i} className="font-[family-name:var(--font-terminal)] text-base text-gray-300 mb-1">
                     {c}
                   </p>
                 ))}
@@ -157,7 +157,7 @@ export function BoardRoom({
               <div className="dialogue-box p-3">
                 <div className="stat-label mb-2 text-[var(--color-dbz-red)]">IMPASSES</div>
                 {synthesis.impasses.map((c, i) => (
-                  <p key={i} className="font-[family-name:var(--font-terminal)] text-base text-gray-300 mb-2">
+                  <p key={i} className="font-[family-name:var(--font-terminal)] text-base text-gray-300 mb-1">
                     {c}
                   </p>
                 ))}
@@ -191,7 +191,7 @@ function PhaseTracker({ phase }: { phase: string }) {
           return (
             <div key={p.key} className="flex flex-col items-center gap-1 flex-1">
               <div
-                className={`w-8 h-8 flex items-center justify-center text-xs font-bold ${
+                className={`w-6 h-6 flex items-center justify-center text-[7px] font-bold ${
                   isDone
                     ? "bg-[var(--color-dbz-green)] text-black"
                     : isActive
@@ -205,7 +205,7 @@ function PhaseTracker({ phase }: { phase: string }) {
                 {p.icon}
               </div>
               <span
-                className={`text-xs tracking-wider ${
+                className={`text-[6px] tracking-wider ${
                   isDone || isActive ? "text-white" : "text-gray-700"
                 }`}
               >
