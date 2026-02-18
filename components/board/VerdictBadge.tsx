@@ -5,24 +5,33 @@ import { getVerdictColor, getVerdictCategory } from "@/lib/utils/constants";
 interface VerdictBadgeProps {
   verdict: string;
   animated?: boolean;
+  size?: "sm" | "md" | "lg";
 }
 
-export function VerdictBadge({ verdict, animated = true }: VerdictBadgeProps) {
+export function VerdictBadge({ verdict, animated = true, size = "md" }: VerdictBadgeProps) {
   const color = getVerdictColor(verdict);
   const category = getVerdictCategory(verdict);
-  const bgClass =
-    category === "positive"
-      ? "bg-green-900/50"
-      : category === "negative"
-        ? "bg-red-900/50"
-        : "bg-amber-900/50";
+
+  const sizeClasses = {
+    sm: "text-[7px] px-2 py-0.5",
+    md: "text-[9px] px-3 py-1",
+    lg: "text-[11px] px-4 py-2",
+  };
 
   return (
     <span
-      className={`inline-block px-2 py-1 text-xs font-[family-name:var(--font-retro)] font-bold ${bgClass} ${animated ? "verdict-appear" : ""}`}
-      style={{ color, borderLeft: `3px solid ${color}` }}
+      className={`inline-block font-bold tracking-wider ${sizeClasses[size]} ${animated ? "verdict-appear" : ""}`}
+      style={{
+        color: "#000",
+        backgroundColor: color,
+        boxShadow: `0 0 8px ${color}60, 0 2px 0 0 rgba(0,0,0,0.4)`,
+        textShadow: `0 1px 0 ${color}80`,
+        clipPath: category === "negative"
+          ? "polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%)"
+          : undefined,
+      }}
     >
-      {verdict}
+      {verdict.replace(/_/g, " ")}
     </span>
   );
 }

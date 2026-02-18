@@ -15,32 +15,34 @@ export function ApiKeyInput({ apiKey, onSave }: ApiKeyInputProps) {
   if (!editing && apiKey) {
     return (
       <div className="flex items-center gap-3">
-        <span className="text-green-400 text-sm">
-          OpenRouter key: ****{apiKey.slice(-4)}
+        <span className="stat-label text-[var(--color-dbz-green)]">
+          KEY ACTIVE: ****{apiKey.slice(-4)}
         </span>
         <button
           onClick={() => setEditing(true)}
-          className="text-xs text-gray-400 hover:text-white underline"
+          className="stat-label text-gray-500 hover:text-[var(--color-dbz-gold)] transition-colors"
         >
-          change
+          [CHANGE]
         </button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-xs text-gray-400 font-[family-name:var(--font-retro)]">
+    <div className="flex flex-col gap-3">
+      <label className="stat-label text-[var(--color-dbz-gold)]">
         OPENROUTER API KEY
       </label>
       <div className="flex gap-2">
-        <input
-          type="password"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="sk-or-..."
-          className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] text-white px-3 py-2 text-sm font-mono focus:border-[var(--color-dbz-orange)] focus:outline-none"
-        />
+        <div className="pixel-border-sm flex-1">
+          <input
+            type="password"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="sk-or-..."
+            className="w-full bg-transparent text-gray-200 px-3 py-2 focus:outline-none placeholder:text-gray-600"
+          />
+        </div>
         <RetroButton
           onClick={() => {
             onSave(value);
@@ -48,16 +50,16 @@ export function ApiKeyInput({ apiKey, onSave }: ApiKeyInputProps) {
           }}
           variant="secondary"
         >
-          Save
+          SAVE
         </RetroButton>
       </div>
       <a
         href="https://openrouter.ai/keys"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-xs text-[var(--color-dbz-blue)] hover:underline"
+        className="stat-label text-[var(--color-dbz-cyan)] hover:text-[var(--color-dbz-blue)] transition-colors"
       >
-        Get an OpenRouter API key
+        GET AN OPENROUTER API KEY →
       </a>
     </div>
   );

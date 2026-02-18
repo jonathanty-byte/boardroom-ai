@@ -14,21 +14,21 @@ interface MemberCardProps {
 }
 
 const MEMBER_COLORS: Record<BoardMemberRole, string> = {
-  cpo: "#FF6B00",  // Vegeta - orange
-  cmo: "#1A73E8",  // Bulma - blue
-  cfo: "#2D8E4E",  // Piccolo - green
-  cro: "#9B59B6",  // Whis - purple
-  cco: "#E74C3C",  // Gohan - red
-  cto: "#3498DB",  // Trunks - light blue
+  cpo: "#FF6B00",  // Vegeta - fiery orange
+  cmo: "#2196F3",  // Bulma - tech blue
+  cfo: "#4CAF50",  // Piccolo - namekian green
+  cro: "#9C27B0",  // Whis - divine purple
+  cco: "#F44336",  // Gohan - power red
+  cto: "#00BCD4",  // Trunks - future cyan
 };
 
-const MEMBER_INITIALS: Record<BoardMemberRole, string> = {
-  cpo: "VG",
-  cmo: "BL",
-  cfo: "PC",
-  cro: "WH",
-  cco: "GH",
-  cto: "TR",
+const MEMBER_AVATARS: Record<BoardMemberRole, string> = {
+  cpo: "/avatars/vegeta.png",
+  cmo: "/avatars/bulma.png",
+  cfo: "/avatars/piccolo.png",
+  cro: "/avatars/whis.png",
+  cco: "/avatars/gohan.png",
+  cto: "/avatars/trunks.png",
 };
 
 export function MemberCard({ role, state }: MemberCardProps) {
@@ -43,40 +43,70 @@ export function MemberCard({ role, state }: MemberCardProps) {
   return (
     <>
       <div
-        className={`pixel-border p-4 bg-[var(--color-surface-card)] flex flex-col gap-2 min-h-[180px] transition-all duration-300 ${
+        className={`char-card p-3 flex flex-col gap-2 min-h-[200px] transition-all duration-300 ${
           isAnalyzing ? "analyzing-glow" : ""
-        } ${isComplete ? "cursor-pointer hover:bg-[var(--color-border)]" : ""}`}
+        } ${isComplete ? "cursor-pointer" : ""}`}
         onClick={() => isComplete && setShowDetail(true)}
         style={isComplete ? { borderColor: color } : undefined}
       >
-        {/* Header */}
+        {/* Character Header */}
         <div className="flex items-center gap-3">
-          {/* Avatar placeholder */}
+          {/* Avatar */}
           <div
-            className="w-10 h-10 rounded flex items-center justify-center text-black font-bold text-sm font-[family-name:var(--font-retro)]"
-            style={{ backgroundColor: color }}
+            className="w-14 h-14 flex-shrink-0 pixel-border-sm flex items-center justify-center overflow-hidden"
+            style={{ borderColor: color }}
           >
-            {MEMBER_INITIALS[role]}
+            <img
+              src={MEMBER_AVATARS[role]}
+              alt={name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback to colored initial if image not found
+                const target = e.target as HTMLImageElement;
+                target.style.display = "none";
+                target.parentElement!.innerHTML = `<span style="color:${color};font-size:16px;font-family:var(--font-retro)">${name[0]}</span>`;
+              }}
+            />
           </div>
-          <div className="flex-1">
-            <div className="font-[family-name:var(--font-retro)] text-xs" style={{ color }}>
+
+          {/* Name + Role */}
+          <div className="flex-1 min-w-0">
+            <div className="text-[10px] font-bold truncate" style={{ color }}>
               {name}
             </div>
-            <div className="text-xs text-gray-500 uppercase">
-              {role.toUpperCase()} - {title.split(" ").pop()}
+            <div className="stat-label truncate">
+              {role.toUpperCase()}
+            </div>
+            <div className="text-[7px] text-gray-500 truncate">
+              {title}
             </div>
           </div>
         </div>
 
-        {/* Content */}
+        {/* Power Bar (shows during analysis) */}
+        {isAnalyzing && (
+          <div>
+            <div className="stat-label mb-1">ANALYZING...</div>
+            <div className="power-bar-track">
+              <div
+                className="power-bar-fill"
+                style={{ width: `${Math.min(95, state.streamedText.length / 20)}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Content Area */}
         {state.status === "waiting" && (
-          <div className="text-gray-600 text-sm italic flex-1 flex items-center">
-            Awaiting briefing...
+          <div className="flex-1 flex items-center justify-center">
+            <span className="text-[8px] text-gray-600 tracking-widest uppercase">
+              Standby
+            </span>
           </div>
         )}
 
         {isAnalyzing && (
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden dialogue-box p-2">
             <StreamingText
               text={state.streamedText}
               isStreaming={true}
@@ -88,10 +118,12 @@ export function MemberCard({ role, state }: MemberCardProps) {
         {isComplete && state.result && (
           <div className="flex-1 flex flex-col gap-2">
             <VerdictBadge verdict={state.result.verdict} />
-            <p className="text-xs text-gray-400 line-clamp-3">
-              {state.result.analysis.slice(0, 150)}...
+            <p className="text-[10px] text-gray-400 line-clamp-3 font-[family-name:var(--font-terminal)] text-sm leading-tight">
+              {state.result.analysis.slice(0, 120)}...
             </p>
-            <span className="text-xs text-gray-600">Click for details</span>
+            <span className="text-[7px] text-gray-600 tracking-wider mt-auto">
+              CLICK TO INSPECT
+            </span>
           </div>
         )}
       </div>

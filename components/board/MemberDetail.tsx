@@ -10,79 +10,107 @@ interface MemberDetailProps {
   onClose: () => void;
 }
 
+const MEMBER_COLORS: Record<BoardMemberRole, string> = {
+  cpo: "#FF6B00",
+  cmo: "#2196F3",
+  cfo: "#4CAF50",
+  cro: "#9C27B0",
+  cco: "#F44336",
+  cto: "#00BCD4",
+};
+
 export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
+  const color = MEMBER_COLORS[role];
+
   return (
     <div
-      className="fixed inset-0 bg-black/80 z-40 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/85 z-40 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
-        className="pixel-border bg-[var(--color-surface-card)] p-6 max-w-2xl w-full max-h-[85vh] overflow-y-auto"
+        className="pixel-border p-0 max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="font-[family-name:var(--font-retro)] text-sm text-[var(--color-dbz-orange)]">
-              {BOARD_MEMBER_NAMES[role]}
-            </h2>
-            <p className="text-xs text-gray-400">{BOARD_MEMBER_TITLES[role]}</p>
+        {/* Header bar */}
+        <div
+          className="px-4 py-3 flex items-center justify-between"
+          style={{ background: `linear-gradient(90deg, ${color}30, transparent)` }}
+        >
+          <div className="flex items-center gap-3">
+            <img
+              src={`/avatars/${role === "cpo" ? "vegeta" : role === "cmo" ? "bulma" : role === "cfo" ? "piccolo" : role === "cro" ? "whis" : role === "cco" ? "gohan" : "trunks"}.png`}
+              alt={BOARD_MEMBER_NAMES[role]}
+              className="w-10 h-10 pixel-border-sm"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+            />
+            <div>
+              <h2 className="text-[11px] font-bold" style={{ color }}>
+                {BOARD_MEMBER_NAMES[role]}
+              </h2>
+              <p className="stat-label">{BOARD_MEMBER_TITLES[role]}</p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl leading-none"
+            className="text-gray-500 hover:text-white text-[10px] px-2 py-1 pixel-border-sm"
           >
-            x
+            CLOSE
           </button>
         </div>
 
-        {/* Verdict */}
-        <div className="mb-4">
-          <VerdictBadge verdict={result.verdict} animated={false} />
-        </div>
-
-        {/* Analysis */}
-        <div className="mb-4">
-          <h3 className="text-xs font-[family-name:var(--font-retro)] text-gray-400 mb-2">
-            ANALYSIS
-          </h3>
-          <p className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">
-            {result.analysis}
-          </p>
-        </div>
-
-        {/* Challenges */}
-        {result.challenges.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-xs font-[family-name:var(--font-retro)] text-[var(--color-dbz-red)] mb-2">
-              CHALLENGES FOR THE CEO
-            </h3>
-            <ul className="space-y-1">
-              {result.challenges.map((c, i) => (
-                <li key={i} className="text-sm text-gray-300 pl-4 border-l-2 border-[var(--color-dbz-red)]">
-                  {c}
-                </li>
-              ))}
-            </ul>
+        {/* Scrollable content */}
+        <div className="overflow-y-auto p-4 flex flex-col gap-4">
+          {/* Verdict */}
+          <div className="flex items-center gap-3">
+            <span className="stat-label">VERDICT:</span>
+            <VerdictBadge verdict={result.verdict} animated={false} size="lg" />
           </div>
-        )}
 
-        {/* Verdict Details */}
-        <div>
-          <h3 className="text-xs font-[family-name:var(--font-retro)] text-gray-400 mb-2">
-            VERDICT DETAILS
-          </h3>
-          <div className="space-y-2">
-            {Object.entries(result.verdictDetails).map(([key, value]) =>
-              value ? (
-                <div key={key} className="text-sm">
-                  <span className="text-gray-500 capitalize">
-                    {key.replace(/([A-Z])/g, " $1").trim()}:
-                  </span>{" "}
-                  <span className="text-gray-200">{value}</span>
-                </div>
-              ) : null,
-            )}
+          {/* Analysis */}
+          <div className="dialogue-box p-4">
+            <div className="stat-label mb-2" style={{ color }}>ANALYSIS</div>
+            <p className="font-[family-name:var(--font-terminal)] text-base text-gray-200 whitespace-pre-wrap leading-relaxed">
+              {result.analysis}
+            </p>
+          </div>
+
+          {/* Challenges */}
+          {result.challenges.length > 0 && (
+            <div>
+              <div className="stat-label mb-2 text-[var(--color-dbz-red)]">
+                CHALLENGES FOR CEO
+              </div>
+              <div className="space-y-2">
+                {result.challenges.map((c, i) => (
+                  <div
+                    key={i}
+                    className="dialogue-box p-3 font-[family-name:var(--font-terminal)] text-sm text-gray-300"
+                    style={{ borderLeftColor: "var(--color-dbz-red)", borderLeftWidth: "4px" }}
+                  >
+                    {c}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Verdict Details */}
+          <div>
+            <div className="stat-label mb-2">VERDICT DETAILS</div>
+            <div className="space-y-2">
+              {Object.entries(result.verdictDetails).map(([key, value]) =>
+                value ? (
+                  <div key={key} className="flex flex-col gap-0.5">
+                    <span className="stat-label" style={{ color }}>
+                      {key.replace(/([A-Z])/g, " $1").trim().toUpperCase()}
+                    </span>
+                    <span className="font-[family-name:var(--font-terminal)] text-sm text-gray-300">
+                      {value}
+                    </span>
+                  </div>
+                ) : null,
+              )}
+            </div>
           </div>
         </div>
       </div>

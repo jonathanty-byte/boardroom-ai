@@ -7,6 +7,17 @@ import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { BoardRoom } from "@/components/board/BoardRoom";
 import { ExportButton } from "@/components/report/ExportButton";
 import { RetroButton } from "@/components/ui/RetroButton";
+import { BOARD_MEMBER_NAMES } from "@/lib/engine/types";
+import type { BoardMemberRole } from "@/lib/engine/types";
+
+const MEMBER_COLORS: Record<BoardMemberRole, string> = {
+  cpo: "#FF6B00",
+  cmo: "#2196F3",
+  cfo: "#4CAF50",
+  cro: "#9C27B0",
+  cco: "#F44336",
+  cto: "#00BCD4",
+};
 
 export default function Home() {
   const { apiKey, saveKey, loaded, hasKey } = useApiKey();
@@ -22,21 +33,21 @@ export default function Home() {
   if (!loaded) return null;
 
   return (
-    <main className="min-h-screen flex flex-col items-center px-4 py-8">
+    <main className="min-h-screen flex flex-col items-center px-4 py-8 star-bg">
       {/* Header */}
       <header className="w-full max-w-5xl flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-[family-name:var(--font-retro)] text-lg text-[var(--color-dbz-orange)]">
+          <h1 className="rpg-title text-lg text-[var(--color-dbz-orange)]">
             COMEX BOARD
           </h1>
-          <p className="text-sm text-gray-500">
-            AI Executive Decision Engine
+          <p className="stat-label text-gray-500">
+            AI EXECUTIVE DECISION ENGINE
           </p>
         </div>
         <div className="flex items-center gap-4">
           {state.phase !== "idle" && (
             <RetroButton onClick={reset} variant="secondary">
-              New Analysis
+              NEW ANALYSIS
             </RetroButton>
           )}
         </div>
@@ -44,27 +55,27 @@ export default function Home() {
 
       {/* API Key section */}
       {!hasKey && (
-        <div className="w-full max-w-2xl mb-8 pixel-border p-6 bg-[var(--color-surface-card)]">
+        <div className="w-full max-w-2xl mb-8 pixel-border p-6">
           <ApiKeyInput apiKey={apiKey} onSave={saveKey} />
         </div>
       )}
 
-      {/* Main content */}
+      {/* Main content - Idle state */}
       {state.phase === "idle" && (
         <div className="flex flex-col items-center gap-8">
           {/* Hero */}
           <div className="text-center max-w-2xl">
-            <h2 className="font-[family-name:var(--font-retro)] text-sm text-white mb-4">
+            <h2 className="rpg-title text-sm text-white mb-4">
               SUBMIT YOUR DECISION TO THE BOARD
             </h2>
-            <p className="text-gray-400 text-base leading-relaxed">
+            <p className="font-[family-name:var(--font-terminal)] text-lg text-gray-400 leading-relaxed">
               6 AI board members will analyze your project independently,
               detect disagreements, debate contradictions, and deliver a
-              structured decision report.
+              structured COSTRAT decision report.
             </p>
           </div>
 
-          {/* API key inline if needed */}
+          {/* API key inline if set */}
           {hasKey && (
             <div className="w-full max-w-2xl">
               <ApiKeyInput apiKey={apiKey} onSave={saveKey} />
@@ -75,14 +86,29 @@ export default function Home() {
           <AnalysisForm onSubmit={handleSubmit} disabled={!hasKey || isRunning} />
 
           {/* Board member preview */}
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-4 w-full max-w-3xl opacity-40">
-            {(["cpo", "cmo", "cfo", "cro", "cco", "cto"] as const).map((role) => (
-              <div key={role} className="text-center">
-                <div className="w-12 h-12 mx-auto rounded bg-[var(--color-surface-card)] pixel-border flex items-center justify-center text-xs font-[family-name:var(--font-retro)] text-gray-500">
-                  {role.toUpperCase()}
+          <div className="w-full max-w-3xl">
+            <div className="stat-label text-center mb-3">THE BOARD</div>
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+              {(["cpo", "cmo", "cfo", "cro", "cco", "cto"] as const).map((role) => (
+                <div key={role} className="char-card p-3 text-center opacity-60 hover:opacity-100 transition-opacity">
+                  <div
+                    className="w-10 h-10 mx-auto pixel-border-sm flex items-center justify-center mb-2"
+                    style={{ borderColor: MEMBER_COLORS[role] }}
+                  >
+                    <span
+                      className="text-[10px] font-bold"
+                      style={{ color: MEMBER_COLORS[role] }}
+                    >
+                      {BOARD_MEMBER_NAMES[role][0]}
+                    </span>
+                  </div>
+                  <div className="text-[8px] font-bold" style={{ color: MEMBER_COLORS[role] }}>
+                    {BOARD_MEMBER_NAMES[role]}
+                  </div>
+                  <div className="stat-label">{role.toUpperCase()}</div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -101,7 +127,7 @@ export default function Home() {
       {/* Complete state */}
       {state.phase === "complete" && state.report && (
         <div className="mt-6 flex flex-col items-center gap-4">
-          <div className="font-[family-name:var(--font-retro)] text-xs text-green-400">
+          <div className="rpg-title text-[10px] text-[var(--color-dbz-green)]">
             ANALYSIS COMPLETE — {(state.report.totalDurationMs / 1000).toFixed(1)}s
           </div>
           <ExportButton report={state.report} />
@@ -110,29 +136,33 @@ export default function Home() {
 
       {/* Error state */}
       {state.phase === "error" && (
-        <div className="mt-6 pixel-border p-4 bg-red-900/20 border-red-500 max-w-2xl">
-          <h3 className="font-[family-name:var(--font-retro)] text-xs text-red-400 mb-2">
-            ERROR
+        <div className="mt-6 pixel-border p-4 max-w-2xl" style={{ borderColor: "var(--color-dbz-red)" }}>
+          <h3 className="rpg-title text-[10px] text-[var(--color-dbz-red)] mb-2">
+            ERROR DETECTED
           </h3>
-          <p className="text-sm text-red-300">{state.error}</p>
+          <p className="font-[family-name:var(--font-terminal)] text-base text-red-300">
+            {state.error}
+          </p>
           <RetroButton onClick={reset} variant="secondary" className="mt-4">
-            Try Again
+            RETRY
           </RetroButton>
         </div>
       )}
 
       {/* Footer */}
-      <footer className="mt-auto pt-12 text-center text-xs text-gray-600">
-        COMEX Board by{" "}
-        <a
-          href="https://github.com/jonathanty-byte"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-gray-500 hover:text-[var(--color-dbz-orange)]"
-        >
-          Jonathan Ty
-        </a>
-        {" "}— Powered by OpenRouter
+      <footer className="mt-auto pt-12 text-center">
+        <div className="stat-label text-gray-600">
+          COMEX BOARD by{" "}
+          <a
+            href="https://github.com/jonathanty-byte"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 hover:text-[var(--color-dbz-orange)] transition-colors"
+          >
+            JONATHAN TY
+          </a>
+          {" "}— POWERED BY OPENROUTER
+        </div>
       </footer>
     </main>
   );

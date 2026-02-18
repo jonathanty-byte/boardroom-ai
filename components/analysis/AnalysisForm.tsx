@@ -23,51 +23,61 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-2xl">
+      {/* Main input */}
       <div>
-        <label className="block text-xs font-[family-name:var(--font-retro)] text-[var(--color-dbz-orange)] mb-2">
-          YOUR DECISION / PROJECT
+        <label className="stat-label block mb-2 text-[var(--color-dbz-gold)]">
+          PROJECT / DECISION BRIEFING
         </label>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Describe your project, business case, or decision to analyze...&#10;&#10;The more context you provide, the better the analysis."
-          rows={8}
-          className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] text-white px-4 py-3 text-base font-mono resize-y focus:border-[var(--color-dbz-orange)] focus:outline-none placeholder:text-gray-600"
-        />
+        <div className="dialogue-box">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Describe your project, business case, or decision..."
+            rows={8}
+            className="w-full bg-transparent text-gray-200 px-4 py-3 resize-y focus:outline-none placeholder:text-gray-600"
+          />
+        </div>
       </div>
 
+      {/* CEO Vision */}
       <div>
-        <label className="block text-xs font-[family-name:var(--font-retro)] text-gray-400 mb-2">
+        <label className="stat-label block mb-2">
           CEO VISION (OPTIONAL)
         </label>
-        <input
-          type="text"
-          value={ceoVision}
-          onChange={(e) => setCeoVision(e.target.value)}
-          placeholder="Focus the analysis: e.g. 'Focus on unit economics' or 'Is this technically feasible?'"
-          className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] text-white px-4 py-2 text-base font-mono focus:border-[var(--color-dbz-orange)] focus:outline-none placeholder:text-gray-600"
-        />
+        <div className="pixel-border-sm">
+          <input
+            type="text"
+            value={ceoVision}
+            onChange={(e) => setCeoVision(e.target.value)}
+            placeholder="Focus: e.g. 'Unit economics' or 'Go-to-market strategy'"
+            className="w-full bg-transparent text-gray-200 px-3 py-2 focus:outline-none placeholder:text-gray-600"
+          />
+        </div>
       </div>
 
+      {/* Model selector */}
       <div>
-        <label className="block text-xs font-[family-name:var(--font-retro)] text-gray-400 mb-2">
-          MODEL
+        <label className="stat-label block mb-2">
+          AI MODEL
         </label>
-        <select
-          value={model}
-          onChange={(e) => setModel(e.target.value)}
-          className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] text-white px-4 py-2 text-base font-mono focus:border-[var(--color-dbz-orange)] focus:outline-none"
-        >
-          {RECOMMENDED_MODELS.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.name} — {m.description}
-            </option>
-          ))}
-        </select>
+        <div className="pixel-border-sm">
+          <select
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+            className="w-full bg-[var(--color-surface)] text-gray-200 px-3 py-2 focus:outline-none"
+          >
+            {RECOMMENDED_MODELS.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name} — {m.description}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
+      {/* Submit */}
       <RetroButton type="submit" disabled={disabled || !content.trim()}>
-        Launch COMEX Analysis
+        ⚔ LAUNCH COMEX ANALYSIS ⚔
       </RetroButton>
     </form>
   );

@@ -15,7 +15,7 @@ export function StreamingText({ text, isStreaming, maxLines = 4 }: StreamingText
       : text;
 
   return (
-    <div className="text-sm text-gray-300 font-mono leading-relaxed overflow-hidden">
+    <div className="font-[family-name:var(--font-terminal)] text-sm text-gray-300 leading-relaxed overflow-hidden">
       <span className="whitespace-pre-wrap break-words">
         {displayText}
       </span>

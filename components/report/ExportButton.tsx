@@ -21,8 +21,8 @@ export function ExportButton({ report }: ExportButtonProps) {
   };
 
   return (
-    <RetroButton onClick={handleExport} variant="secondary">
-      Export COSTRAT.md
+    <RetroButton onClick={handleExport} variant="primary">
+      ⬇ DOWNLOAD COSTRAT REPORT ⬇
     </RetroButton>
   );
 }
