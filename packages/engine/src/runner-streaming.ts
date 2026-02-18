@@ -2,11 +2,14 @@ import OpenAI from "openai";
 import type {
   BoardMemberConfig,
   BoardMemberRole,
+  DebateTurn,
+  ModeratorAction,
   Round1Output,
   Round1Result,
   Round2Response,
   Round2Result,
 } from "./types";
+import { MODERATOR_CONFIG, MODERATOR_SYSTEM_PROMPT } from "./moderator";
 
 const DEFAULT_MODEL = "deepseek/deepseek-v3.2";
 
@@ -174,6 +177,113 @@ export class StreamingAgentRunner {
     } catch {
       throw new Error(
         `${config.name} (${config.role}) Round 2 returned invalid JSON.\nRaw:\n${raw.slice(0, 500)}`,
+      );
+    }
+  }
+
+  // === V0.2 DEBATE ENGINE METHODS ===
+
+  async runModeratorStreaming(
+    userPrompt: string,
+    onChunk: (chunk: string) => void,
+  ): Promise<ModeratorAction> {
+    const client = this.createClient();
+    let fullText = "";
+
+    const stream = await client.chat.completions.create({
+      model: this.model,
+      max_tokens: MODERATOR_CONFIG.maxTokens,
+      temperature: MODERATOR_CONFIG.temperature,
+      stream: true,
+      messages: [
+        { role: "system", content: MODERATOR_SYSTEM_PROMPT },
+        { role: "user", content: userPrompt },
+      ],
+    });
+
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) {
+        fullText += delta;
+        onChunk(delta);
+      }
+    }
+
+    return this.parseModeratorResponse(fullText);
+  }
+
+  async runDebateTurnStreaming(
+    config: BoardMemberConfig,
+    systemPrompt: string,
+    userPrompt: string,
+    turnNumber: number,
+    onChunk: (role: BoardMemberRole, chunk: string) => void,
+  ): Promise<DebateTurn> {
+    const client = this.createClient();
+    let fullText = "";
+
+    const stream = await client.chat.completions.create({
+      model: this.model,
+      max_tokens: 1024,
+      temperature: config.temperature,
+      stream: true,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    });
+
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) {
+        fullText += delta;
+        onChunk(config.role, delta);
+      }
+    }
+
+    return this.parseDebateTurn(fullText, config, turnNumber);
+  }
+
+  parseModeratorResponse(raw: string): ModeratorAction {
+    const cleaned = this.extractJSON(raw);
+
+    try {
+      const parsed = JSON.parse(cleaned) as Record<string, unknown>;
+      return {
+        action: (parsed.action as ModeratorAction["action"]) ?? "DECLARE_IMPASSE",
+        targetMember: parsed.targetMember as BoardMemberRole | undefined,
+        question: parsed.question as string | undefined,
+        reasoning: (parsed.reasoning as string) ?? "",
+        convergenceSummary: parsed.convergenceSummary as string | undefined,
+      };
+    } catch {
+      // If parsing fails, default to impasse to avoid infinite loops
+      return {
+        action: "DECLARE_IMPASSE",
+        reasoning: "Moderator response could not be parsed",
+      };
+    }
+  }
+
+  parseDebateTurn(raw: string, config: BoardMemberConfig, turnNumber: number): DebateTurn {
+    const cleaned = this.extractJSON(raw);
+
+    try {
+      const parsed = JSON.parse(cleaned) as Record<string, unknown>;
+      return {
+        turnNumber,
+        speaker: config.role,
+        addressedTo: Array.isArray(parsed.addressedTo)
+          ? (parsed.addressedTo as BoardMemberRole[])
+          : [],
+        type: (parsed.type as DebateTurn["type"]) ?? "RESPONSE",
+        content: (parsed.content as string) ?? "",
+        quotedFrom: (parsed.quotedFrom as string) ?? undefined,
+        positionShift: (parsed.positionShift as DebateTurn["positionShift"]) ?? "UNCHANGED",
+      };
+    } catch {
+      throw new Error(
+        `${config.name} (${config.role}) debate turn returned invalid JSON.\nRaw:\n${raw.slice(0, 500)}`,
       );
     }
   }
