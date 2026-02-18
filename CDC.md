@@ -1,18 +1,18 @@
-# Cahier des Charges — COMEX Board
+# Cahier des Charges — BoardRoom AI
 
 **Plateforme d'Analyse Strategique Multi-Agents IA**
 
 - **Date :** 18 fevrier 2026
 - **Version :** 0.1.0
 - **Auteur :** Jonathan Ty
-- **Repo :** github.com/jonathanty-byte/comex-board-web
-- **Production :** comex-board-web.vercel.app
+- **Repo :** github.com/jonathanty-byte/boardroom-ai
+- **Production :** boardroom-ai.vercel.app
 
 ---
 
 ## 1. Vision produit
 
-COMEX Board simule un comite executif (COMEX) compose de 6 personnalites IA qui analysent, debattent et jugent un projet ou une decision business. Chaque membre a un role C-level, une personnalite distincte (theme Dragon Ball Z) et un cadre d'analyse propre.
+BoardRoom AI simule un comite executif compose de 6 personnalites IA qui analysent, debattent et jugent un projet ou une decision business. Chaque membre a un role C-level, une personnalite distincte (theme Dragon Ball Z) et un cadre d'analyse propre.
 
 **Proposition de valeur :** Transformer une decision solitaire en un stress-test multi-perspective en moins de 2 minutes, pour une fraction du cout d'un vrai conseil consultatif.
 
@@ -47,7 +47,7 @@ Debats Round 2 (LLM, membres en friction)
 Synthese (code)
     |
     v
-Rapport COSTRAT final
+Rapport BoardRoom Report final
 ```
 
 ### Stack
@@ -75,7 +75,7 @@ Rapport COSTRAT final
 
 ---
 
-## 3. Les 6 membres du COMEX
+## 3. Les 6 membres du BoardRoom AI
 
 | Role | Persona | Titre | Temperature | Specialite |
 |------|---------|-------|-------------|------------|
@@ -175,7 +175,7 @@ Chaque membre produit :
 | Detail membre | `MemberDetail.tsx` | Analyse complete, challenges, verdict details |
 | Badge verdict | `VerdictBadge.tsx` | Badge colore avec glow (vert/orange/rouge) |
 | Texte streaming | `StreamingText.tsx` | Texte en temps reel avec curseur clignotant |
-| Export | `ExportButton.tsx` | Telecharger rapport COSTRAT en Markdown |
+| Export | `ExportButton.tsx` | Telecharger rapport BoardRoom Report en Markdown |
 | Bouton retro | `RetroButton.tsx` | Bouton gradient or/orange avec effet 3D |
 
 ### Avatars
@@ -198,11 +198,11 @@ frictions_detected → Frictions identifiees
 debate_chunk      → Texte streaming par membre (Round 2)
 debate_complete   → Resultat parse d'un debat (Round 2)
 synthesis_complete → Synthese finale
-analysis_complete  → Rapport COSTRAT complet
+analysis_complete  → Rapport BoardRoom Report complet
 error             → Message d'erreur
 ```
 
-### Export COSTRAT
+### Export BoardRoom Report
 
 Le rapport final est exportable en Markdown avec la structure :
 - En-tete (nom du projet, date, CEO vision)
@@ -374,7 +374,7 @@ MVP minimal en parallele des interviews, budget max 2 semaines de dev.
 - [x] Synthese automatique
 - [x] Interface RPG pixel art (theme DBZ)
 - [x] Avatars SVG pixel art
-- [x] Export COSTRAT Markdown
+- [x] Export BoardRoom Report Markdown
 - [x] BYOK OpenRouter
 - [x] Deploy Vercel
 
@@ -406,7 +406,7 @@ MVP minimal en parallele des interviews, budget max 2 semaines de dev.
 ## 9. Structure du projet
 
 ```
-comex-board-web/
+boardroom-ai/
 ├── app/
 │   ├── layout.tsx                  # Fonts (Press Start 2P, VT323), metadata
 │   ├── page.tsx                    # Page principale
@@ -422,7 +422,7 @@ comex-board-web/
 │   │   ├── AnalysisForm.tsx        # Formulaire briefing + CEO vision + modele
 │   │   └── StreamingText.tsx       # Texte temps reel avec curseur
 │   ├── report/
-│   │   └── ExportButton.tsx        # Telecharger COSTRAT.md
+│   │   └── ExportButton.tsx        # Telecharger BoardRoom Report.md
 │   ├── settings/
 │   │   └── ApiKeyInput.tsx         # BYOK OpenRouter + localStorage
 │   └── ui/
@@ -436,12 +436,12 @@ comex-board-web/
 │   │   ├── friction.ts             # Detection frictions (sentiment scoring)
 │   │   └── synthesis.ts            # Synthese + verdict collectif
 │   ├── hooks/
-│   │   ├── useComexAnalysis.ts     # Hook SSE principal
+│   │   ├── useBoardroomAnalysis.ts  # Hook SSE principal
 │   │   ├── useAnalysisState.ts     # Reducer etat analyse (9 actions)
 │   │   └── useApiKey.ts            # Hook localStorage cle API
 │   └── utils/
 │       ├── constants.ts            # Modeles, couleurs verdicts
-│       └── markdown-export.ts      # Generateur rapport COSTRAT
+│       └── markdown-export.ts      # Generateur rapport BoardRoom Report
 └── public/
     └── avatars/                    # 6 SVG pixel art (vegeta, bulma, piccolo, whis, gohan, trunks)
 ```

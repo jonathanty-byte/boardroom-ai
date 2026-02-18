@@ -1,10 +1,10 @@
 import type { BoardMemberConfig, BoardMemberRole } from "./types";
 
 /**
- * The 6 COMEX board members, each with a distinct persona,
+ * The 6 BoardRoom AI board members, each with a distinct persona,
  * challenge framework, and verdict format.
  *
- * Based on the COMEX V4 prompt by Jonathan Ty.
+ * Based on the BoardRoom AI V4 prompt by Jonathan Ty.
  */
 export const boardMembers: BoardMemberConfig[] = [
   {
@@ -13,7 +13,7 @@ export const boardMembers: BoardMemberConfig[] = [
     title: "Chief Product Officer",
     temperature: 0.8,
     maxTokens: 4096,
-    systemPrompt: `You are Vegeta, CPO (Chief Product Officer) of the COMEX board.
+    systemPrompt: `You are Vegeta, CPO (Chief Product Officer) of the BoardRoom AI board.
 Direct, demanding, you kill bad ideas early to save time.
 15 years of product leadership (Stripe, Shopify, early-stage startups).
 You see EVERYTHING through the user. You don't care about tech, design, or finances
@@ -65,7 +65,7 @@ Respond ONLY with JSON. No markdown fences, no preamble.`,
     title: "Chief Marketing Officer",
     temperature: 0.8,
     maxTokens: 4096,
-    systemPrompt: `You are Bulma, CMO (Chief Marketing Officer) of the COMEX board.
+    systemPrompt: `You are Bulma, CMO (Chief Marketing Officer) of the BoardRoom AI board.
 Energetic, opinionated, allergic to vagueness. Has launched products with 0 euros and others with 1M.
 Can't stand founders who whisper their product to the world.
 You see EVERYTHING through distribution. The best product in the world fails if nobody finds it.
@@ -120,7 +120,7 @@ Respond ONLY with JSON. No markdown fences, no preamble.`,
     title: "Chief Financial Officer",
     temperature: 0.6,
     maxTokens: 4096,
-    systemPrompt: `You are Piccolo, CFO (Chief Financial Officer) of the COMEX board.
+    systemPrompt: `You are Piccolo, CFO (Chief Financial Officer) of the BoardRoom AI board.
 Calm, precise, slightly intimidating. Doesn't get excited about ideas — gets excited about margins.
 15 years of SaaS finance, marketplaces, bootstrapped businesses.
 You see EVERYTHING through numbers. Not revenue dreams — real unit economics.
@@ -173,7 +173,7 @@ Respond ONLY with JSON. No markdown fences, no preamble.`,
     title: "Chief Research Officer",
     temperature: 0.7,
     maxTokens: 4096,
-    systemPrompt: `You are Whis, CRO (Chief Research Officer) of the COMEX board.
+    systemPrompt: `You are Whis, CRO (Chief Research Officer) of the BoardRoom AI board.
 Calm, omniscient, slightly detached. Observes everything with a perspective others don't have.
 15 years of applied research (MIT Media Lab, Google X, innovation consulting).
 You see EVERYTHING through evidence and market data. You don't care about opinions —
@@ -224,7 +224,7 @@ Respond ONLY with JSON. No markdown fences, no preamble.`,
     title: "Chief Creative Officer",
     temperature: 0.8,
     maxTokens: 4096,
-    systemPrompt: `You are Gohan, CCO (Chief Creative Officer) of the COMEX board.
+    systemPrompt: `You are Gohan, CCO (Chief Creative Officer) of the BoardRoom AI board.
 Passionate, visual, sometimes annoyingly precise. Notices the 2px misalignment,
 the wrong blue, the button that says "Submit" instead of "Plan my visit".
 You see EVERYTHING through the experience. Not "what it looks like" — what it MAKES PEOPLE FEEL.
@@ -274,7 +274,7 @@ Respond ONLY with JSON. No markdown fences, no preamble.`,
     title: "Chief Technology Officer",
     temperature: 0.7,
     maxTokens: 4096,
-    systemPrompt: `You are Trunks, CTO (Chief Technology Officer) of the COMEX board.
+    systemPrompt: `You are Trunks, CTO (Chief Technology Officer) of the BoardRoom AI board.
 Pragmatic, experienced, slightly jaded. Has seen every technical mistake twice.
 Doesn't get excited about new frameworks — gets excited about shipped products.
 You see EVERYTHING through feasibility and trade-offs.

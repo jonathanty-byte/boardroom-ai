@@ -4,14 +4,14 @@ import { identifyFrictions } from "./friction";
 import { synthesize } from "./synthesis";
 import type {
   AnalysisInput,
-  CostratReport,
+  BoardroomReport,
   Round1Result,
   Round2Result,
   SSEEvent,
 } from "./types";
 
 /**
- * Streaming COMEX Decision Engine.
+ * Streaming BoardRoom AI Decision Engine.
  * Orchestrates the full analysis pipeline and emits SSE events for each step.
  */
 export async function runAnalysis(
@@ -103,8 +103,8 @@ export async function runAnalysis(
 
     // Build final report
     const totalDurationMs = Math.round(performance.now() - startTime);
-    const report: CostratReport = {
-      projectName: "COMEX Analysis",
+    const report: BoardroomReport = {
+      projectName: "BoardRoom AI Analysis",
       timestamp: new Date().toISOString(),
       ceoVision: input.ceoVision ?? "",
       round1: round1Results,

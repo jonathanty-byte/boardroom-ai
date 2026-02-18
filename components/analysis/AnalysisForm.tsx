@@ -77,7 +77,7 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
 
       {/* Submit */}
       <RetroButton type="submit" disabled={disabled || !content.trim()}>
-        ⚔ LAUNCH COMEX ANALYSIS ⚔
+        ⚔ LAUNCH BOARDROOM ANALYSIS ⚔
       </RetroButton>
     </form>
   );

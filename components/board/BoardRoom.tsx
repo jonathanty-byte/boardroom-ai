@@ -32,7 +32,7 @@ export function BoardRoom({
       {/* Board members grid - RPG battle formation style */}
       <div>
         <div className="stat-label mb-2 text-center text-[var(--color-dbz-gold)]">
-          COMEX BOARD MEMBERS
+          BOARDROOM AI MEMBERS
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {ROLES.map((role) => (

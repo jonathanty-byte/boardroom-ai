@@ -7,7 +7,7 @@ import type {
   Round2Response,
   FrictionPoint,
   Synthesis,
-  CostratReport,
+  BoardroomReport,
   SSEEvent,
 } from "@/lib/engine/types";
 
@@ -38,7 +38,7 @@ export interface AnalysisState {
   frictions: FrictionPoint[];
   debates: Record<BoardMemberRole, DebateState>;
   synthesis: Synthesis | null;
-  report: CostratReport | null;
+  report: BoardroomReport | null;
   error: string | null;
 }
 

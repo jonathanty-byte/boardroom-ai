@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { useAnalysisState } from "./useAnalysisState";
 import type { SSEEvent } from "@/lib/engine/types";
 
-export function useComexAnalysis() {
+export function useBoardroomAnalysis() {
   const { state, start, reset, handleEvent } = useAnalysisState();
 
   const analyze = useCallback(

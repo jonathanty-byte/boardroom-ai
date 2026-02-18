@@ -1,7 +1,7 @@
 "use client";
 
 import { useApiKey } from "@/lib/hooks/useApiKey";
-import { useComexAnalysis } from "@/lib/hooks/useComexAnalysis";
+import { useBoardroomAnalysis } from "@/lib/hooks/useBoardroomAnalysis";
 import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
 import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { BoardRoom } from "@/components/board/BoardRoom";
@@ -30,7 +30,7 @@ const MEMBER_AVATARS: Record<BoardMemberRole, string> = {
 
 export default function Home() {
   const { apiKey, saveKey, loaded, hasKey } = useApiKey();
-  const { state, analyze, reset } = useComexAnalysis();
+  const { state, analyze, reset } = useBoardroomAnalysis();
 
   const isRunning = state.phase !== "idle" && state.phase !== "complete" && state.phase !== "error";
 
@@ -47,7 +47,7 @@ export default function Home() {
       <header className="w-full max-w-5xl flex items-center justify-between mb-8">
         <div>
           <h1 className="rpg-title text-lg text-[var(--color-dbz-orange)]">
-            COMEX BOARD
+            BOARDROOM AI
           </h1>
           <p className="stat-label text-gray-500">
             AI EXECUTIVE DECISION ENGINE
@@ -80,7 +80,7 @@ export default function Home() {
             <p className="font-[family-name:var(--font-terminal)] text-lg text-gray-400 leading-relaxed">
               6 AI board members will analyze your project independently,
               detect disagreements, debate contradictions, and deliver a
-              structured COSTRAT decision report.
+              structured BoardRoom decision report.
             </p>
           </div>
 
@@ -160,7 +160,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="mt-auto pt-12 text-center">
         <div className="stat-label text-gray-600">
-          COMEX BOARD by{" "}
+          BOARDROOM AI by{" "}
           <a
             href="https://github.com/jonathanty-byte"
             target="_blank"

@@ -25,8 +25,8 @@ export class StreamingAgentRunner {
       apiKey: this.apiKey,
       baseURL: "https://openrouter.ai/api/v1",
       defaultHeaders: {
-        "HTTP-Referer": "https://comex-board.vercel.app",
-        "X-Title": "COMEX Board",
+        "HTTP-Referer": "https://boardroom-ai.vercel.app",
+        "X-Title": "BoardRoom AI",
       },
     });
   }
@@ -105,7 +105,7 @@ export class StreamingAgentRunner {
       messages: [
         {
           role: "system",
-          content: `You are ${config.name}, ${config.title} of the COMEX board. You are in Round 2 of a contradictory debate. Defend or adjust your position.`,
+          content: `You are ${config.name}, ${config.title} of the BoardRoom AI board. You are in Round 2 of a contradictory debate. Defend or adjust your position.`,
         },
         { role: "user", content: prompt },
       ],

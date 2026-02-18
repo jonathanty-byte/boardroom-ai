@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-const STORAGE_KEY = "comex-openrouter-key";
+const STORAGE_KEY = "boardroom-openrouter-key";
 
 export function useApiKey() {
   const [apiKey, setApiKey] = useState<string>("");

@@ -1,5 +1,5 @@
 /**
- * Core types for the COMEX web engine.
+ * Core types for the BoardRoom AI engine.
  * Adapted from ai-decision-engine for OpenRouter + streaming.
  */
 
@@ -82,7 +82,7 @@ export interface AnalysisInput {
   model?: string;
 }
 
-export interface CostratReport {
+export interface BoardroomReport {
   projectName: string;
   timestamp: string;
   ceoVision: string;
@@ -111,5 +111,5 @@ export type SSEEvent =
   | { type: "debate_chunk"; role: BoardMemberRole; chunk: string }
   | { type: "debate_complete"; role: BoardMemberRole; result: Round2Response }
   | { type: "synthesis_complete"; synthesis: Synthesis }
-  | { type: "analysis_complete"; report: CostratReport }
+  | { type: "analysis_complete"; report: BoardroomReport }
   | { type: "error"; message: string };
