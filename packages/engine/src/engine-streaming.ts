@@ -1,4 +1,5 @@
 import { boardMembers } from "./board-members";
+import { extractCEOFollowUp } from "./ceo-followup";
 import { flattenDebatesToRound2, runDebateForFriction } from "./debate-engine";
 import { identifyFrictions } from "./friction";
 import { StreamingAgentRunner } from "./runner-streaming";
@@ -74,6 +75,12 @@ export async function runAnalysis(
     const synthesis = synthesize(round1Results, round2Results, frictions);
     send({ type: "synthesis_complete", synthesis });
 
+    // CEO follow-up questions (only if debates were unresolved)
+    const ceoFollowUp = extractCEOFollowUp(round1Results, debateHistories);
+    if (ceoFollowUp.length > 0) {
+      send({ type: "ceo_followup", questions: ceoFollowUp });
+    }
+
     // Build final report
     const totalDurationMs = Math.round(performance.now() - startTime);
     const report: BoardroomReport = {
@@ -86,6 +93,7 @@ export async function runAnalysis(
       synthesis,
       totalDurationMs,
       debates: debateHistories.length > 0 ? debateHistories : undefined,
+      ceoFollowUp: ceoFollowUp.length > 0 ? ceoFollowUp : undefined,
     };
 
     send({ type: "analysis_complete", report });

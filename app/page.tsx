@@ -2,8 +2,10 @@
 
 import type { BoardMemberRole } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
+import { useRef } from "react";
 import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { BoardRoom } from "@/components/board/BoardRoom";
+import { CEOFollowUp } from "@/components/board/CEOFollowUp";
 import { ExportButton } from "@/components/report/ExportButton";
 import { ShareImage } from "@/components/report/ShareImage";
 import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
@@ -33,11 +35,23 @@ export default function Home() {
   const { apiKey, saveKey, loaded, hasKey } = useApiKey();
   const { state, analyze, reset } = useBoardroomAnalysis();
 
+  // Store last submit params for re-analysis
+  const contentRef = useRef("");
+  const modelRef = useRef("");
+
   const isRunning = state.phase !== "idle" && state.phase !== "complete" && state.phase !== "error";
 
   const handleSubmit = (content: string, ceoVision: string, model: string) => {
     if (!apiKey) return;
+    contentRef.current = content;
+    modelRef.current = model;
     analyze(content, apiKey, ceoVision, model);
+  };
+
+  const handleReanalyze = (enrichedVision: string) => {
+    if (!apiKey) return;
+    reset();
+    analyze(contentRef.current, apiKey, enrichedVision, modelRef.current);
   };
 
   if (!loaded) return null;
@@ -144,6 +158,13 @@ export default function Home() {
           synthesis={state.synthesis}
           phase={state.phase}
         />
+      )}
+
+      {/* CEO Follow-Up Questions */}
+      {state.phase === "complete" && state.ceoFollowUp.length > 0 && (
+        <div className="w-full max-w-5xl mt-6">
+          <CEOFollowUp questions={state.ceoFollowUp} onReanalyze={handleReanalyze} />
+        </div>
       )}
 
       {/* Complete state */}

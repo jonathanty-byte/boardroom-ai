@@ -1,6 +1,9 @@
 // Config
 export { boardMembers, getMemberConfig } from "./board-members";
 
+// CEO follow-up
+export { extractCEOFollowUp } from "./ceo-followup";
+
 // V0.2 debate modules
 export { analyzeConvergence } from "./convergence";
 export { flattenDebatesToRound2, runDebateForFriction } from "./debate-engine";
@@ -24,6 +27,7 @@ export type {
   BoardMemberConfig,
   BoardMemberRole,
   BoardroomReport,
+  CEOFollowUpQuestion,
   CcoVerdict,
   CfoVerdict,
   CmoVerdict,

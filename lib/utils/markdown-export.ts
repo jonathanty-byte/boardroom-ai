@@ -1,4 +1,4 @@
-import type { BoardroomReport } from "@boardroom/engine";
+import type { BoardMemberRole, BoardroomReport } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 
 export function formatBoardroomReport(report: BoardroomReport): string {
@@ -145,6 +145,21 @@ export function formatBoardroomReport(report: BoardroomReport): string {
   if (report.synthesis.impasses.length > 0) {
     lines.push("### Impasses (CEO must decide)");
     report.synthesis.impasses.forEach((c) => lines.push(`- ${c}`));
+    lines.push("");
+  }
+
+  // CEO Follow-Up Questions
+  if (report.ceoFollowUp && report.ceoFollowUp.length > 0) {
+    lines.push("---");
+    lines.push("");
+    lines.push("## CEO Follow-Up Questions");
+    lines.push("");
+    lines.push("The board identified unresolved questions requiring CEO input:");
+    lines.push("");
+    for (const q of report.ceoFollowUp) {
+      const name = BOARD_MEMBER_NAMES[q.fromMember as BoardMemberRole] ?? q.fromMember;
+      lines.push(`${q.id}. **${name}** (${q.source === "challenge" ? "Round 1" : "Debate"}): ${q.question}`);
+    }
     lines.push("");
   }
 

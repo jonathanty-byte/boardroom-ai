@@ -3,6 +3,7 @@
 import type {
   BoardMemberRole,
   BoardroomReport,
+  CEOFollowUpQuestion,
   DebateHistory,
   DebateTurn,
   FrictionPoint,
@@ -54,6 +55,7 @@ export interface AnalysisState {
   debates: Record<BoardMemberRole, DebateState>;
   debateThreads: DebateThreadState[];
   synthesis: Synthesis | null;
+  ceoFollowUp: CEOFollowUpQuestion[];
   report: BoardroomReport | null;
   error: string | null;
 }
@@ -83,6 +85,7 @@ export const initialState: AnalysisState = {
   debates: createInitialDebateState(),
   debateThreads: [],
   synthesis: null,
+  ceoFollowUp: [],
   report: null,
   error: null,
 };
@@ -227,6 +230,9 @@ function handleSSEEvent(state: AnalysisState, event: SSEEvent): AnalysisState {
 
     case "synthesis_complete":
       return { ...state, synthesis: event.synthesis };
+
+    case "ceo_followup":
+      return { ...state, ceoFollowUp: event.questions };
 
     case "analysis_complete":
       return { ...state, phase: "complete", report: event.report };

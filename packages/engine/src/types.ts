@@ -96,6 +96,7 @@ export interface BoardroomReport {
   synthesis: Synthesis;
   totalDurationMs: number;
   debates?: DebateHistory[];
+  ceoFollowUp?: CEOFollowUpQuestion[];
 }
 
 export interface BoardMemberConfig {
@@ -141,6 +142,16 @@ export interface DebateHistory {
   durationMs: number;
 }
 
+// === CEO FOLLOW-UP TYPES ===
+
+export interface CEOFollowUpQuestion {
+  id: number;
+  question: string;
+  source: "challenge" | "debate_unresolved";
+  fromMember: BoardMemberRole;
+  frictionIndex?: number;
+}
+
 // SSE event types for streaming to frontend
 export type SSEEvent =
   | { type: "state_change"; state: string }
@@ -162,5 +173,6 @@ export type SSEEvent =
   | { type: "debate_turn_complete"; frictionIndex: number; turn: DebateTurn }
   | { type: "debate_resolved"; frictionIndex: number; history: DebateHistory }
   | { type: "synthesis_complete"; synthesis: Synthesis }
+  | { type: "ceo_followup"; questions: CEOFollowUpQuestion[] }
   | { type: "analysis_complete"; report: BoardroomReport }
   | { type: "error"; message: string };
