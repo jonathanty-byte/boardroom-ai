@@ -124,11 +124,21 @@ export class StreamingAgentRunner {
     return { output, durationMs };
   }
 
+  private extractJSON(raw: string): string {
+    // Try to find JSON object in the response, handling various LLM quirks
+    // 1. Remove markdown fences anywhere in the text
+    let cleaned = raw.replace(/```json?\s*/gi, "").replace(/```/g, "").trim();
+    // 2. Try to find the first { ... } block
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+    }
+    return cleaned;
+  }
+
   private parseRound1(raw: string, config: BoardMemberConfig): Round1Output {
-    const cleaned = raw
-      .replace(/^```json?\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
+    const cleaned = this.extractJSON(raw);
 
     try {
       const parsed = JSON.parse(cleaned) as Record<string, unknown>;
@@ -154,10 +164,7 @@ export class StreamingAgentRunner {
     raw: string,
     config: BoardMemberConfig,
   ): Round2Response {
-    const cleaned = raw
-      .replace(/^```json?\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
+    const cleaned = this.extractJSON(raw);
 
     try {
       const parsed = JSON.parse(cleaned) as Record<string, unknown>;
