@@ -1,4 +1,12 @@
-import type { BoardMemberRole, FrictionPoint, Round1Result, Round2Result } from "../src/types";
+import type {
+  BoardMemberRole,
+  DebateHistory,
+  DebateTurn,
+  FrictionPoint,
+  ModeratorAction,
+  Round1Result,
+  Round2Result,
+} from "../src/types";
 
 export function makeRound1Result(
   overrides: Partial<Round1Result["output"]> & { durationMs?: number } = {},
@@ -46,6 +54,43 @@ export function makeFriction(overrides: Partial<FrictionPoint> = {}): FrictionPo
       cpo: "GO: Launch with freemium model",
       cfo: "NOT_VIABLE: Unit economics don't work",
     },
+    ...overrides,
+  };
+}
+
+export function makeDebateTurn(overrides: Partial<DebateTurn> = {}): DebateTurn {
+  return {
+    turnNumber: 1,
+    speaker: "cpo",
+    addressedTo: ["cfo"],
+    type: "CHALLENGE",
+    content: "My position stands. The market data supports my verdict.",
+    positionShift: "UNCHANGED",
+    ...overrides,
+  };
+}
+
+export function makeModeratorAction(overrides: Partial<ModeratorAction> = {}): ModeratorAction {
+  return {
+    action: "ASK_QUESTION",
+    targetMember: "cpo",
+    question: "Vegeta, Piccolo says the unit economics don't work. What's your response?",
+    reasoning: "Testing CPO's financial awareness",
+    ...overrides,
+  };
+}
+
+export function makeDebateHistory(overrides: Partial<DebateHistory> = {}): DebateHistory {
+  return {
+    frictionIndex: 0,
+    friction: makeFriction(),
+    moderatorOpening:
+      "Let's discuss the fundamental disagreement between product vision and financial viability.",
+    turns: [makeDebateTurn()],
+    outcome: "CONVERGED",
+    outcomeSummary: "Vegeta softened to accept a phased launch approach.",
+    totalTurns: 1,
+    durationMs: 5000,
     ...overrides,
   };
 }

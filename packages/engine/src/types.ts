@@ -95,6 +95,7 @@ export interface BoardroomReport {
   round2: Round2Result[];
   synthesis: Synthesis;
   totalDurationMs: number;
+  debates?: DebateHistory[];
 }
 
 export interface BoardMemberConfig {
@@ -106,14 +107,55 @@ export interface BoardMemberConfig {
   maxTokens: number;
 }
 
+// === V0.2 DEBATE ENGINE TYPES ===
+
+/** A single turn in the multi-turn debate. */
+export interface DebateTurn {
+  turnNumber: number;
+  speaker: BoardMemberRole;
+  addressedTo: BoardMemberRole[];
+  type: "CHALLENGE" | "RESPONSE" | "COUNTER" | "CONCESSION";
+  content: string;
+  quotedFrom?: string;
+  positionShift: "UNCHANGED" | "SOFTENED" | "REVERSED";
+}
+
+/** A moderator decision: who speaks next and whether the debate continues. */
+export interface ModeratorAction {
+  action: "ASK_QUESTION" | "DECLARE_CONVERGENCE" | "DECLARE_IMPASSE";
+  targetMember?: BoardMemberRole;
+  question?: string;
+  reasoning: string;
+  convergenceSummary?: string;
+}
+
+/** Complete history of a debate on one friction point. */
+export interface DebateHistory {
+  frictionIndex: number;
+  friction: FrictionPoint;
+  moderatorOpening: string;
+  turns: DebateTurn[];
+  outcome: "CONVERGED" | "IMPASSE" | "MAX_TURNS_REACHED";
+  outcomeSummary: string;
+  totalTurns: number;
+  durationMs: number;
+}
+
 // SSE event types for streaming to frontend
 export type SSEEvent =
   | { type: "state_change"; state: string }
   | { type: "member_chunk"; role: BoardMemberRole; chunk: string }
   | { type: "member_complete"; role: BoardMemberRole; result: Round1Output }
   | { type: "frictions_detected"; frictions: FrictionPoint[] }
+  // Legacy Round 2 events (kept for backward compat)
   | { type: "debate_chunk"; role: BoardMemberRole; chunk: string }
   | { type: "debate_complete"; role: BoardMemberRole; result: Round2Response }
+  // V0.2 debate events
+  | { type: "moderator_action"; frictionIndex: number; action: ModeratorAction }
+  | { type: "debate_turn_start"; frictionIndex: number; turnNumber: number; speaker: BoardMemberRole }
+  | { type: "debate_turn_chunk"; frictionIndex: number; speaker: BoardMemberRole; chunk: string }
+  | { type: "debate_turn_complete"; frictionIndex: number; turn: DebateTurn }
+  | { type: "debate_resolved"; frictionIndex: number; history: DebateHistory }
   | { type: "synthesis_complete"; synthesis: Synthesis }
   | { type: "analysis_complete"; report: BoardroomReport }
   | { type: "error"; message: string };
