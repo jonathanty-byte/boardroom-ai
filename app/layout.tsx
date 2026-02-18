@@ -7,15 +7,12 @@ export const metadata: Metadata = {
     "6 AI board members analyze your project, debate disagreements, and deliver a structured decision report. Powered by LLMs.",
   openGraph: {
     title: "BoardRoom AI — Multi-Agent Decision Engine",
-    description: "Your AI-powered executive committee. Submit a decision, watch 6 board members debate in real-time.",
+    description:
+      "Your AI-powered executive committee. Submit a decision, watch 6 board members debate in real-time.",
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -24,9 +21,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="scanlines min-h-screen">
-        {children}
-      </body>
+      <body className="scanlines min-h-screen">{children}</body>
     </html>
   );
 }

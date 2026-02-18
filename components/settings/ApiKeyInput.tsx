@@ -30,9 +30,7 @@ export function ApiKeyInput({ apiKey, onSave }: ApiKeyInputProps) {
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="stat-label text-[var(--color-dbz-gold)]">
-        OPENROUTER API KEY
-      </label>
+      <label className="stat-label text-[var(--color-dbz-gold)]">OPENROUTER API KEY</label>
       <div className="flex gap-2">
         <div className="pixel-border-sm flex-1">
           <input

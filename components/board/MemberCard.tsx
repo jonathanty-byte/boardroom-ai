@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import type { MemberState } from "@/lib/hooks/useAnalysisState";
+import { StreamingText } from "@/components/analysis/StreamingText";
 import type { BoardMemberRole } from "@/lib/engine/types";
 import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@/lib/engine/types";
-import { VerdictBadge } from "./VerdictBadge";
-import { StreamingText } from "@/components/analysis/StreamingText";
+import type { MemberState } from "@/lib/hooks/useAnalysisState";
 import { MemberDetail } from "./MemberDetail";
+import { VerdictBadge } from "./VerdictBadge";
 
 interface MemberCardProps {
   role: BoardMemberRole;
@@ -14,12 +14,12 @@ interface MemberCardProps {
 }
 
 const MEMBER_COLORS: Record<BoardMemberRole, string> = {
-  cpo: "#FF6B00",  // Vegeta - fiery orange
-  cmo: "#2196F3",  // Bulma - tech blue
-  cfo: "#4CAF50",  // Piccolo - namekian green
-  cro: "#9C27B0",  // Whis - divine purple
-  cco: "#F44336",  // Gohan - power red
-  cto: "#00BCD4",  // Trunks - future cyan
+  cpo: "#FF6B00", // Vegeta - fiery orange
+  cmo: "#2196F3", // Bulma - tech blue
+  cfo: "#4CAF50", // Piccolo - namekian green
+  cro: "#9C27B0", // Whis - divine purple
+  cco: "#F44336", // Gohan - power red
+  cto: "#00BCD4", // Trunks - future cyan
 };
 
 const MEMBER_AVATARS: Record<BoardMemberRole, string> = {
@@ -74,12 +74,8 @@ export function MemberCard({ role, state }: MemberCardProps) {
             <div className="text-[10px] font-bold truncate" style={{ color }}>
               {name}
             </div>
-            <div className="stat-label truncate">
-              {role.toUpperCase()}
-            </div>
-            <div className="text-[7px] text-gray-500 truncate">
-              {title}
-            </div>
+            <div className="stat-label truncate">{role.toUpperCase()}</div>
+            <div className="text-[7px] text-gray-500 truncate">{title}</div>
           </div>
         </div>
 
@@ -99,19 +95,13 @@ export function MemberCard({ role, state }: MemberCardProps) {
         {/* Content Area */}
         {state.status === "waiting" && (
           <div className="flex-1 flex items-center justify-center">
-            <span className="text-[8px] text-gray-600 tracking-widest uppercase">
-              Standby
-            </span>
+            <span className="text-[8px] text-gray-600 tracking-widest uppercase">Standby</span>
           </div>
         )}
 
         {isAnalyzing && (
           <div className="flex-1 overflow-hidden dialogue-box p-2">
-            <StreamingText
-              text={state.streamedText}
-              isStreaming={true}
-              maxLines={3}
-            />
+            <StreamingText text={state.streamedText} isStreaming={true} maxLines={3} />
           </div>
         )}
 
@@ -129,11 +119,7 @@ export function MemberCard({ role, state }: MemberCardProps) {
       </div>
 
       {showDetail && state.result && (
-        <MemberDetail
-          role={role}
-          result={state.result}
-          onClose={() => setShowDetail(false)}
-        />
+        <MemberDetail role={role} result={state.result} onClose={() => setShowDetail(false)} />
       )}
     </>
   );

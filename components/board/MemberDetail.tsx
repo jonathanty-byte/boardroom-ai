@@ -41,7 +41,9 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
               src={`/avatars/${role === "cpo" ? "vegeta" : role === "cmo" ? "bulma" : role === "cfo" ? "piccolo" : role === "cro" ? "whis" : role === "cco" ? "gohan" : "trunks"}.svg`}
               alt={BOARD_MEMBER_NAMES[role]}
               className="w-10 h-10 pixel-border-sm"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
             />
             <div>
               <h2 className="text-[11px] font-bold" style={{ color }}>
@@ -68,7 +70,9 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
 
           {/* Analysis */}
           <div className="dialogue-box p-4">
-            <div className="stat-label mb-2" style={{ color }}>ANALYSIS</div>
+            <div className="stat-label mb-2" style={{ color }}>
+              ANALYSIS
+            </div>
             <p className="font-[family-name:var(--font-terminal)] text-lg text-gray-200 whitespace-pre-wrap leading-relaxed">
               {result.analysis}
             </p>
@@ -77,9 +81,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
           {/* Challenges */}
           {result.challenges.length > 0 && (
             <div>
-              <div className="stat-label mb-2 text-[var(--color-dbz-red)]">
-                CHALLENGES FOR CEO
-              </div>
+              <div className="stat-label mb-2 text-[var(--color-dbz-red)]">CHALLENGES FOR CEO</div>
               <div className="space-y-2">
                 {result.challenges.map((c, i) => (
                   <div
@@ -102,7 +104,10 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
                 value ? (
                   <div key={key} className="flex flex-col gap-0.5">
                     <span className="stat-label" style={{ color }}>
-                      {key.replace(/([A-Z])/g, " $1").trim().toUpperCase()}
+                      {key
+                        .replace(/([A-Z])/g, " $1")
+                        .trim()
+                        .toUpperCase()}
                     </span>
                     <span className="font-[family-name:var(--font-terminal)] text-base text-gray-300">
                       {value}

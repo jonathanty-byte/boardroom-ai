@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback } from "react";
-import { useAnalysisState } from "./useAnalysisState";
 import type { SSEEvent } from "@/lib/engine/types";
+import { useAnalysisState } from "./useAnalysisState";
 
 export function useBoardroomAnalysis() {
   const { state, start, reset, handleEvent } = useAnalysisState();

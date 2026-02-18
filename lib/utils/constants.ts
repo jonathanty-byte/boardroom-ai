@@ -48,6 +48,11 @@ export function getVerdictColor(verdict: string): string {
 
 export function getVerdictCategory(verdict: string): "positive" | "middle" | "negative" {
   if (["GO", "VIABLE", "VALIDATED", "SHIP_IT", "FEASIBLE"].includes(verdict)) return "positive";
-  if (["RETHINK", "NOT_VIABLE", "HYPOTHESIS_ONLY", "WILL_FEEL_GENERIC", "UNREALISTIC"].includes(verdict)) return "negative";
+  if (
+    ["RETHINK", "NOT_VIABLE", "HYPOTHESIS_ONLY", "WILL_FEEL_GENERIC", "UNREALISTIC"].includes(
+      verdict,
+    )
+  )
+    return "negative";
   return "middle";
 }

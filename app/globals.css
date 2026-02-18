@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-dbz-orange: #FF6B00;
-  --color-dbz-blue: #2196F3;
-  --color-dbz-purple: #9C27B0;
-  --color-dbz-green: #4CAF50;
-  --color-dbz-red: #F44336;
-  --color-dbz-gold: #FFD700;
-  --color-dbz-cyan: #00BCD4;
-  --color-dbz-yellow: #FFEB3B;
+  --color-dbz-orange: #ff6b00;
+  --color-dbz-blue: #2196f3;
+  --color-dbz-purple: #9c27b0;
+  --color-dbz-green: #4caf50;
+  --color-dbz-red: #f44336;
+  --color-dbz-gold: #ffd700;
+  --color-dbz-cyan: #00bcd4;
+  --color-dbz-yellow: #ffeb3b;
   --color-surface: #0a0a12;
   --color-surface-light: #111128;
   --color-surface-card: #15152d;
@@ -81,33 +81,43 @@ body {
 .power-bar-fill {
   height: 100%;
   transition: width 0.3s ease;
-  background: linear-gradient(180deg, #FFD700 0%, #FF8C00 50%, #FF6B00 100%);
+  background: linear-gradient(180deg, #ffd700 0%, #ff8c00 50%, #ff6b00 100%);
   box-shadow: 0 0 6px rgba(255, 107, 0, 0.6);
 }
 
 .power-bar-fill.green {
-  background: linear-gradient(180deg, #7CFC00 0%, #4CAF50 50%, #2E7D32 100%);
+  background: linear-gradient(180deg, #7cfc00 0%, #4caf50 50%, #2e7d32 100%);
   box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
 }
 
 .power-bar-fill.red {
-  background: linear-gradient(180deg, #FF6B6B 0%, #F44336 50%, #C62828 100%);
+  background: linear-gradient(180deg, #ff6b6b 0%, #f44336 50%, #c62828 100%);
   box-shadow: 0 0 6px rgba(244, 67, 54, 0.6);
 }
 
 /* ── Ki / Energy Glow Animation ── */
 @keyframes ki-charge {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(255, 215, 0, 0.2), 0 0 10px rgba(255, 107, 0, 0.1);
+  0%,
+  100% {
+    box-shadow:
+      0 0 5px rgba(255, 215, 0, 0.2),
+      0 0 10px rgba(255, 107, 0, 0.1);
   }
   25% {
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), 0 0 30px rgba(255, 107, 0, 0.2);
+    box-shadow:
+      0 0 15px rgba(255, 215, 0, 0.4),
+      0 0 30px rgba(255, 107, 0, 0.2);
   }
   50% {
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), 0 0 50px rgba(255, 107, 0, 0.3), 0 0 80px rgba(255, 107, 0, 0.1);
+    box-shadow:
+      0 0 25px rgba(255, 215, 0, 0.6),
+      0 0 50px rgba(255, 107, 0, 0.3),
+      0 0 80px rgba(255, 107, 0, 0.1);
   }
   75% {
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), 0 0 30px rgba(255, 107, 0, 0.2);
+    box-shadow:
+      0 0 15px rgba(255, 215, 0, 0.4),
+      0 0 30px rgba(255, 107, 0, 0.2);
   }
 }
 
@@ -117,9 +127,21 @@ body {
 
 /* ── Verdict Flash (like a special attack name appearing) ── */
 @keyframes verdict-flash {
-  0% { transform: scale(2); opacity: 0; filter: brightness(3); }
-  40% { transform: scale(1.1); opacity: 1; filter: brightness(1.5); }
-  100% { transform: scale(1); opacity: 1; filter: brightness(1); }
+  0% {
+    transform: scale(2);
+    opacity: 0;
+    filter: brightness(3);
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 1;
+    filter: brightness(1.5);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: brightness(1);
+  }
 }
 
 .verdict-appear {
@@ -128,8 +150,14 @@ body {
 
 /* ── Streaming Cursor ── */
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 .cursor-blink::after {
@@ -176,31 +204,40 @@ body {
     inset 2px 2px 0 0 #7a7ada,
     inset -2px -2px 0 0 #2a2a5a;
   font-family: var(--font-terminal), monospace;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.6;
 }
 
 /* ── Friction Spark Animation ── */
 @keyframes spark {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .friction-spark {
   animation: spark 1s ease-in-out infinite;
-  text-shadow: 0 0 8px var(--color-dbz-red), 0 0 16px var(--color-dbz-red);
+  text-shadow:
+    0 0 8px var(--color-dbz-red),
+    0 0 16px var(--color-dbz-red);
 }
 
 /* ── HP/Status Bar Labels ── */
 .stat-label {
-  font-size: 11px;
+  font-size: 8px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: #8888aa;
 }
 
 /* ── Form Inputs (RPG style) ── */
-input, textarea, select {
+input,
+textarea,
+select {
   font-family: var(--font-terminal), monospace !important;
   font-size: 16px !important;
 }
@@ -223,11 +260,11 @@ input, textarea, select {
 /* ── Star background ── */
 .star-bg {
   background-image:
-    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.15) 1px, transparent 0),
-    radial-gradient(1px 1px at 40% 60%, rgba(255,255,255,0.1) 1px, transparent 0),
-    radial-gradient(1px 1px at 70% 30%, rgba(255,255,255,0.12) 1px, transparent 0),
-    radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.08) 1px, transparent 0),
-    radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.1) 1px, transparent 0),
-    radial-gradient(1px 1px at 55% 15%, rgba(255,255,255,0.12) 1px, transparent 0),
-    radial-gradient(1px 1px at 85% 55%, rgba(255,255,255,0.08) 1px, transparent 0);
+    radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.15) 1px, transparent 0),
+    radial-gradient(1px 1px at 40% 60%, rgba(255, 255, 255, 0.1) 1px, transparent 0),
+    radial-gradient(1px 1px at 70% 30%, rgba(255, 255, 255, 0.12) 1px, transparent 0),
+    radial-gradient(1px 1px at 90% 80%, rgba(255, 255, 255, 0.08) 1px, transparent 0),
+    radial-gradient(1px 1px at 20% 90%, rgba(255, 255, 255, 0.1) 1px, transparent 0),
+    radial-gradient(1px 1px at 55% 15%, rgba(255, 255, 255, 0.12) 1px, transparent 0),
+    radial-gradient(1px 1px at 85% 55%, rgba(255, 255, 255, 0.08) 1px, transparent 0);
 }

@@ -13,10 +13,10 @@ export async function POST(req: Request) {
   };
 
   if (!content || !apiKey) {
-    return new Response(
-      JSON.stringify({ error: "content and apiKey are required" }),
-      { status: 400, headers: { "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "content and apiKey are required" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const encoder = new TextEncoder();
@@ -24,9 +24,7 @@ export async function POST(req: Request) {
   const stream = new ReadableStream({
     async start(controller) {
       const send = (event: SSEEvent) => {
-        controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify(event)}\n\n`),
-        );
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
       };
 
       await runAnalysis({ content, ceoVision, apiKey, model }, send);

@@ -3,12 +3,12 @@
 import { useReducer } from "react";
 import type {
   BoardMemberRole,
+  BoardroomReport,
+  FrictionPoint,
   Round1Output,
   Round2Response,
-  FrictionPoint,
-  Synthesis,
-  BoardroomReport,
   SSEEvent,
+  Synthesis,
 } from "@/lib/engine/types";
 
 export type AnalysisPhase =
@@ -70,15 +70,16 @@ export const initialState: AnalysisState = {
   error: null,
 };
 
-type Action =
-  | { type: "RESET" }
-  | { type: "START" }
-  | { type: "SSE_EVENT"; event: SSEEvent };
+type Action = { type: "RESET" } | { type: "START" } | { type: "SSE_EVENT"; event: SSEEvent };
 
 function reducer(state: AnalysisState, action: Action): AnalysisState {
   switch (action.type) {
     case "RESET":
-      return { ...initialState, members: createInitialMemberState(), debates: createInitialDebateState() };
+      return {
+        ...initialState,
+        members: createInitialMemberState(),
+        debates: createInitialDebateState(),
+      };
 
     case "START":
       return {
@@ -188,7 +189,6 @@ export function useAnalysisState() {
     state,
     start: () => dispatch({ type: "START" }),
     reset: () => dispatch({ type: "RESET" }),
-    handleEvent: (event: SSEEvent) =>
-      dispatch({ type: "SSE_EVENT", event }),
+    handleEvent: (event: SSEEvent) => dispatch({ type: "SSE_EVENT", event }),
   };
 }

@@ -1,4 +1,4 @@
-import type { Round1Result, FrictionPoint } from "./types";
+import type { FrictionPoint, Round1Result } from "./types";
 
 // Sentiment scoring: +1 positive, 0 middle, -1 negative
 const VERDICT_SENTIMENT: Record<string, number> = {
@@ -76,8 +76,7 @@ export function identifyFrictions(round1: Round1Result[]): FrictionPoint[] {
     for (let i = 0; i < round1.length; i++) {
       for (let j = i + 1; j < round1.length; j++) {
         const gap = Math.abs(
-          getSentiment(round1[i].output.verdict) -
-            getSentiment(round1[j].output.verdict),
+          getSentiment(round1[i].output.verdict) - getSentiment(round1[j].output.verdict),
         );
         if (gap > maxGap) {
           maxGap = gap;

@@ -41,9 +41,7 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
 
       {/* CEO Vision */}
       <div>
-        <label className="stat-label block mb-2">
-          CEO VISION (OPTIONAL)
-        </label>
+        <label className="stat-label block mb-2">CEO VISION (OPTIONAL)</label>
         <div className="pixel-border-sm">
           <input
             type="text"
@@ -57,9 +55,7 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
 
       {/* Model selector */}
       <div>
-        <label className="stat-label block mb-2">
-          AI MODEL
-        </label>
+        <label className="stat-label block mb-2">AI MODEL</label>
         <div className="pixel-border-sm">
           <select
             value={model}

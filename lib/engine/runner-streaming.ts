@@ -124,10 +124,13 @@ export class StreamingAgentRunner {
     return { output, durationMs };
   }
 
-  private extractJSON(raw: string): string {
+  extractJSON(raw: string): string {
     // Try to find JSON object in the response, handling various LLM quirks
     // 1. Remove markdown fences anywhere in the text
-    let cleaned = raw.replace(/```json?\s*/gi, "").replace(/```/g, "").trim();
+    let cleaned = raw
+      .replace(/```json?\s*/gi, "")
+      .replace(/```/g, "")
+      .trim();
     // 2. Try to find the first { ... } block
     const firstBrace = cleaned.indexOf("{");
     const lastBrace = cleaned.lastIndexOf("}");
@@ -137,7 +140,7 @@ export class StreamingAgentRunner {
     return cleaned;
   }
 
-  private parseRound1(raw: string, config: BoardMemberConfig): Round1Output {
+  parseRound1(raw: string, config: BoardMemberConfig): Round1Output {
     const cleaned = this.extractJSON(raw);
 
     try {
@@ -146,12 +149,9 @@ export class StreamingAgentRunner {
         role: config.role,
         name: (parsed.name as string) ?? config.name,
         analysis: (parsed.analysis as string) ?? "",
-        challenges: Array.isArray(parsed.challenges)
-          ? (parsed.challenges as string[])
-          : [],
+        challenges: Array.isArray(parsed.challenges) ? (parsed.challenges as string[]) : [],
         verdict: (parsed.verdict as Round1Output["verdict"]) ?? "RETHINK",
-        verdictDetails:
-          (parsed.verdictDetails as Record<string, string>) ?? {},
+        verdictDetails: (parsed.verdictDetails as Record<string, string>) ?? {},
       };
     } catch {
       throw new Error(
@@ -160,18 +160,14 @@ export class StreamingAgentRunner {
     }
   }
 
-  private parseRound2(
-    raw: string,
-    config: BoardMemberConfig,
-  ): Round2Response {
+  parseRound2(raw: string, config: BoardMemberConfig): Round2Response {
     const cleaned = this.extractJSON(raw);
 
     try {
       const parsed = JSON.parse(cleaned) as Record<string, unknown>;
       return {
         role: config.role,
-        position:
-          (parsed.position as Round2Response["position"]) ?? "MAINTAIN",
+        position: (parsed.position as Round2Response["position"]) ?? "MAINTAIN",
         argument: (parsed.argument as string) ?? "",
         condition: (parsed.condition as string) ?? "",
       };

@@ -1,14 +1,8 @@
-import { StreamingAgentRunner } from "./runner-streaming";
 import { boardMembers } from "./board-members";
 import { identifyFrictions } from "./friction";
+import { StreamingAgentRunner } from "./runner-streaming";
 import { synthesize } from "./synthesis";
-import type {
-  AnalysisInput,
-  BoardroomReport,
-  Round1Result,
-  Round2Result,
-  SSEEvent,
-} from "./types";
+import type { AnalysisInput, BoardroomReport, Round1Result, Round2Result, SSEEvent } from "./types";
 
 /**
  * Streaming BoardRoom AI Decision Engine.
@@ -47,7 +41,7 @@ export async function runAnalysis(
     send({ type: "frictions_detected", frictions });
 
     // Round 2: debate on frictions
-    let round2Results: Round2Result[] = [];
+    const round2Results: Round2Result[] = [];
 
     if (frictions.length > 0) {
       send({ type: "state_change", state: "ROUND2_RUNNING" });
@@ -55,9 +49,7 @@ export async function runAnalysis(
       for (const friction of frictions) {
         const debatePromises = friction.members.map((role) => {
           const member = boardMembers.find((m) => m.role === role)!;
-          const ownResult = round1Results.find(
-            (r) => r.output.role === role,
-          )!;
+          const ownResult = round1Results.find((r) => r.output.role === role)!;
 
           const ownVerdict = [
             `Your verdict: ${ownResult.output.verdict}`,
@@ -67,21 +59,14 @@ export async function runAnalysis(
           const adversaries = friction.members
             .filter((r) => r !== role)
             .map((advRole) => {
-              const adv = round1Results.find(
-                (r) => r.output.role === advRole,
-              )!;
+              const adv = round1Results.find((r) => r.output.role === advRole)!;
               return `[${adv.output.name} - ${adv.output.verdict}]\n${adv.output.analysis.slice(0, 500)}`;
             })
             .join("\n\n");
 
-          return runner.runRound2Streaming(
-            member,
-            ownVerdict,
-            adversaries,
-            (role, chunk) => {
-              send({ type: "debate_chunk", role, chunk });
-            },
-          );
+          return runner.runRound2Streaming(member, ownVerdict, adversaries, (role, chunk) => {
+            send({ type: "debate_chunk", role, chunk });
+          });
         });
 
         const results = await Promise.all(debatePromises);

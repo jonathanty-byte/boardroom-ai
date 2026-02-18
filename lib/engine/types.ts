@@ -31,8 +31,12 @@ export type CcoVerdict = "SHIP_IT" | "NEEDS_DESIGN_DIRECTION" | "WILL_FEEL_GENER
 export type CtoVerdict = "FEASIBLE" | "FEASIBLE_WITH_CUTS" | "UNREALISTIC";
 
 export type AnyVerdict =
-  | CpoVerdict | CmoVerdict | CfoVerdict
-  | CroVerdict | CcoVerdict | CtoVerdict;
+  | CpoVerdict
+  | CmoVerdict
+  | CfoVerdict
+  | CroVerdict
+  | CcoVerdict
+  | CtoVerdict;
 
 export type CollectiveVerdict = "GO" | "GO_WITH_CHANGES" | "RETHINK";
 

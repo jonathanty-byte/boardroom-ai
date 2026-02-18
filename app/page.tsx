@@ -1,14 +1,14 @@
 "use client";
 
-import { useApiKey } from "@/lib/hooks/useApiKey";
-import { useBoardroomAnalysis } from "@/lib/hooks/useBoardroomAnalysis";
-import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
 import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { BoardRoom } from "@/components/board/BoardRoom";
 import { ExportButton } from "@/components/report/ExportButton";
+import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
 import { RetroButton } from "@/components/ui/RetroButton";
-import { BOARD_MEMBER_NAMES } from "@/lib/engine/types";
 import type { BoardMemberRole } from "@/lib/engine/types";
+import { BOARD_MEMBER_NAMES } from "@/lib/engine/types";
+import { useApiKey } from "@/lib/hooks/useApiKey";
+import { useBoardroomAnalysis } from "@/lib/hooks/useBoardroomAnalysis";
 
 const MEMBER_COLORS: Record<BoardMemberRole, string> = {
   cpo: "#FF6B00",
@@ -46,12 +46,8 @@ export default function Home() {
       {/* Header */}
       <header className="w-full max-w-5xl flex items-center justify-between mb-8">
         <div>
-          <h1 className="rpg-title text-lg text-[var(--color-dbz-orange)]">
-            BOARDROOM AI
-          </h1>
-          <p className="stat-label text-gray-500">
-            AI EXECUTIVE DECISION ENGINE
-          </p>
+          <h1 className="rpg-title text-lg text-[var(--color-dbz-orange)]">BOARDROOM AI</h1>
+          <p className="stat-label text-gray-500">AI EXECUTIVE DECISION ENGINE</p>
         </div>
         <div className="flex items-center gap-4">
           {state.phase !== "idle" && (
@@ -74,13 +70,10 @@ export default function Home() {
         <div className="flex flex-col items-center gap-8">
           {/* Hero */}
           <div className="text-center max-w-2xl">
-            <h2 className="rpg-title text-sm text-white mb-4">
-              SUBMIT YOUR DECISION TO THE BOARD
-            </h2>
+            <h2 className="rpg-title text-sm text-white mb-4">SUBMIT YOUR DECISION TO THE BOARD</h2>
             <p className="font-[family-name:var(--font-terminal)] text-lg text-gray-400 leading-relaxed">
-              6 AI board members will analyze your project independently,
-              detect disagreements, debate contradictions, and deliver a
-              structured BoardRoom decision report.
+              6 AI board members will analyze your project independently, detect disagreements,
+              debate contradictions, and deliver a structured BoardRoom decision report.
             </p>
           </div>
 
@@ -99,7 +92,10 @@ export default function Home() {
             <div className="stat-label text-center mb-3">THE BOARD</div>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
               {(["cpo", "cmo", "cfo", "cro", "cco", "cto"] as const).map((role) => (
-                <div key={role} className="char-card p-3 text-center opacity-60 hover:opacity-100 transition-opacity">
+                <div
+                  key={role}
+                  className="char-card p-3 text-center opacity-60 hover:opacity-100 transition-opacity"
+                >
                   <div
                     className="w-16 h-16 mx-auto pixel-border-sm overflow-hidden mb-2"
                     style={{ borderColor: MEMBER_COLORS[role] }}
@@ -144,10 +140,11 @@ export default function Home() {
 
       {/* Error state */}
       {state.phase === "error" && (
-        <div className="mt-6 pixel-border p-4 max-w-2xl" style={{ borderColor: "var(--color-dbz-red)" }}>
-          <h3 className="rpg-title text-[10px] text-[var(--color-dbz-red)] mb-2">
-            ERROR DETECTED
-          </h3>
+        <div
+          className="mt-6 pixel-border p-4 max-w-2xl"
+          style={{ borderColor: "var(--color-dbz-red)" }}
+        >
+          <h3 className="rpg-title text-[10px] text-[var(--color-dbz-red)] mb-2">ERROR DETECTED</h3>
           <p className="font-[family-name:var(--font-terminal)] text-base text-red-300">
             {state.error}
           </p>
@@ -168,8 +165,8 @@ export default function Home() {
             className="text-gray-500 hover:text-[var(--color-dbz-orange)] transition-colors"
           >
             JONATHAN TY
-          </a>
-          {" "}— POWERED BY OPENROUTER
+          </a>{" "}
+          — POWERED BY OPENROUTER
         </div>
       </footer>
     </main>
