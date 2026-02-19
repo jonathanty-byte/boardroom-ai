@@ -6,7 +6,7 @@ export { extractCEOFollowUp, runFinalVerdictFlow } from "./ceo-followup";
 
 // V0.2 debate modules
 export { analyzeConvergence } from "./convergence";
-export { flattenDebatesToRound2, runDebateForFriction } from "./debate-engine";
+export { runDebateForFriction } from "./debate-engine";
 export { runAnalysis } from "./engine-streaming";
 
 // Engine functions
@@ -42,8 +42,6 @@ export type {
   ModeratorAction,
   Round1Output,
   Round1Result,
-  Round2Response,
-  Round2Result,
   SSEEvent,
   Synthesis,
 } from "./types";

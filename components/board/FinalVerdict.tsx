@@ -13,10 +13,8 @@ export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
   if (!verdict && streamedText) {
     return (
       <div className="pixel-border p-4">
-        <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">
-          FINAL DELIBERATION
-        </div>
-        <div className="flex gap-3">
+        <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">FINAL DELIBERATION</div>
+        <div data-testid="final-verdict-streaming" className="flex gap-3">
           <div className="w-1 flex-shrink-0 rounded-sm bg-[var(--color-dbz-gold)] animate-pulse" />
           <p className="font-[family-name:var(--font-terminal)] text-base text-gray-400">
             <span className="cursor-blink">{streamedText.slice(-400)}</span>
@@ -30,9 +28,7 @@ export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
   if (!verdict) {
     return (
       <div className="pixel-border p-4">
-        <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">
-          FINAL DELIBERATION
-        </div>
+        <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">FINAL DELIBERATION</div>
         <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse text-center">
           The Final Arbiter is weighing all perspectives...
         </p>
@@ -42,14 +38,17 @@ export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
 
   // Complete state
   return (
-    <div className="pixel-border p-4">
-      <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">
-        FINAL VERDICT
-      </div>
+    <div data-testid="final-verdict" className="pixel-border p-4">
+      <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">FINAL VERDICT</div>
 
       {/* Big verdict badge */}
       <div className="text-center mb-4 py-3">
-        <VerdictBadge verdict={verdict.collectiveVerdict} animated={true} size="lg" />
+        <VerdictBadge
+          verdict={verdict.collectiveVerdict}
+          animated={true}
+          size="lg"
+          data-testid="final-verdict-badge"
+        />
       </div>
 
       {/* Reasoning */}

@@ -79,34 +79,3 @@ describe("parseRound1", () => {
   });
 });
 
-describe("parseRound2", () => {
-  it("parses valid Round 2 JSON", () => {
-    const raw = JSON.stringify({
-      role: "cpo",
-      position: "CONCEDE",
-      argument: "The CFO makes a good point.",
-      condition: "If we reduce scope.",
-    });
-
-    const result = runner.parseRound2(raw, mockConfig);
-    expect(result.role).toBe("cpo");
-    expect(result.position).toBe("CONCEDE");
-    expect(result.argument).toBe("The CFO makes a good point.");
-    expect(result.condition).toBe("If we reduce scope.");
-  });
-
-  it("defaults position to MAINTAIN when missing", () => {
-    const raw = JSON.stringify({
-      argument: "Standing firm.",
-      condition: "No compromise.",
-    });
-
-    const result = runner.parseRound2(raw, mockConfig);
-    expect(result.position).toBe("MAINTAIN");
-  });
-
-  it("throws on invalid JSON", () => {
-    const raw = "totally broken [not json";
-    expect(() => runner.parseRound2(raw, mockConfig)).toThrow();
-  });
-});

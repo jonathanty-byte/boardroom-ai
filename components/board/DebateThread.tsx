@@ -3,15 +3,7 @@
 import type { BoardMemberRole } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import type { DebateThreadState } from "@/lib/hooks/useAnalysisState";
-
-const MEMBER_COLORS: Record<BoardMemberRole, string> = {
-  cpo: "#FF6B00",
-  cmo: "#2196F3",
-  cfo: "#4CAF50",
-  cro: "#9C27B0",
-  cco: "#F44336",
-  cto: "#00BCD4",
-};
+import { MEMBER_COLORS } from "@/lib/utils/constants";
 
 const TURN_TYPE_LABELS: Record<string, { label: string; color: string }> = {
   CHALLENGE: { label: "CHALLENGE", color: "#ef4444" },
@@ -39,7 +31,7 @@ interface DebateThreadProps {
 
 export function DebateThread({ thread, frictionDescription }: DebateThreadProps) {
   return (
-    <div className="dialogue-box p-4 mb-4">
+    <div data-testid={`debate-thread-${thread.frictionIndex}`} className="dialogue-box p-4 mb-4">
       {/* Friction header */}
       <div className="text-[10px] text-[var(--color-dbz-gold)] font-bold mb-3 tracking-wider">
         {frictionDescription}
@@ -148,23 +140,27 @@ export function DebateThread({ thread, frictionDescription }: DebateThreadProps)
       )}
 
       {/* Moderator thinking indicator (between turns, no speaker active, not resolved) */}
-      {!thread.currentSpeaker && !thread.outcome && thread.status === "in_progress" && thread.turns.length > 0 && (
-        <div className="flex gap-3 mb-3">
-          <div className="w-1 flex-shrink-0 rounded-sm bg-[var(--color-dbz-gold)] animate-pulse" />
-          <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-[var(--color-dbz-gold)] tracking-wider">
-              MODERATOR
-            </span>
-            <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse">
-              Evaluating arguments...
-            </p>
+      {!thread.currentSpeaker &&
+        !thread.outcome &&
+        thread.status === "in_progress" &&
+        thread.turns.length > 0 && (
+          <div className="flex gap-3 mb-3">
+            <div className="w-1 flex-shrink-0 rounded-sm bg-[var(--color-dbz-gold)] animate-pulse" />
+            <div className="flex-1 min-w-0">
+              <span className="text-[10px] font-bold text-[var(--color-dbz-gold)] tracking-wider">
+                MODERATOR
+              </span>
+              <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse">
+                Evaluating arguments...
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Outcome banner */}
       {thread.outcome && (
         <div
+          data-testid={`debate-outcome-${thread.frictionIndex}`}
           className="mt-3 p-2 text-center border"
           style={{
             borderColor: OUTCOME_STYLES[thread.outcome]?.color ?? "#6b7280",

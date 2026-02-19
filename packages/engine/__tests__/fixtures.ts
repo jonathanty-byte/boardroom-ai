@@ -5,7 +5,6 @@ import type {
   FrictionPoint,
   ModeratorAction,
   Round1Result,
-  Round2Result,
 } from "../src/types";
 
 export function makeRound1Result(
@@ -24,22 +23,6 @@ export function makeRound1Result(
         risqueCritique: "Unclear monetization",
         recommandationConcrete: "Launch with freemium model",
       },
-      ...outputOverrides,
-    },
-    durationMs,
-  };
-}
-
-export function makeRound2Result(
-  overrides: Partial<Round2Result["output"]> & { durationMs?: number } = {},
-): Round2Result {
-  const { durationMs = 500, ...outputOverrides } = overrides;
-  return {
-    output: {
-      role: "cpo" as BoardMemberRole,
-      position: "MAINTAIN",
-      argument: "My analysis stands based on the data.",
-      condition: "Unless new market data emerges.",
       ...outputOverrides,
     },
     durationMs,

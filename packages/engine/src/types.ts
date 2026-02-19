@@ -60,18 +60,6 @@ export interface FrictionPoint {
   positions: Partial<Record<BoardMemberRole, string>>;
 }
 
-export interface Round2Response {
-  role: BoardMemberRole;
-  position: "MAINTAIN" | "CONCEDE" | "COMPROMISE";
-  argument: string;
-  condition: string;
-}
-
-export interface Round2Result {
-  output: Round2Response;
-  durationMs: number;
-}
-
 export interface Synthesis {
   consensus: string[];
   compromises: string[];
@@ -93,7 +81,6 @@ export interface BoardroomReport {
   ceoVision: string;
   round1: Round1Result[];
   frictions: FrictionPoint[];
-  round2: Round2Result[];
   synthesis: Synthesis;
   totalDurationMs: number;
   debates?: DebateHistory[];
@@ -170,10 +157,7 @@ export type SSEEvent =
   | { type: "member_chunk"; role: BoardMemberRole; chunk: string }
   | { type: "member_complete"; role: BoardMemberRole; result: Round1Output }
   | { type: "frictions_detected"; frictions: FrictionPoint[] }
-  // Legacy Round 2 events (kept for backward compat)
-  | { type: "debate_chunk"; role: BoardMemberRole; chunk: string }
-  | { type: "debate_complete"; role: BoardMemberRole; result: Round2Response }
-  // V0.2 debate events
+  // Debate events
   | { type: "moderator_action"; frictionIndex: number; action: ModeratorAction }
   | {
       type: "debate_turn_start";

@@ -10,7 +10,6 @@ import type {
   FrictionPoint,
   ModeratorAction,
   Round1Output,
-  Round2Response,
   SSEEvent,
   Synthesis,
 } from "@boardroom/engine";
@@ -31,13 +30,7 @@ export interface MemberState {
   result: Round1Output | null;
 }
 
-export interface DebateState {
-  status: "waiting" | "debating" | "complete";
-  streamedText: string;
-  result: Round2Response | null;
-}
-
-// V0.2: Multi-turn debate thread state
+// Multi-turn debate thread state
 export interface DebateThreadState {
   frictionIndex: number;
   status: "waiting" | "in_progress" | "resolved";
@@ -53,7 +46,6 @@ export interface AnalysisState {
   phase: AnalysisPhase;
   members: Record<BoardMemberRole, MemberState>;
   frictions: FrictionPoint[];
-  debates: Record<BoardMemberRole, DebateState>;
   debateThreads: DebateThreadState[];
   synthesis: Synthesis | null;
   ceoFollowUp: CEOFollowUpQuestion[];
@@ -73,19 +65,10 @@ function createInitialMemberState(): Record<BoardMemberRole, MemberState> {
   return members;
 }
 
-function createInitialDebateState(): Record<BoardMemberRole, DebateState> {
-  const debates = {} as Record<BoardMemberRole, DebateState>;
-  for (const role of ALL_ROLES) {
-    debates[role] = { status: "waiting", streamedText: "", result: null };
-  }
-  return debates;
-}
-
 export const initialState: AnalysisState = {
   phase: "idle",
   members: createInitialMemberState(),
   frictions: [],
-  debates: createInitialDebateState(),
   debateThreads: [],
   synthesis: null,
   ceoFollowUp: [],
@@ -107,7 +90,6 @@ function reducer(state: AnalysisState, action: Action): AnalysisState {
       return {
         ...initialState,
         members: createInitialMemberState(),
-        debates: createInitialDebateState(),
       };
 
     case "START":
@@ -115,7 +97,6 @@ function reducer(state: AnalysisState, action: Action): AnalysisState {
         ...initialState,
         phase: "round1",
         members: createInitialMemberState(),
-        debates: createInitialDebateState(),
       };
 
     case "FINALIZE_START":
@@ -124,9 +105,7 @@ function reducer(state: AnalysisState, action: Action): AnalysisState {
         finalVerdictStreaming: "",
         finalVerdict: null,
         // Store CEO answers in report for export
-        report: state.report
-          ? { ...state.report, ceoAnswers: action.ceoAnswers }
-          : state.report,
+        report: state.report ? { ...state.report, ceoAnswers: action.ceoAnswers } : state.report,
       };
 
     case "SSE_EVENT":
@@ -181,36 +160,6 @@ function handleSSEEvent(state: AnalysisState, event: SSEEvent): AnalysisState {
     case "frictions_detected":
       return { ...state, frictions: event.frictions };
 
-    // Legacy Round 2 events (backward compat)
-    case "debate_chunk": {
-      const debate = state.debates[event.role];
-      return {
-        ...state,
-        debates: {
-          ...state.debates,
-          [event.role]: {
-            ...debate,
-            status: "debating",
-            streamedText: debate.streamedText + event.chunk,
-          },
-        },
-      };
-    }
-
-    case "debate_complete":
-      return {
-        ...state,
-        debates: {
-          ...state.debates,
-          [event.role]: {
-            status: "complete",
-            streamedText: "",
-            result: event.result,
-          },
-        },
-      };
-
-    // V0.2 debate events
     case "moderator_action":
       return updateDebateThread(state, event.frictionIndex, (thread) => ({
         ...thread,
@@ -266,9 +215,7 @@ function handleSSEEvent(state: AnalysisState, event: SSEEvent): AnalysisState {
         finalVerdict: event.verdict,
         finalVerdictStreaming: "",
         // Update report with final verdict so export includes it
-        report: state.report
-          ? { ...state.report, finalVerdict: event.verdict }
-          : state.report,
+        report: state.report ? { ...state.report, finalVerdict: event.verdict } : state.report,
       };
 
     case "analysis_complete":

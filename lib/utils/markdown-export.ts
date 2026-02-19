@@ -107,20 +107,6 @@ export function formatBoardroomReport(report: BoardroomReport): string {
       lines.push(`**Resolution:** ${debate.outcomeSummary}`);
       lines.push("");
     }
-  } else if (report.round2.length > 0) {
-    // Legacy Round 2 format
-    lines.push("---");
-    lines.push("");
-    lines.push("## Round 2 — Contradictory Debate");
-    lines.push("");
-    for (const r of report.round2) {
-      const name = BOARD_MEMBER_NAMES[r.output.role];
-      lines.push(`- **${name}**: **${r.output.position}** — ${r.output.argument}`);
-      if (r.output.condition) {
-        lines.push(`  - *Condition:* ${r.output.condition}`);
-      }
-    }
-    lines.push("");
   }
 
   // Synthesis

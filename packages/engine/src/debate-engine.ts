@@ -13,8 +13,6 @@ import type {
   DebateTurn,
   FrictionPoint,
   Round1Result,
-  Round2Response,
-  Round2Result,
   SSEEvent,
 } from "./types";
 
@@ -197,54 +195,3 @@ async function runSingleTurn(
   return turn;
 }
 
-/**
- * Convert debate histories to legacy Round2Result[] for backward compat with synthesis.
- * Takes the last turn of each unique speaker and maps it to a Round2Response.
- */
-export function flattenDebatesToRound2(histories: DebateHistory[]): Round2Result[] {
-  const results: Round2Result[] = [];
-
-  for (const history of histories) {
-    const lastTurnBySpeaker = new Map<string, DebateTurn>();
-    for (const turn of history.turns) {
-      lastTurnBySpeaker.set(turn.speaker, turn);
-    }
-
-    for (const [role, turn] of lastTurnBySpeaker) {
-      results.push({
-        output: turnToRound2Response(role, turn),
-        durationMs:
-          history.totalTurns > 0 ? Math.round(history.durationMs / history.totalTurns) : 0,
-      });
-    }
-  }
-
-  return results;
-}
-
-function turnToRound2Response(role: string, turn: DebateTurn): Round2Response {
-  let position: Round2Response["position"];
-  if (turn.type === "CONCESSION" || turn.positionShift === "REVERSED") {
-    position = "CONCEDE";
-  } else if (turn.positionShift === "SOFTENED") {
-    position = "COMPROMISE";
-  } else {
-    position = "MAINTAIN";
-  }
-
-  let condition: string;
-  if (turn.positionShift === "REVERSED") {
-    condition = "Position reversed during debate";
-  } else if (turn.positionShift === "SOFTENED") {
-    condition = "Position softened during debate";
-  } else {
-    condition = "Position maintained through debate";
-  }
-
-  return {
-    role: role as Round2Response["role"],
-    position,
-    argument: turn.content,
-    condition,
-  };
-}

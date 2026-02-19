@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import type { BoardMemberRole } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
+import { useEffect, useState } from "react";
 import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { BoardRoom } from "@/components/board/BoardRoom";
 import { CEOFollowUp } from "@/components/board/CEOFollowUp";
@@ -13,41 +13,34 @@ import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
 import { RetroButton } from "@/components/ui/RetroButton";
 import { useApiKey } from "@/lib/hooks/useApiKey";
 import { useBoardroomAnalysis } from "@/lib/hooks/useBoardroomAnalysis";
-
-const MEMBER_COLORS: Record<BoardMemberRole, string> = {
-  cpo: "#FF6B00",
-  cmo: "#2196F3",
-  cfo: "#4CAF50",
-  cro: "#9C27B0",
-  cco: "#F44336",
-  cto: "#00BCD4",
-};
-
-const MEMBER_AVATARS: Record<BoardMemberRole, string> = {
-  cpo: "/avatars/vegeta.svg",
-  cmo: "/avatars/bulma.svg",
-  cfo: "/avatars/piccolo.svg",
-  cro: "/avatars/whis.svg",
-  cco: "/avatars/gohan.svg",
-  cto: "/avatars/trunks.svg",
-};
+import { MEMBER_AVATARS, MEMBER_COLORS } from "@/lib/utils/constants";
 
 export default function Home() {
   const { apiKey, saveKey, loaded, hasKey } = useApiKey();
   const { state, analyze, finalize, reset } = useBoardroomAnalysis();
   const [finalizing, setFinalizing] = useState(false);
+  const [demoAvailable, setDemoAvailable] = useState(false);
+
+  // Check if demo mode is available (server has OPENROUTER_API_KEY)
+  useEffect(() => {
+    fetch("/api/demo-status")
+      .then((r) => r.json())
+      .then((data) => setDemoAvailable(data.available === true))
+      .catch(() => {});
+  }, []);
 
   const isRunning = state.phase !== "idle" && state.phase !== "complete" && state.phase !== "error";
+  const canSubmit = hasKey || demoAvailable;
 
   const handleSubmit = (content: string, ceoVision: string, model: string) => {
-    if (!apiKey) return;
-    analyze(content, apiKey, ceoVision, model);
+    if (!canSubmit) return;
+    analyze(content, apiKey ?? "", ceoVision, model);
   };
 
   const handleFinalize = (ceoAnswers: string) => {
-    if (!apiKey || !state.report) return;
+    if (!canSubmit || !state.report) return;
     setFinalizing(true);
-    finalize(state.report, ceoAnswers, apiKey, state.report.debates ? undefined : undefined);
+    finalize(state.report, ceoAnswers, apiKey ?? "");
   };
 
   if (!loaded) return null;
@@ -62,15 +55,22 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-4">
           {state.phase !== "idle" && (
-            <RetroButton onClick={() => { reset(); setFinalizing(false); }} variant="secondary">
+            <RetroButton
+              data-testid="new-analysis-button"
+              onClick={() => {
+                reset();
+                setFinalizing(false);
+              }}
+              variant="secondary"
+            >
               NEW ANALYSIS
             </RetroButton>
           )}
         </div>
       </header>
 
-      {/* API Key section */}
-      {!hasKey && (
+      {/* API Key section — only show when no key AND no demo mode */}
+      {!hasKey && !demoAvailable && (
         <div className="w-full max-w-2xl mb-8 pixel-border p-6">
           <ApiKeyInput apiKey={apiKey} onSave={saveKey} />
         </div>
@@ -104,15 +104,38 @@ export default function Home() {
             </p>
           </div>
 
-          {/* API key inline if set */}
-          {hasKey && (
-            <div className="w-full max-w-2xl">
+          {/* Demo mode banner */}
+          {demoAvailable && !hasKey && (
+            <div className="w-full max-w-2xl text-center pixel-border p-4">
+              <div className="rpg-title text-[9px] text-[var(--color-dbz-green)] mb-2">
+                DEMO MODE ACTIVE
+              </div>
+              <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-400">
+                Try it now — no API key needed. Or{" "}
+                <button
+                  type="button"
+                  className="text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] underline transition-colors"
+                  onClick={() => {
+                    const el = document.getElementById("api-key-section");
+                    el?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  bring your own key
+                </button>{" "}
+                for unlimited use.
+              </p>
+            </div>
+          )}
+
+          {/* API key inline — collapsible in demo mode */}
+          {(hasKey || demoAvailable) && (
+            <div id="api-key-section" className="w-full max-w-2xl">
               <ApiKeyInput apiKey={apiKey} onSave={saveKey} />
             </div>
           )}
 
           {/* Form */}
-          <AnalysisForm onSubmit={handleSubmit} disabled={!hasKey || isRunning} />
+          <AnalysisForm onSubmit={handleSubmit} disabled={!canSubmit || isRunning} />
 
           {/* Board member preview */}
           <div className="w-full max-w-3xl">
@@ -149,7 +172,6 @@ export default function Home() {
         <BoardRoom
           members={state.members}
           frictions={state.frictions}
-          debates={state.debates}
           debateThreads={state.debateThreads}
           synthesis={state.synthesis}
           phase={state.phase}
@@ -170,27 +192,27 @@ export default function Home() {
       {/* Final Verdict (streaming or complete) */}
       {(state.finalVerdict || state.finalVerdictStreaming) && (
         <div className="w-full max-w-5xl mt-6">
-          <FinalVerdict
-            verdict={state.finalVerdict}
-            streamedText={state.finalVerdictStreaming}
-          />
+          <FinalVerdict verdict={state.finalVerdict} streamedText={state.finalVerdictStreaming} />
         </div>
       )}
 
       {/* Complete state — wait for final verdict if follow-up questions exist */}
-      {state.phase === "complete" && state.report && (
-        state.ceoFollowUp.length === 0 || state.finalVerdict
-      ) && (
-        <div className="mt-6 flex flex-col items-center gap-4">
-          <div className="rpg-title text-[10px] text-[var(--color-dbz-green)]">
-            ANALYSIS COMPLETE — {(state.report.totalDurationMs / 1000).toFixed(1)}s
+      {state.phase === "complete" &&
+        state.report &&
+        (state.ceoFollowUp.length === 0 || state.finalVerdict) && (
+          <div className="mt-6 flex flex-col items-center gap-4">
+            <div
+              data-testid="analysis-complete"
+              className="rpg-title text-[10px] text-[var(--color-dbz-green)]"
+            >
+              ANALYSIS COMPLETE — {(state.report.totalDurationMs / 1000).toFixed(1)}s
+            </div>
+            <div className="flex gap-3">
+              <ExportButton report={state.report} />
+              <ShareImage report={state.report} />
+            </div>
           </div>
-          <div className="flex gap-3">
-            <ExportButton report={state.report} />
-            <ShareImage report={state.report} />
-          </div>
-        </div>
-      )}
+        )}
 
       {/* Error state */}
       {state.phase === "error" && (
@@ -199,10 +221,27 @@ export default function Home() {
           style={{ borderColor: "var(--color-dbz-red)" }}
         >
           <h3 className="rpg-title text-[10px] text-[var(--color-dbz-red)] mb-2">ERROR DETECTED</h3>
-          <p className="font-[family-name:var(--font-terminal)] text-base text-red-300">
+          <p
+            data-testid="error-message"
+            className="font-[family-name:var(--font-terminal)] text-base text-red-300"
+          >
             {state.error}
           </p>
-          <RetroButton onClick={() => { reset(); setFinalizing(false); }} variant="secondary" className="mt-4">
+          {/* Show API key input on demo exhaustion errors */}
+          {state.error?.includes("Demo limit") && (
+            <div className="mt-4">
+              <ApiKeyInput apiKey={apiKey} onSave={saveKey} />
+            </div>
+          )}
+          <RetroButton
+            data-testid="retry-button"
+            onClick={() => {
+              reset();
+              setFinalizing(false);
+            }}
+            variant="secondary"
+            className="mt-4"
+          >
             RETRY
           </RetroButton>
         </div>

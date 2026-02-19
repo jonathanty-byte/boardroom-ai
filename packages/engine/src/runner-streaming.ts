@@ -9,8 +9,6 @@ import type {
   ModeratorAction,
   Round1Output,
   Round1Result,
-  Round2Response,
-  Round2Result,
 } from "./types";
 
 const DEFAULT_MODEL = "deepseek/deepseek-v3.2";
@@ -72,63 +70,6 @@ export class StreamingAgentRunner {
     return { output, durationMs };
   }
 
-  async runRound2Streaming(
-    config: BoardMemberConfig,
-    ownVerdict: string,
-    adversePositions: string,
-    onChunk: (role: BoardMemberRole, chunk: string) => void,
-  ): Promise<Round2Result> {
-    const client = this.createClient();
-    const start = performance.now();
-    let fullText = "";
-
-    const prompt = [
-      "## Your Round 1 verdict",
-      ownVerdict,
-      "",
-      "## Adverse positions from other board members",
-      adversePositions,
-      "",
-      "React to the adverse positions. You can ATTACK, CONCEDE, or PROPOSE A COMPROMISE.",
-      "Be direct, argue, don't be polite for nothing.",
-      "",
-      "Respond with valid JSON:",
-      "{",
-      `  "role": "${config.role}",`,
-      '  "position": "MAINTAIN" | "CONCEDE" | "COMPROMISE",',
-      '  "argument": "Why, in 2-3 sentences max",',
-      '  "condition": "If I concede, under what condition. If I maintain, what risk I accept."',
-      "}",
-      "Respond ONLY with JSON.",
-    ].join("\n");
-
-    const stream = await client.chat.completions.create({
-      model: this.model,
-      max_tokens: 1024,
-      temperature: config.temperature,
-      stream: true,
-      messages: [
-        {
-          role: "system",
-          content: `You are ${config.name}, ${config.title} of the BoardRoom AI board. You are in Round 2 of a contradictory debate. Defend or adjust your position.`,
-        },
-        { role: "user", content: prompt },
-      ],
-    });
-
-    for await (const chunk of stream) {
-      const delta = chunk.choices[0]?.delta?.content;
-      if (delta) {
-        fullText += delta;
-        onChunk(config.role, delta);
-      }
-    }
-
-    const durationMs = Math.round(performance.now() - start);
-    const output = this.parseRound2(fullText, config);
-    return { output, durationMs };
-  }
-
   extractJSON(raw: string): string {
     // Try to find JSON object in the response, handling various LLM quirks
     // 1. Remove markdown fences anywhere in the text
@@ -161,24 +102,6 @@ export class StreamingAgentRunner {
     } catch {
       throw new Error(
         `${config.name} (${config.role}) returned invalid JSON.\nRaw:\n${raw.slice(0, 500)}`,
-      );
-    }
-  }
-
-  parseRound2(raw: string, config: BoardMemberConfig): Round2Response {
-    const cleaned = this.extractJSON(raw);
-
-    try {
-      const parsed = JSON.parse(cleaned) as Record<string, unknown>;
-      return {
-        role: config.role,
-        position: (parsed.position as Round2Response["position"]) ?? "MAINTAIN",
-        argument: (parsed.argument as string) ?? "",
-        condition: (parsed.condition as string) ?? "",
-      };
-    } catch {
-      throw new Error(
-        `${config.name} (${config.role}) Round 2 returned invalid JSON.\nRaw:\n${raw.slice(0, 500)}`,
       );
     }
   }

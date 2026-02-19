@@ -4,14 +4,12 @@ import type {
   DebateHistory,
   FrictionPoint,
   Round1Result,
-  Round2Result,
   Synthesis,
 } from "./types";
 import { BOARD_MEMBER_NAMES } from "./types";
 
 export function synthesize(
   round1: Round1Result[],
-  round2: Round2Result[],
   frictions: FrictionPoint[],
   debateHistories?: DebateHistory[],
 ): Synthesis {
@@ -24,27 +22,14 @@ export function synthesize(
     return rec ? [`${r.output.name}: ${rec}`] : [];
   });
 
-  // Check Round 2 for compromises and impasses
-  for (const friction of frictions) {
-    const responses = round2.filter((r) => friction.members.includes(r.output.role));
-
-    const hasCompromise = responses.some(
-      (r) => r.output.position === "COMPROMISE" || r.output.position === "CONCEDE",
-    );
-    const allMaintain = responses.every((r) => r.output.position === "MAINTAIN");
-
-    if (allMaintain) {
-      impasses.push(
-        `${friction.description}: ${responses
-          .map((r) => `${r.output.role} maintains (${r.output.condition})`)
-          .join(" | ")}`,
-      );
-    } else if (hasCompromise) {
-      compromises.push(
-        `${friction.description}: ${responses
-          .map((r) => `${r.output.role} ${r.output.position.toLowerCase()}s (${r.output.argument})`)
-          .join(" | ")}`,
-      );
+  // Extract compromises and impasses from debate outcomes
+  if (debateHistories) {
+    for (const debate of debateHistories) {
+      if (debate.outcome === "CONVERGED") {
+        compromises.push(`${debate.friction.description}: ${debate.outcomeSummary}`);
+      } else {
+        impasses.push(`${debate.friction.description}: ${debate.outcomeSummary}`);
+      }
     }
   }
 

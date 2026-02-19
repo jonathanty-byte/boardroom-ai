@@ -5,20 +5,11 @@ import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 import html2canvas from "html2canvas";
 import { useCallback, useRef } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
-import { getVerdictColor } from "@/lib/utils/constants";
+import { MEMBER_COLORS, getVerdictColor } from "@/lib/utils/constants";
 
 interface ShareImageProps {
   report: BoardroomReport;
 }
-
-const MEMBER_COLORS: Record<BoardMemberRole, string> = {
-  cpo: "#FF6B00",
-  cmo: "#2196F3",
-  cfo: "#4CAF50",
-  cro: "#9C27B0",
-  cco: "#F44336",
-  cto: "#00BCD4",
-};
 
 export function ShareImage({ report }: ShareImageProps) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -202,7 +193,7 @@ export function ShareImage({ report }: ShareImageProps) {
       </div>
 
       {/* Button */}
-      <RetroButton onClick={handleCapture} variant="secondary">
+      <RetroButton data-testid="share-image-button" onClick={handleCapture} variant="secondary">
         SHARE IMAGE
       </RetroButton>
     </>

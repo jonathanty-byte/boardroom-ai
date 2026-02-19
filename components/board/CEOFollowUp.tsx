@@ -1,18 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import type { BoardMemberRole, CEOFollowUpQuestion } from "@boardroom/engine";
+import type { CEOFollowUpQuestion } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
+import { useState } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
-
-const MEMBER_COLORS: Record<BoardMemberRole, string> = {
-  cpo: "#FF6B00",
-  cmo: "#2196F3",
-  cfo: "#4CAF50",
-  cro: "#9C27B0",
-  cco: "#F44336",
-  cto: "#00BCD4",
-};
+import { MEMBER_COLORS } from "@/lib/utils/constants";
 
 const SOURCE_LABELS: Record<CEOFollowUpQuestion["source"], string> = {
   challenge: "Round 1 challenge",
@@ -43,7 +35,7 @@ export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProp
   };
 
   return (
-    <div className="pixel-border p-4">
+    <div data-testid="ceo-followup-section" className="pixel-border p-4">
       {/* Header */}
       <div className="text-center mb-4">
         <div className="stat-label text-[var(--color-dbz-gold)] mb-1">
@@ -61,7 +53,7 @@ export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProp
           const name = BOARD_MEMBER_NAMES[q.fromMember] ?? q.fromMember;
 
           return (
-            <div key={q.id} className="dialogue-box p-3">
+            <div key={q.id} data-testid={`ceo-question-${q.id}`} className="dialogue-box p-3">
               {/* Member badge + source */}
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <div
@@ -83,14 +75,13 @@ export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProp
 
               {/* Answer textarea */}
               <textarea
+                data-testid={`ceo-answer-${q.id}`}
                 className="w-full bg-[#0a0a1a] border border-[#3a3a6a] text-gray-200 font-[family-name:var(--font-terminal)] text-sm p-2 resize-none focus:border-[var(--color-dbz-gold)] focus:outline-none transition-colors"
                 rows={2}
                 placeholder="Your answer..."
                 value={answers[q.id] ?? ""}
                 disabled={disabled}
-                onChange={(e) =>
-                  setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))
-                }
+                onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
               />
             </div>
           );
@@ -100,6 +91,7 @@ export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProp
       {/* Submit button */}
       <div className="mt-4 text-center">
         <RetroButton
+          data-testid="ceo-submit"
           onClick={handleSubmit}
           disabled={filledCount === 0 || disabled}
           variant="primary"

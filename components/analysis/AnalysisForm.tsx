@@ -30,6 +30,7 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
         </label>
         <div className="dialogue-box">
           <textarea
+            data-testid="briefing-textarea"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Describe your project, business case, or decision..."
@@ -44,6 +45,7 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
         <label className="stat-label block mb-2">CEO VISION (OPTIONAL)</label>
         <div className="pixel-border-sm">
           <input
+            data-testid="ceo-vision-input"
             type="text"
             value={ceoVision}
             onChange={(e) => setCeoVision(e.target.value)}
@@ -58,6 +60,7 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
         <label className="stat-label block mb-2">AI MODEL</label>
         <div className="pixel-border-sm">
           <select
+            data-testid="model-select"
             value={model}
             onChange={(e) => setModel(e.target.value)}
             className="w-full bg-[var(--color-surface)] text-gray-200 px-3 py-2 focus:outline-none"
@@ -75,6 +78,7 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
       {!content.trim() && (
         <RetroButton
           variant="secondary"
+          data-testid="example-button"
           onClick={() => {
             setContent(EXAMPLE_BRIEFING);
             setCeoVision(EXAMPLE_CEO_VISION);
@@ -85,7 +89,7 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
       )}
 
       {/* Submit */}
-      <RetroButton type="submit" disabled={disabled || !content.trim()}>
+      <RetroButton type="submit" disabled={disabled || !content.trim()} data-testid="launch-button">
         LAUNCH BOARDROOM ANALYSIS
       </RetroButton>
     </form>

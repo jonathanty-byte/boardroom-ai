@@ -1,6 +1,6 @@
 import { boardMembers } from "./board-members";
 import { extractCEOFollowUp } from "./ceo-followup";
-import { flattenDebatesToRound2, runDebateForFriction } from "./debate-engine";
+import { runDebateForFriction } from "./debate-engine";
 import { identifyFrictions } from "./friction";
 import { StreamingAgentRunner } from "./runner-streaming";
 import { synthesize } from "./synthesis";
@@ -67,12 +67,9 @@ export async function runAnalysis(
       }
     }
 
-    // Convert to legacy Round2Result[] for synthesis backward compat
-    const round2Results = flattenDebatesToRound2(debateHistories);
-
     // Synthesis
     send({ type: "state_change", state: "SYNTHESIZING" });
-    const synthesis = synthesize(round1Results, round2Results, frictions, debateHistories);
+    const synthesis = synthesize(round1Results, frictions, debateHistories);
     send({ type: "synthesis_complete", synthesis });
 
     // CEO follow-up questions (only if debates were unresolved)
@@ -89,7 +86,6 @@ export async function runAnalysis(
       ceoVision: input.ceoVision ?? "",
       round1: round1Results,
       frictions,
-      round2: round2Results,
       synthesis,
       totalDurationMs,
       debates: debateHistories.length > 0 ? debateHistories : undefined,

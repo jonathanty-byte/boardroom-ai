@@ -2,6 +2,7 @@
 
 import type { BoardMemberRole, Round1Output } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
+import { MEMBER_AVATARS, MEMBER_COLORS } from "@/lib/utils/constants";
 import { VerdictBadge } from "./VerdictBadge";
 
 interface MemberDetailProps {
@@ -9,15 +10,6 @@ interface MemberDetailProps {
   result: Round1Output;
   onClose: () => void;
 }
-
-const MEMBER_COLORS: Record<BoardMemberRole, string> = {
-  cpo: "#FF6B00",
-  cmo: "#2196F3",
-  cfo: "#4CAF50",
-  cro: "#9C27B0",
-  cco: "#F44336",
-  cto: "#00BCD4",
-};
 
 export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
   const color = MEMBER_COLORS[role];
@@ -38,7 +30,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
         >
           <div className="flex items-center gap-3">
             <img
-              src={`/avatars/${role === "cpo" ? "vegeta" : role === "cmo" ? "bulma" : role === "cfo" ? "piccolo" : role === "cro" ? "whis" : role === "cco" ? "gohan" : "trunks"}.svg`}
+              src={MEMBER_AVATARS[role]}
               alt={BOARD_MEMBER_NAMES[role]}
               className="w-10 h-10 pixel-border-sm"
               onError={(e) => {

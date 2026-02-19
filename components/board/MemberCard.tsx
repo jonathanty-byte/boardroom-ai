@@ -5,6 +5,7 @@ import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 import { useState } from "react";
 import { StreamingText } from "@/components/analysis/StreamingText";
 import type { MemberState } from "@/lib/hooks/useAnalysisState";
+import { MEMBER_AVATARS, MEMBER_COLORS } from "@/lib/utils/constants";
 import { MemberDetail } from "./MemberDetail";
 import { VerdictBadge } from "./VerdictBadge";
 
@@ -13,26 +14,9 @@ interface MemberCardProps {
   state: MemberState;
 }
 
-const MEMBER_COLORS: Record<BoardMemberRole, string> = {
-  cpo: "#FF6B00", // Vegeta - fiery orange
-  cmo: "#2196F3", // Bulma - tech blue
-  cfo: "#4CAF50", // Piccolo - namekian green
-  cro: "#9C27B0", // Whis - divine purple
-  cco: "#F44336", // Gohan - power red
-  cto: "#00BCD4", // Trunks - future cyan
-};
-
-const MEMBER_AVATARS: Record<BoardMemberRole, string> = {
-  cpo: "/avatars/vegeta.svg",
-  cmo: "/avatars/bulma.svg",
-  cfo: "/avatars/piccolo.svg",
-  cro: "/avatars/whis.svg",
-  cco: "/avatars/gohan.svg",
-  cto: "/avatars/trunks.svg",
-};
-
 export function MemberCard({ role, state }: MemberCardProps) {
   const [showDetail, setShowDetail] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const name = BOARD_MEMBER_NAMES[role];
   const title = BOARD_MEMBER_TITLES[role];
   const color = MEMBER_COLORS[role];
@@ -43,6 +27,7 @@ export function MemberCard({ role, state }: MemberCardProps) {
   return (
     <>
       <div
+        data-testid={`member-card-${role}`}
         className={`char-card p-3 flex flex-col gap-2 min-h-[200px] transition-all duration-300 ${
           isAnalyzing ? "analyzing-glow" : ""
         } ${isComplete ? "cursor-pointer" : ""}`}
@@ -56,17 +41,16 @@ export function MemberCard({ role, state }: MemberCardProps) {
             className="w-14 h-14 flex-shrink-0 pixel-border-sm flex items-center justify-center overflow-hidden"
             style={{ borderColor: color }}
           >
-            <img
-              src={MEMBER_AVATARS[role]}
-              alt={name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                // Fallback to colored initial if image not found
-                const target = e.target as HTMLImageElement;
-                target.style.display = "none";
-                target.parentElement!.innerHTML = `<span style="color:${color};font-size:16px;font-family:var(--font-retro)">${name[0]}</span>`;
-              }}
-            />
+            {imgError ? (
+              <span style={{ color, fontSize: 16, fontFamily: "var(--font-retro)" }}>{name[0]}</span>
+            ) : (
+              <img
+                src={MEMBER_AVATARS[role]}
+                alt={name}
+                className="w-full h-full object-cover"
+                onError={() => setImgError(true)}
+              />
+            )}
           </div>
 
           {/* Name + Role */}
@@ -95,7 +79,12 @@ export function MemberCard({ role, state }: MemberCardProps) {
         {/* Content Area */}
         {state.status === "waiting" && (
           <div className="flex-1 flex items-center justify-center">
-            <span className="text-[8px] text-gray-600 tracking-widest uppercase">Standby</span>
+            <span
+              data-testid={`member-status-${role}`}
+              className="text-[8px] text-gray-600 tracking-widest uppercase"
+            >
+              Standby
+            </span>
           </div>
         )}
 
@@ -107,7 +96,7 @@ export function MemberCard({ role, state }: MemberCardProps) {
 
         {isComplete && state.result && (
           <div className="flex-1 flex flex-col gap-2">
-            <VerdictBadge verdict={state.result.verdict} />
+            <VerdictBadge verdict={state.result.verdict} data-testid={`member-verdict-${role}`} />
             <p className="text-gray-400 line-clamp-3 font-[family-name:var(--font-terminal)] text-base leading-tight">
               {state.result.analysis.slice(0, 120)}...
             </p>

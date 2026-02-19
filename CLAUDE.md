@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-BoardRoom AI — a multi-agent AI decision engine. 6 AI executives (DBZ-themed) analyze, debate, and judge business decisions via a retro RPG-styled web app. V0.2 is complete (multi-turn debate + CEO follow-up loop).
+BoardRoom AI — a multi-agent AI decision engine. 6 AI executives (DBZ-themed) analyze, debate, and judge business decisions via a retro RPG-styled web app.
 
 ## Commands
 
 ```bash
 npm run dev          # Start Next.js dev server (localhost:3000)
 npm run build        # Production build
-npm test             # Run all tests (vitest, 84 tests across 8 files)
+npm test             # Run all tests (vitest)
 npm run test:watch   # Watch mode
 npm run lint         # Biome check
 npm run lint:fix     # Biome auto-fix
@@ -23,12 +23,21 @@ Run a single test file:
 npx vitest run packages/engine/__tests__/ceo-followup.test.ts
 ```
 
+CI runs: `tsc --noEmit` → `biome check .` → `vitest run` (Node 20, Ubuntu).
+
 ## Architecture
 
 ### Monorepo (npm workspaces)
 
-- **`packages/engine/`** (`@boardroom/engine`): Pure TypeScript engine, zero framework deps. All LLM orchestration, debate logic, friction detection, synthesis. Imported by the web app as `@boardroom/engine`.
-- **Root**: Next.js 16 app (App Router, React 19, Tailwind 4) consuming the engine via SSE streaming.
+- **`packages/engine/`** (`@boardroom/engine`): Pure TypeScript engine, zero framework deps. All LLM orchestration, debate logic, friction detection, synthesis. Only dependency: `openai` SDK.
+- **Root**: Next.js 16 app (App Router, React 19, Tailwind 4) consuming the engine via SSE streaming. Engine is transpiled via `transpilePackages` in `next.config.ts`.
+
+### Path Aliases
+
+- `@/*` → project root (e.g. `@/components/board/BoardRoom`)
+- `@boardroom/engine` → `packages/engine/src/index.ts`
+
+Both are defined in `tsconfig.json` and mirrored in `vitest.config.ts`.
 
 ### Pipeline Flow
 
@@ -69,7 +78,7 @@ Round 1 (6 parallel LLM calls) → Friction Detection (code) → Moderator (LLM)
 
 ### SSE Event Flow
 
-Two endpoints:
+Two endpoints, both Edge Runtime, SSE over POST (not EventSource):
 - **`/api/analyze`**: `state_change` → `member_chunk`/`member_complete` → `frictions_detected` → `moderator_action` → `debate_turn_*` → `debate_resolved` → `synthesis_complete` → `ceo_followup` (optional) → `analysis_complete`
 - **`/api/finalize`**: `final_verdict_start` → `final_verdict_chunk` → `final_verdict_complete`
 
@@ -80,29 +89,15 @@ Two endpoints:
 
 ## Conventions
 
-- LLM provider: OpenRouter (BYOK). Default model: `deepseek/deepseek-v3.2`
+- **BYOK model**: No server-side env vars required. API key is entered via browser UI, sent per-request. Default model: `deepseek/deepseek-v3.2`
 - Engine uses OpenAI SDK pointed at OpenRouter's base URL
-- All streaming is SSE over POST (not EventSource)
 - Frontend state management: `useReducer` pattern, no external state lib
 - CSS: Tailwind 4 + custom RPG theme in `globals.css` (pixel-border, stat-label, rpg-title, char-card classes)
-- Linting: Biome (not ESLint)
+- Linting: Biome (not ESLint) — line width 100, 2-space indent, semicolons always. `noExplicitAny` and some a11y rules are off for velocity.
 - Board member roles: `cpo`, `cmo`, `cfo`, `cro`, `cco`, `cto` (always lowercase)
 
 ## Testing
 
-Tests are in `packages/engine/__tests__/`. They test pure logic (no LLM calls, no network). Fixtures in `fixtures.ts` provide mock Round1Results, DebateHistories, etc.
+Tests are in `packages/engine/__tests__/`. They test pure logic (no LLM calls, no network). Fixtures in `fixtures.ts` provide mock Round1Results, DebateHistories, etc. Vitest globals are enabled — no need to import `describe`, `it`, `expect`.
 
 When adding engine logic, write tests alongside. The engine is the core differentiator — keep it well-tested.
-
-## Current State (V0.2 complete)
-
-Last 3 commits:
-- `e65d352` fix: keep Q&A visible and delay report until final verdict
-- `8077b81` feat: replace re-analysis loop with Final Arbiter verdict
-- `0e18b54` feat: CEO follow-up questions when debates are unresolved
-
-Next priorities (V0.3):
-- Prompt tuning (moderator + member prompts) via real test iterations
-- OG image / share link
-- Mobile responsive
-- Playwright MCP installed for automated browser testing (requires session restart)

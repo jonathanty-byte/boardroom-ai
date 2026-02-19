@@ -6,9 +6,15 @@ interface VerdictBadgeProps {
   verdict: string;
   animated?: boolean;
   size?: "sm" | "md" | "lg";
+  "data-testid"?: string;
 }
 
-export function VerdictBadge({ verdict, animated = true, size = "md" }: VerdictBadgeProps) {
+export function VerdictBadge({
+  verdict,
+  animated = true,
+  size = "md",
+  ...rest
+}: VerdictBadgeProps) {
   const color = getVerdictColor(verdict);
   const category = getVerdictCategory(verdict);
 
@@ -20,6 +26,7 @@ export function VerdictBadge({ verdict, animated = true, size = "md" }: VerdictB
 
   return (
     <span
+      {...rest}
       className={`inline-block font-bold tracking-wider ${sizeClasses[size]} ${animated ? "verdict-appear" : ""}`}
       style={{
         color: "#000",

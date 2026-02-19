@@ -2,7 +2,7 @@
 
 import type { BoardMemberRole, FrictionPoint, Synthesis } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
-import type { DebateState, DebateThreadState, MemberState } from "@/lib/hooks/useAnalysisState";
+import type { DebateThreadState, MemberState } from "@/lib/hooks/useAnalysisState";
 import { DebateThread } from "./DebateThread";
 import { MemberCard } from "./MemberCard";
 import { VerdictBadge } from "./VerdictBadge";
@@ -10,7 +10,6 @@ import { VerdictBadge } from "./VerdictBadge";
 interface BoardRoomProps {
   members: Record<BoardMemberRole, MemberState>;
   frictions: FrictionPoint[];
-  debates: Record<BoardMemberRole, DebateState>;
   debateThreads: DebateThreadState[];
   synthesis: Synthesis | null;
   phase: string;
@@ -21,7 +20,6 @@ const ROLES: BoardMemberRole[] = ["cpo", "cmo", "cfo", "cro", "cco", "cto"];
 export function BoardRoom({
   members,
   frictions,
-  debates,
   debateThreads,
   synthesis,
   phase,
@@ -93,8 +91,8 @@ export function BoardRoom({
         </div>
       )}
 
-      {/* Multi-turn Debate (V0.2) or Legacy Round 2 */}
-      {debateThreads.length > 0 ? (
+      {/* Multi-turn Debate */}
+      {debateThreads.length > 0 && (
         <div className="pixel-border p-4">
           <div className="stat-label mb-3 text-[var(--color-dbz-purple)]">MULTI-TURN DEBATE</div>
           {debateThreads.map((thread) => (
@@ -108,43 +106,7 @@ export function BoardRoom({
             />
           ))}
         </div>
-      ) : Object.values(debates).some((d) => d.status !== "waiting") ? (
-        <div className="pixel-border p-4">
-          <div className="stat-label mb-3 text-[var(--color-dbz-purple)]">
-            ROUND 2 — CONTRADICTORY DEBATE
-          </div>
-          <div className="space-y-3">
-            {ROLES.filter((r) => debates[r].status !== "waiting").map((role) => {
-              const debate = debates[role];
-              return (
-                <div key={role} className="dialogue-box p-3">
-                  <div className="text-[10px] font-bold text-white mb-1">
-                    {BOARD_MEMBER_NAMES[role]}
-                  </div>
-                  {debate.status === "debating" && (
-                    <div className="font-[family-name:var(--font-terminal)] text-base text-gray-400">
-                      <span className="cursor-blink">{debate.streamedText.slice(-200)}</span>
-                    </div>
-                  )}
-                  {debate.result && (
-                    <div className="flex flex-col gap-1">
-                      <VerdictBadge verdict={debate.result.position} animated={true} size="sm" />
-                      <p className="font-[family-name:var(--font-terminal)] text-base text-gray-300 mt-1">
-                        {debate.result.argument}
-                      </p>
-                      {debate.result.condition && (
-                        <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 italic">
-                          Condition: {debate.result.condition}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
+      )}
 
       {/* Synthesis - Final results */}
       {synthesis && (

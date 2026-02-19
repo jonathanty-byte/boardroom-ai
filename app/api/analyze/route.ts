@@ -1,5 +1,6 @@
 import type { SSEEvent } from "@boardroom/engine";
 import { runAnalysis } from "@boardroom/engine";
+import { checkDemoRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "edge";
 
@@ -12,11 +13,28 @@ export async function POST(req: Request) {
     model?: string;
   };
 
-  if (!content || !apiKey) {
+  const effectiveKey = apiKey || process.env.OPENROUTER_API_KEY;
+
+  if (!content || !effectiveKey) {
     return new Response(JSON.stringify({ error: "content and apiKey are required" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
+  }
+
+  // Rate limit demo mode (no client key, using server key)
+  if (!apiKey && effectiveKey) {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const { limited } = checkDemoRateLimit(ip);
+    if (limited) {
+      return new Response(
+        JSON.stringify({
+          error: "Demo limit reached for today. Come back tomorrow or use your own OpenRouter key!",
+          demo_exhausted: true,
+        }),
+        { status: 429, headers: { "Content-Type": "application/json" } },
+      );
+    }
   }
 
   const encoder = new TextEncoder();
@@ -27,7 +45,7 @@ export async function POST(req: Request) {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
       };
 
-      await runAnalysis({ content, ceoVision, apiKey, model }, send);
+      await runAnalysis({ content, ceoVision, apiKey: effectiveKey, model }, send);
       controller.close();
     },
   });

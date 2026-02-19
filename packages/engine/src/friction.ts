@@ -94,8 +94,10 @@ function buildPairFriction(a: Round1Result, b: Round1Result): FrictionPoint {
     description: `${high.output.name} (${high.output.verdict}) vs ${low.output.name} (${low.output.verdict})`,
     members: [high.output.role, low.output.role],
     positions: {
-      [high.output.role]: `${high.output.verdict}: ${high.output.verdictDetails.recommandationConcrete ?? high.output.verdictDetails.pointFort ?? high.output.analysis.slice(0, 200)}`,
-      [low.output.role]: `${low.output.verdict}: ${low.output.verdictDetails.recommandationConcrete ?? low.output.verdictDetails.pointFort ?? low.output.analysis.slice(0, 200)}`,
+      [high.output.role]:
+        `${high.output.verdict}: ${high.output.verdictDetails.recommandationConcrete ?? high.output.verdictDetails.pointFort ?? high.output.analysis.slice(0, 200)}`,
+      [low.output.role]:
+        `${low.output.verdict}: ${low.output.verdictDetails.recommandationConcrete ?? low.output.verdictDetails.pointFort ?? low.output.analysis.slice(0, 200)}`,
     },
   };
 }

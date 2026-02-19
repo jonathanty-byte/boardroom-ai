@@ -5,7 +5,6 @@ import {
   makeDebateTurn,
   makeFriction,
   makeRound1Result,
-  makeRound2Result,
 } from "@/packages/engine/__tests__/fixtures";
 import { formatBoardroomReport } from "../markdown-export";
 
@@ -23,7 +22,6 @@ function makeReport(overrides: Partial<BoardroomReport> = {}): BoardroomReport {
       makeRound1Result({ role: "cto", name: "Trunks", verdict: "FEASIBLE" }),
     ],
     frictions: [],
-    round2: [],
     synthesis: {
       consensus: ["Vegeta: Launch with freemium model"],
       compromises: [],
@@ -90,30 +88,6 @@ describe("formatBoardroomReport", () => {
     expect(md).not.toContain("## Friction Points");
   });
 
-  it("includes round 2 section when round2 results exist", () => {
-    const report = makeReport({
-      round2: [
-        makeRound2Result({
-          role: "cpo",
-          position: "MAINTAIN",
-          argument: "I stand by my analysis.",
-        }),
-      ],
-    });
-    const md = formatBoardroomReport(report);
-
-    expect(md).toContain("## Round 2 — Contradictory Debate");
-    expect(md).toContain("**MAINTAIN**");
-    expect(md).toContain("I stand by my analysis.");
-  });
-
-  it("excludes round 2 section when no round2 results", () => {
-    const report = makeReport({ round2: [] });
-    const md = formatBoardroomReport(report);
-
-    expect(md).not.toContain("## Round 2 — Contradictory Debate");
-  });
-
   it("shows CEO vision section", () => {
     const report = makeReport({ ceoVision: "Disrupt the market" });
     const md = formatBoardroomReport(report);
@@ -168,19 +142,10 @@ describe("formatBoardroomReport", () => {
     expect(md).toContain("**Resolution:** Both agreed on phased launch.");
   });
 
-  it("uses legacy round 2 format when no debates field", () => {
-    const report = makeReport({
-      round2: [
-        makeRound2Result({
-          role: "cpo",
-          position: "MAINTAIN",
-          argument: "Legacy argument.",
-        }),
-      ],
-    });
+  it("excludes debate section when no debates", () => {
+    const report = makeReport();
     const md = formatBoardroomReport(report);
 
-    expect(md).toContain("## Round 2 — Contradictory Debate");
     expect(md).not.toContain("## Multi-Turn Debate");
   });
 });

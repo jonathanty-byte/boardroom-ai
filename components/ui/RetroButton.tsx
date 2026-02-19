@@ -1,21 +1,16 @@
 "use client";
 
-interface RetroButtonProps {
+interface RetroButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  onClick?: () => void;
-  disabled?: boolean;
   variant?: "primary" | "secondary";
-  type?: "button" | "submit";
-  className?: string;
 }
 
 export function RetroButton({
   children,
-  onClick,
-  disabled,
   variant = "primary",
   type = "button",
   className = "",
+  ...rest
 }: RetroButtonProps) {
   const base =
     "text-[10px] px-6 py-3 uppercase tracking-widest transition-all duration-150 font-bold";
@@ -43,12 +38,7 @@ export function RetroButton({
   };
 
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`${base} ${variants[variant]} ${className}`}
-    >
+    <button type={type} className={`${base} ${variants[variant]} ${className}`} {...rest}>
       {children}
     </button>
   );

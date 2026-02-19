@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import { flattenDebatesToRound2, runDebateForFriction } from "../src/debate-engine";
+import { runDebateForFriction } from "../src/debate-engine";
 import type { BoardMemberConfig } from "../src/types";
 import {
-  makeDebateHistory,
   makeDebateTurn,
   makeFriction,
   makeModeratorAction,
@@ -200,65 +199,3 @@ describe("runDebateForFriction", () => {
   });
 });
 
-describe("flattenDebatesToRound2", () => {
-  it("maps CONCESSION to CONCEDE", () => {
-    const history = makeDebateHistory({
-      turns: [makeDebateTurn({ speaker: "cpo", type: "CONCESSION", positionShift: "REVERSED" })],
-    });
-    const results = flattenDebatesToRound2([history]);
-    expect(results).toHaveLength(1);
-    expect(results[0].output.position).toBe("CONCEDE");
-    expect(results[0].output.role).toBe("cpo");
-  });
-
-  it("maps SOFTENED to COMPROMISE", () => {
-    const history = makeDebateHistory({
-      turns: [makeDebateTurn({ speaker: "cfo", type: "RESPONSE", positionShift: "SOFTENED" })],
-    });
-    const results = flattenDebatesToRound2([history]);
-    expect(results[0].output.position).toBe("COMPROMISE");
-  });
-
-  it("maps UNCHANGED to MAINTAIN", () => {
-    const history = makeDebateHistory({
-      turns: [makeDebateTurn({ speaker: "cpo", type: "CHALLENGE", positionShift: "UNCHANGED" })],
-    });
-    const results = flattenDebatesToRound2([history]);
-    expect(results[0].output.position).toBe("MAINTAIN");
-  });
-
-  it("takes last turn per speaker when multiple turns exist", () => {
-    const history = makeDebateHistory({
-      turns: [
-        makeDebateTurn({
-          turnNumber: 1,
-          speaker: "cpo",
-          positionShift: "UNCHANGED",
-          content: "First argument",
-        }),
-        makeDebateTurn({
-          turnNumber: 2,
-          speaker: "cfo",
-          positionShift: "UNCHANGED",
-          content: "Counter",
-        }),
-        makeDebateTurn({
-          turnNumber: 3,
-          speaker: "cpo",
-          positionShift: "SOFTENED",
-          content: "I soften",
-        }),
-      ],
-    });
-    const results = flattenDebatesToRound2([history]);
-    const cpoResult = results.find((r) => r.output.role === "cpo");
-    expect(cpoResult?.output.position).toBe("COMPROMISE");
-    expect(cpoResult?.output.argument).toBe("I soften");
-  });
-
-  it("handles empty debate history", () => {
-    const history = makeDebateHistory({ turns: [] });
-    const results = flattenDebatesToRound2([history]);
-    expect(results).toHaveLength(0);
-  });
-});

@@ -1,8 +1,28 @@
+import type { BoardMemberRole } from "@boardroom/engine";
+
+export const MEMBER_COLORS: Record<BoardMemberRole, string> = {
+  cpo: "#FF6B00", // Vegeta - fiery orange
+  cmo: "#2196F3", // Bulma - tech blue
+  cfo: "#4CAF50", // Piccolo - namekian green
+  cro: "#9C27B0", // Whis - divine purple
+  cco: "#F44336", // Gohan - power red
+  cto: "#00BCD4", // Trunks - future cyan
+};
+
+export const MEMBER_AVATARS: Record<BoardMemberRole, string> = {
+  cpo: "/avatars/vegeta.svg",
+  cmo: "/avatars/bulma.svg",
+  cfo: "/avatars/piccolo.svg",
+  cro: "/avatars/whis.svg",
+  cco: "/avatars/gohan.svg",
+  cto: "/avatars/trunks.svg",
+};
+
 export const RECOMMENDED_MODELS = [
   {
     id: "deepseek/deepseek-v3.2",
     name: "DeepSeek V3.2",
-    description: "Default - excellent quality, very affordable",
+    description: "Default - quality & affordable",
   },
   {
     id: "anthropic/claude-sonnet-4.6",

@@ -15,10 +15,11 @@ export function ApiKeyInput({ apiKey, onSave }: ApiKeyInputProps) {
   if (!editing && apiKey) {
     return (
       <div className="flex items-center gap-3">
-        <span className="stat-label text-[var(--color-dbz-green)]">
+        <span data-testid="api-key-display" className="stat-label text-[var(--color-dbz-green)]">
           KEY ACTIVE: ****{apiKey.slice(-4)}
         </span>
         <button
+          data-testid="api-key-change"
           onClick={() => setEditing(true)}
           className="stat-label text-gray-500 hover:text-[var(--color-dbz-gold)] transition-colors"
         >
@@ -34,6 +35,7 @@ export function ApiKeyInput({ apiKey, onSave }: ApiKeyInputProps) {
       <div className="flex gap-2">
         <div className="pixel-border-sm flex-1">
           <input
+            data-testid="api-key-input"
             type="password"
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -42,6 +44,7 @@ export function ApiKeyInput({ apiKey, onSave }: ApiKeyInputProps) {
           />
         </div>
         <RetroButton
+          data-testid="api-key-save"
           onClick={() => {
             onSave(value);
             setEditing(false);

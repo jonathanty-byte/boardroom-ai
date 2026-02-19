@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { synthesize } from "../src/synthesis";
-import { makeDebateHistory, makeFriction, makeRound1Result, makeRound2Result } from "./fixtures";
+import { makeDebateHistory, makeFriction, makeRound1Result } from "./fixtures";
 
 describe("synthesize", () => {
   it("returns GO when all verdicts are positive (avg > 0.3)", () => {
@@ -13,7 +13,7 @@ describe("synthesize", () => {
       makeRound1Result({ role: "cto", verdict: "FEASIBLE" }),
     ];
 
-    const result = synthesize(round1, [], []);
+    const result = synthesize(round1, []);
     expect(result.collectiveVerdict).toBe("GO");
   });
 
@@ -30,7 +30,7 @@ describe("synthesize", () => {
     // Sentiments in synthesize: GO→1, GO_WITH_CHANGES→0, VIABLE_WITH_ADJUSTMENTS→0,
     // NEEDS_RESEARCH→0, NEEDS_DESIGN_DIRECTION→0, FEASIBLE_WITH_CUTS→0
     // avg = 1/6 ≈ 0.167 → between -0.3 and 0.3 → GO_WITH_CHANGES
-    const result = synthesize(round1, [], []);
+    const result = synthesize(round1, []);
     expect(result.collectiveVerdict).toBe("GO_WITH_CHANGES");
   });
 
@@ -44,52 +44,67 @@ describe("synthesize", () => {
       makeRound1Result({ role: "cto", verdict: "UNREALISTIC" }),
     ];
 
-    const result = synthesize(round1, [], []);
+    const result = synthesize(round1, []);
     expect(result.collectiveVerdict).toBe("RETHINK");
   });
 
-  it("classifies CONCEDE as compromise", () => {
+  it("classifies CONVERGED debate as compromise", () => {
     const friction = makeFriction({ members: ["cpo", "cfo"] });
-    const round2 = [
-      makeRound2Result({
-        role: "cpo",
-        position: "CONCEDE",
-        argument: "I accept the financial concerns.",
-      }),
-      makeRound2Result({
-        role: "cfo",
-        position: "MAINTAIN",
-        argument: "Numbers speak for themselves.",
-        condition: "Risk accepted.",
+    const debates = [
+      makeDebateHistory({
+        friction,
+        outcome: "CONVERGED",
+        outcomeSummary: "Both agreed on phased launch approach.",
       }),
     ];
 
-    const result = synthesize([makeRound1Result(), makeRound1Result({ role: "cfo" })], round2, [
-      friction,
-    ]);
+    const result = synthesize(
+      [makeRound1Result(), makeRound1Result({ role: "cfo" })],
+      [friction],
+      debates,
+    );
 
     expect(result.compromises.length).toBe(1);
+    expect(result.compromises[0]).toContain("phased launch");
     expect(result.impasses.length).toBe(0);
   });
 
-  it("classifies two MAINTAIN as impasse", () => {
+  it("classifies IMPASSE debate as impasse", () => {
     const friction = makeFriction({ members: ["cpo", "cfo"] });
-    const round2 = [
-      makeRound2Result({
-        role: "cpo",
-        position: "MAINTAIN",
-        condition: "I accept the risk of being wrong.",
-      }),
-      makeRound2Result({
-        role: "cfo",
-        position: "MAINTAIN",
-        condition: "The CEO must decide.",
+    const debates = [
+      makeDebateHistory({
+        friction,
+        outcome: "IMPASSE",
+        outcomeSummary: "Positions hardened. CEO must decide.",
       }),
     ];
 
-    const result = synthesize([makeRound1Result(), makeRound1Result({ role: "cfo" })], round2, [
-      friction,
-    ]);
+    const result = synthesize(
+      [makeRound1Result(), makeRound1Result({ role: "cfo" })],
+      [friction],
+      debates,
+    );
+
+    expect(result.impasses.length).toBe(1);
+    expect(result.impasses[0]).toContain("CEO must decide");
+    expect(result.compromises.length).toBe(0);
+  });
+
+  it("classifies MAX_TURNS_REACHED debate as impasse", () => {
+    const friction = makeFriction({ members: ["cpo", "cfo"] });
+    const debates = [
+      makeDebateHistory({
+        friction,
+        outcome: "MAX_TURNS_REACHED",
+        outcomeSummary: "Maximum debate turns reached without resolution.",
+      }),
+    ];
+
+    const result = synthesize(
+      [makeRound1Result(), makeRound1Result({ role: "cfo" })],
+      [friction],
+      debates,
+    );
 
     expect(result.impasses.length).toBe(1);
     expect(result.compromises.length).toBe(0);
@@ -108,7 +123,7 @@ describe("synthesize", () => {
       }),
     ];
 
-    const result = synthesize(round1, [], []);
+    const result = synthesize(round1, []);
     expect(result.consensus).toHaveLength(2);
     expect(result.consensus[0]).toContain("Vegeta");
     expect(result.consensus[0]).toContain("Launch with freemium");
@@ -116,10 +131,10 @@ describe("synthesize", () => {
     expect(result.consensus[1]).toContain("Focus on SEO first");
   });
 
-  it("handles empty case: 0 frictions, 0 round2", () => {
+  it("handles empty case: 0 frictions, 0 debates", () => {
     const round1 = [makeRound1Result({ verdict: "GO" })];
 
-    const result = synthesize(round1, [], []);
+    const result = synthesize(round1, []);
     expect(result.compromises).toHaveLength(0);
     expect(result.impasses).toHaveLength(0);
     expect(result.consensus.length).toBeGreaterThanOrEqual(0);
@@ -134,7 +149,7 @@ describe("synthesize", () => {
       }),
     ];
 
-    const result = synthesize(round1, [], []);
+    const result = synthesize(round1, []);
     expect(result.consensus).toHaveLength(0);
   });
 
@@ -162,7 +177,7 @@ describe("synthesize", () => {
       }),
     ];
 
-    const result = synthesize(round1, [], [], debates);
+    const result = synthesize(round1, [], debates);
     expect(result.unresolvedConcerns).toBeDefined();
     expect(result.unresolvedConcerns!.length).toBe(2);
     expect(result.unresolvedConcerns!.some((c) => c.includes("Trunks"))).toBe(true);
@@ -188,17 +203,17 @@ describe("synthesize", () => {
       }),
     ];
 
-    const result = synthesize(round1, [], [], debates);
+    const result = synthesize(round1, [], debates);
     expect(result.unresolvedConcerns).toBeUndefined();
   });
 
-  it("backward compatible: works without debateHistories parameter", () => {
+  it("works without debateHistories parameter", () => {
     const round1 = [
       makeRound1Result({ verdict: "GO" }),
       makeRound1Result({ role: "cfo", verdict: "NOT_VIABLE" }),
     ];
 
-    const result = synthesize(round1, [], []);
+    const result = synthesize(round1, []);
     expect(result.unresolvedConcerns).toBeUndefined();
     expect(result.collectiveVerdict).toBeDefined();
   });

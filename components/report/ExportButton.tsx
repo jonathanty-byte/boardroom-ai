@@ -21,7 +21,7 @@ export function ExportButton({ report }: ExportButtonProps) {
   };
 
   return (
-    <RetroButton onClick={handleExport} variant="primary">
+    <RetroButton data-testid="export-button" onClick={handleExport} variant="primary">
       ⬇ DOWNLOAD BOARDROOM REPORT ⬇
     </RetroButton>
   );
