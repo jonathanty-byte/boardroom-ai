@@ -78,4 +78,3 @@ describe("parseRound1", () => {
     expect(() => runner.parseRound1(raw, mockConfig)).toThrow();
   });
 });
-

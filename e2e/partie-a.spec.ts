@@ -12,7 +12,8 @@ Tech stack: React Native, Node.js backend, OpenAI API for recipe generation. MVP
 
 Competition: Mealime (free, no AI), Eat This Much (AI but ugly UX), ChatGPT (generic, no structure). Our edge: beautiful UX + structured output + grocery integration.`;
 
-const VAGUE_BRIEFING = "I want to build an app that uses AI to do stuff. Budget is flexible. No timeline.";
+const VAGUE_BRIEFING =
+  "I want to build an app that uses AI to do stuff. Budget is flexible. No timeline.";
 
 // Skip all A tests if no API key is provided
 test.describe("PARTIE A — Tests Fonctionnels Core", () => {
@@ -29,7 +30,9 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
 
       // Fill briefing
       await page.getByTestId("briefing-textarea").fill(EXAMPLE_BRIEFING);
-      await page.getByTestId("ceo-vision-input").fill("Focus on go-to-market strategy and unit economics");
+      await page
+        .getByTestId("ceo-vision-input")
+        .fill("Focus on go-to-market strategy and unit economics");
 
       // Ensure DeepSeek is selected (default)
       await expect(page.getByTestId("model-select")).toHaveValue("deepseek/deepseek-v3.2");
@@ -114,14 +117,16 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       if (await ceoSection.isVisible().catch(() => false)) {
         // Fill first answer textarea
         const firstAnswer = page.locator('[data-testid^="ceo-answer-"]').first();
-        await firstAnswer.fill("We want to build a meal planning app targeting millennials with a $10/month subscription model.");
+        await firstAnswer.fill(
+          "We want to build a meal planning app targeting millennials with a $10/month subscription model.",
+        );
 
         // Submit
         await page.getByTestId("ceo-submit").click();
 
         // Wait for final verdict
         await expect(
-          page.getByTestId("final-verdict").or(page.getByTestId("final-verdict-streaming"))
+          page.getByTestId("final-verdict").or(page.getByTestId("final-verdict-streaming")),
         ).toBeVisible({ timeout: 120000 });
 
         // Wait for final verdict to complete
@@ -182,7 +187,9 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       for (const role of roles) {
         await page.getByTestId(`member-card-${role}`).click();
         // Wait for modal (MemberDetail) — look for CLOSE button or detailed analysis text
-        await expect(page.getByText("CLOSE").or(page.getByText("ANALYSIS"))).toBeVisible({ timeout: 5000 });
+        await expect(page.getByText("CLOSE").or(page.getByText("ANALYSIS"))).toBeVisible({
+          timeout: 5000,
+        });
         // Close modal
         const closeBtn = page.getByText("CLOSE");
         if (await closeBtn.isVisible().catch(() => false)) {
@@ -204,9 +211,9 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       await page.getByTestId("launch-button").click();
 
       // Wait for completion
-      await expect(page.getByTestId("analysis-complete").or(
-        page.getByTestId("ceo-followup-section")
-      )).toBeVisible({ timeout: 240000 });
+      await expect(
+        page.getByTestId("analysis-complete").or(page.getByTestId("ceo-followup-section")),
+      ).toBeVisible({ timeout: 240000 });
 
       // If CEO follow-up, handle it
       const ceoSection = page.getByTestId("ceo-followup-section");
@@ -234,9 +241,9 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       await page.getByTestId("briefing-textarea").fill(EXAMPLE_BRIEFING);
       await page.getByTestId("launch-button").click();
 
-      await expect(page.getByTestId("analysis-complete").or(
-        page.getByTestId("ceo-followup-section")
-      )).toBeVisible({ timeout: 240000 });
+      await expect(
+        page.getByTestId("analysis-complete").or(page.getByTestId("ceo-followup-section")),
+      ).toBeVisible({ timeout: 240000 });
 
       // Handle CEO follow-up if needed
       const ceoSection = page.getByTestId("ceo-followup-section");

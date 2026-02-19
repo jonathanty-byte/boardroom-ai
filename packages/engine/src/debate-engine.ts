@@ -194,4 +194,3 @@ async function runSingleTurn(
   send({ type: "debate_turn_complete", frictionIndex, turn });
   return turn;
 }
-

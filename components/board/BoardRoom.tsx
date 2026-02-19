@@ -17,13 +17,7 @@ interface BoardRoomProps {
 
 const ROLES: BoardMemberRole[] = ["cpo", "cmo", "cfo", "cro", "cco", "cto"];
 
-export function BoardRoom({
-  members,
-  frictions,
-  debateThreads,
-  synthesis,
-  phase,
-}: BoardRoomProps) {
+export function BoardRoom({ members, frictions, debateThreads, synthesis, phase }: BoardRoomProps) {
   return (
     <div className="w-full max-w-5xl flex flex-col gap-6">
       {/* Phase tracker */}

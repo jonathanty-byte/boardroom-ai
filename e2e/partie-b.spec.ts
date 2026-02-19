@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("PARTIE B — Tests Techniques", () => {
-
   test.describe("B1. Validation du formulaire", () => {
     test("LAUNCH disabled sans clé API", async ({ page }) => {
       // Navigate, clear localStorage, verify launch button is disabled
@@ -16,7 +15,9 @@ test.describe("PARTIE B — Tests Techniques", () => {
     test("LAUNCH disabled sans briefing", async ({ page }) => {
       // Set API key but don't fill briefing
       await page.goto("/");
-      await page.evaluate(() => localStorage.setItem("boardroom-openrouter-key", "sk-test-key-12345678"));
+      await page.evaluate(() =>
+        localStorage.setItem("boardroom-openrouter-key", "sk-test-key-12345678"),
+      );
       await page.reload();
       const launchBtn = page.getByTestId("launch-button");
       await expect(launchBtn).toBeDisabled();
@@ -24,7 +25,9 @@ test.describe("PARTIE B — Tests Techniques", () => {
 
     test("LAUNCH activé avec clé + briefing", async ({ page }) => {
       await page.goto("/");
-      await page.evaluate(() => localStorage.setItem("boardroom-openrouter-key", "sk-test-key-12345678"));
+      await page.evaluate(() =>
+        localStorage.setItem("boardroom-openrouter-key", "sk-test-key-12345678"),
+      );
       await page.reload();
       await page.getByTestId("briefing-textarea").fill("Test briefing content");
       const launchBtn = page.getByTestId("launch-button");
@@ -47,7 +50,9 @@ test.describe("PARTIE B — Tests Techniques", () => {
 
     test("[CHANGE] → édition avec clé pré-remplie", async ({ page }) => {
       await page.goto("/");
-      await page.evaluate(() => localStorage.setItem("boardroom-openrouter-key", "sk-or-test1234567890"));
+      await page.evaluate(() =>
+        localStorage.setItem("boardroom-openrouter-key", "sk-or-test1234567890"),
+      );
       await page.reload();
       await page.getByTestId("api-key-change").click();
       const input = page.getByTestId("api-key-input");
@@ -56,7 +61,9 @@ test.describe("PARTIE B — Tests Techniques", () => {
 
     test("Persistance localStorage", async ({ page }) => {
       await page.goto("/");
-      await page.evaluate(() => localStorage.setItem("boardroom-openrouter-key", "sk-or-persist-test"));
+      await page.evaluate(() =>
+        localStorage.setItem("boardroom-openrouter-key", "sk-or-persist-test"),
+      );
       await page.reload();
       const storedKey = await page.evaluate(() => localStorage.getItem("boardroom-openrouter-key"));
       expect(storedKey).toBe("sk-or-persist-test");
@@ -66,7 +73,9 @@ test.describe("PARTIE B — Tests Techniques", () => {
   test.describe("B3. Gestion d'erreurs", () => {
     test("Clé invalide → ERROR DETECTED + message", async ({ page }) => {
       await page.goto("/");
-      await page.evaluate(() => localStorage.setItem("boardroom-openrouter-key", "invalid-key-xxx"));
+      await page.evaluate(() =>
+        localStorage.setItem("boardroom-openrouter-key", "invalid-key-xxx"),
+      );
       await page.reload();
       await page.getByTestId("briefing-textarea").fill("Test briefing for error handling");
       await page.getByTestId("launch-button").click();
@@ -83,7 +92,9 @@ test.describe("PARTIE B — Tests Techniques", () => {
     test("Mobile 375px", async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 812 });
       await page.goto("/");
-      await page.evaluate(() => localStorage.setItem("boardroom-openrouter-key", "sk-test-12345678"));
+      await page.evaluate(() =>
+        localStorage.setItem("boardroom-openrouter-key", "sk-test-12345678"),
+      );
       await page.reload();
       // Verify form is visible
       await expect(page.getByTestId("briefing-textarea")).toBeVisible();
@@ -94,7 +105,9 @@ test.describe("PARTIE B — Tests Techniques", () => {
     test("Tablet 768px", async ({ page }) => {
       await page.setViewportSize({ width: 768, height: 1024 });
       await page.goto("/");
-      await page.evaluate(() => localStorage.setItem("boardroom-openrouter-key", "sk-test-12345678"));
+      await page.evaluate(() =>
+        localStorage.setItem("boardroom-openrouter-key", "sk-test-12345678"),
+      );
       await page.reload();
       await expect(page.getByTestId("briefing-textarea")).toBeVisible();
       await expect(page.getByTestId("model-select")).toBeVisible();
@@ -104,7 +117,9 @@ test.describe("PARTIE B — Tests Techniques", () => {
     test("Desktop 1280px", async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 900 });
       await page.goto("/");
-      await page.evaluate(() => localStorage.setItem("boardroom-openrouter-key", "sk-test-12345678"));
+      await page.evaluate(() =>
+        localStorage.setItem("boardroom-openrouter-key", "sk-test-12345678"),
+      );
       await page.reload();
       await expect(page.getByTestId("briefing-textarea")).toBeVisible();
       await expect(page.getByTestId("model-select")).toBeVisible();
@@ -117,7 +132,9 @@ test.describe("PARTIE B — Tests Techniques", () => {
       const errors: string[] = [];
       page.on("pageerror", (err) => errors.push(err.message));
       await page.goto("/");
-      await page.evaluate(() => localStorage.setItem("boardroom-openrouter-key", "sk-test-12345678"));
+      await page.evaluate(() =>
+        localStorage.setItem("boardroom-openrouter-key", "sk-test-12345678"),
+      );
       await page.reload();
       // Navigate through idle state
       await page.waitForTimeout(2000);

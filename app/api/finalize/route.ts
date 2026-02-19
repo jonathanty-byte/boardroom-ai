@@ -16,10 +16,10 @@ export async function POST(req: Request) {
   const effectiveKey = apiKey || process.env.OPENROUTER_API_KEY;
 
   if (!report || !ceoAnswers || !effectiveKey) {
-    return new Response(
-      JSON.stringify({ error: "report, ceoAnswers, and apiKey are required" }),
-      { status: 400, headers: { "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "report, ceoAnswers, and apiKey are required" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   // Rate limit demo mode

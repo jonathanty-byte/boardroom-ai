@@ -42,7 +42,9 @@ export function MemberCard({ role, state }: MemberCardProps) {
             style={{ borderColor: color }}
           >
             {imgError ? (
-              <span style={{ color, fontSize: 16, fontFamily: "var(--font-retro)" }}>{name[0]}</span>
+              <span style={{ color, fontSize: 16, fontFamily: "var(--font-retro)" }}>
+                {name[0]}
+              </span>
             ) : (
               <img
                 src={MEMBER_AVATARS[role]}

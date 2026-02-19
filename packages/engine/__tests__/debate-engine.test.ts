@@ -1,12 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { runDebateForFriction } from "../src/debate-engine";
 import type { BoardMemberConfig } from "../src/types";
-import {
-  makeDebateTurn,
-  makeFriction,
-  makeModeratorAction,
-  makeRound1Result,
-} from "./fixtures";
+import { makeDebateTurn, makeFriction, makeModeratorAction, makeRound1Result } from "./fixtures";
 
 // Mock board member configs
 const mockConfigs: BoardMemberConfig[] = [
@@ -198,4 +193,3 @@ describe("runDebateForFriction", () => {
     expect(history.turns[1].speaker).toBe("cfo");
   });
 });
-
