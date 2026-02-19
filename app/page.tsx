@@ -93,7 +93,7 @@ export default function Home() {
             <p className="font-[family-name:var(--font-terminal)] text-base text-gray-500">
               Built by{" "}
               <a
-                href="https://x.com/evolved_monkey"
+                href="https://x.com/evolved_monkey_"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] transition-colors"
@@ -261,7 +261,7 @@ export default function Home() {
           </p>
           <div className="flex justify-center gap-4 mt-2">
             <a
-              href="https://x.com/evolved_monkey"
+              href="https://x.com/evolved_monkey_"
               target="_blank"
               rel="noopener noreferrer"
               className="stat-label text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] transition-colors"
@@ -269,12 +269,10 @@ export default function Home() {
               DM ME ON X →
             </a>
             <a
-              href="https://github.com/jonathanty-byte/boardroom-ai/issues"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="mailto:jonathan.jooty@gmail.com?subject=BoardRoom AI Feedback"
               className="stat-label text-gray-500 hover:text-[var(--color-dbz-orange)] transition-colors"
             >
-              OPEN AN ISSUE →
+              EMAIL ME →
             </a>
           </div>
         </div>
@@ -282,7 +280,7 @@ export default function Home() {
         <div className="stat-label text-gray-600">
           BOARDROOM AI by{" "}
           <a
-            href="https://x.com/evolved_monkey"
+            href="https://x.com/evolved_monkey_"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-500 hover:text-[var(--color-dbz-orange)] transition-colors"
