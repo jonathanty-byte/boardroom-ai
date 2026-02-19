@@ -123,7 +123,12 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {synthesis.consensus.length > 0 && (
               <div className="dialogue-box p-3">
-                <div className="stat-label mb-2 text-[var(--color-dbz-green)]">CONSENSUS</div>
+                <div className="rpg-title text-[11px] mb-1 text-[var(--color-dbz-green)]">
+                  CONSENSUS
+                </div>
+                <div className="text-[8px] tracking-wider text-gray-500 mb-2 uppercase">
+                  Shared recommendations from all members
+                </div>
                 {synthesis.consensus.map((c, i) => (
                   <p
                     key={i}
@@ -137,7 +142,12 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
 
             {synthesis.compromises.length > 0 && (
               <div className="dialogue-box p-3">
-                <div className="stat-label mb-2 text-[var(--color-dbz-gold)]">COMPROMISES</div>
+                <div className="rpg-title text-[11px] mb-1 text-[var(--color-dbz-gold)]">
+                  COMPROMISES
+                </div>
+                <div className="text-[8px] tracking-wider text-gray-500 mb-2 uppercase">
+                  Agreements reached during debate
+                </div>
                 {synthesis.compromises.map((c, i) => (
                   <p
                     key={i}
@@ -151,7 +161,12 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
 
             {synthesis.impasses.length > 0 && (
               <div className="dialogue-box p-3">
-                <div className="stat-label mb-2 text-[var(--color-dbz-red)]">IMPASSES</div>
+                <div className="rpg-title text-[11px] mb-1 text-[var(--color-dbz-red)]">
+                  IMPASSES
+                </div>
+                <div className="text-[8px] tracking-wider text-gray-500 mb-2 uppercase">
+                  Unresolved disagreements after debate
+                </div>
                 {synthesis.impasses.map((c, i) => (
                   <p
                     key={i}
@@ -165,8 +180,11 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
 
             {synthesis.unresolvedConcerns && synthesis.unresolvedConcerns.length > 0 && (
               <div className="dialogue-box p-3">
-                <div className="stat-label mb-2 text-[var(--color-dbz-orange)]">
+                <div className="rpg-title text-[11px] mb-1 text-[var(--color-dbz-orange)]">
                   UNRESOLVED CONCERNS
+                </div>
+                <div className="text-[8px] tracking-wider text-gray-500 mb-2 uppercase">
+                  Issues raised by non-debating members
                 </div>
                 {synthesis.unresolvedConcerns.map((c, i) => (
                   <p
