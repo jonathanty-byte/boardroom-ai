@@ -124,10 +124,11 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
             {synthesis.consensus.length > 0 && (
               <div className="dialogue-box p-3">
                 <div className="rpg-title text-[11px] mb-1 text-[var(--color-dbz-green)]">
-                  CONSENSUS
+                  CONSENSUS — {synthesis.collectiveVerdict.replace(/_/g, " ")}
                 </div>
                 <div className="text-[8px] tracking-wider text-gray-500 mb-2 uppercase">
-                  Shared recommendations from all members
+                  The board converged on {synthesis.collectiveVerdict.replace(/_/g, " ")} — key
+                  recommendations from each member
                 </div>
                 {synthesis.consensus.map((c, i) => (
                   <p
