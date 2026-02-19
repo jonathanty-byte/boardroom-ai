@@ -1,6 +1,5 @@
 "use client";
 
-import type { BoardMemberRole } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import { useEffect, useState } from "react";
 import { AnalysisForm } from "@/components/analysis/AnalysisForm";
@@ -135,7 +134,11 @@ export default function Home() {
           )}
 
           {/* Form */}
-          <AnalysisForm onSubmit={handleSubmit} disabled={!canSubmit || isRunning} />
+          <AnalysisForm
+            onSubmit={handleSubmit}
+            disabled={!canSubmit || isRunning}
+            demoMode={demoAvailable && !hasKey}
+          />
 
           {/* Board member preview */}
           <div className="w-full max-w-3xl">

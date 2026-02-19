@@ -7,9 +7,10 @@ import { EXAMPLE_BRIEFING, EXAMPLE_CEO_VISION, RECOMMENDED_MODELS } from "@/lib/
 interface AnalysisFormProps {
   onSubmit: (content: string, ceoVision: string, model: string) => void;
   disabled: boolean;
+  demoMode?: boolean;
 }
 
-export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
+export function AnalysisForm({ onSubmit, disabled, demoMode }: AnalysisFormProps) {
   const [content, setContent] = useState("");
   const [ceoVision, setCeoVision] = useState("");
   const [model, setModel] = useState(RECOMMENDED_MODELS[0].id);
@@ -55,23 +56,43 @@ export function AnalysisForm({ onSubmit, disabled }: AnalysisFormProps) {
         </div>
       </div>
 
-      {/* Model selector */}
+      {/* Model selector — locked in demo mode */}
       <div>
         <label className="stat-label block mb-2">AI MODEL</label>
-        <div className="pixel-border-sm">
-          <select
-            data-testid="model-select"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            className="w-full bg-[var(--color-surface)] text-gray-200 px-3 py-2 focus:outline-none"
-          >
-            {RECOMMENDED_MODELS.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name} — {m.description}
-              </option>
-            ))}
-          </select>
-        </div>
+        {demoMode ? (
+          <div>
+            <div className="pixel-border-sm px-3 py-2 text-gray-400 font-[family-name:var(--font-terminal)]">
+              {RECOMMENDED_MODELS[0].name} — {RECOMMENDED_MODELS[0].description}
+            </div>
+            <p className="text-[9px] text-gray-500 mt-1 tracking-wide">
+              DEMO MODE — Bring your own{" "}
+              <a
+                href="https://openrouter.ai/keys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] underline"
+              >
+                OpenRouter API key
+              </a>{" "}
+              to unlock Claude, GPT, Gemini and more.
+            </p>
+          </div>
+        ) : (
+          <div className="pixel-border-sm">
+            <select
+              data-testid="model-select"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="w-full bg-[var(--color-surface)] text-gray-200 px-3 py-2 focus:outline-none"
+            >
+              {RECOMMENDED_MODELS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} — {m.description}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Try an example */}

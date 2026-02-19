@@ -45,7 +45,9 @@ export async function POST(req: Request) {
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
       };
 
-      await runAnalysis({ content, ceoVision, apiKey: effectiveKey, model }, send);
+      // Force default model in demo mode to control costs
+      const effectiveModel = !apiKey && effectiveKey ? undefined : model;
+      await runAnalysis({ content, ceoVision, apiKey: effectiveKey, model: effectiveModel }, send);
       controller.close();
     },
   });

@@ -46,7 +46,9 @@ export async function POST(req: Request) {
       };
 
       try {
-        await runFinalVerdictFlow(report, ceoAnswers, effectiveKey, model, send);
+        // Force default model in demo mode to control costs
+        const effectiveModel = !apiKey && effectiveKey ? undefined : model;
+        await runFinalVerdictFlow(report, ceoAnswers, effectiveKey, effectiveModel, send);
       } catch (error) {
         send({
           type: "error",
