@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("PARTIE C1 — Validation routes API", () => {
   const BASE = "http://localhost:3000";

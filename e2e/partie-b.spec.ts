@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("PARTIE B — Tests Techniques", () => {
   test.describe("B1. Validation du formulaire", () => {

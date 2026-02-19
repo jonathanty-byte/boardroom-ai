@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 const API_KEY = process.env.OPENROUTER_API_KEY ?? "";
 

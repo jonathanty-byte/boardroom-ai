@@ -5,7 +5,7 @@ import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 import html2canvas from "html2canvas";
 import { useCallback, useRef } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
-import { MEMBER_COLORS, getVerdictColor } from "@/lib/utils/constants";
+import { getVerdictColor, MEMBER_COLORS } from "@/lib/utils/constants";
 
 interface ShareImageProps {
   report: BoardroomReport;
