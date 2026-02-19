@@ -10,7 +10,7 @@ import { BOARD_MEMBER_NAMES } from "./types";
 
 export function synthesize(
   round1: Round1Result[],
-  frictions: FrictionPoint[],
+  _frictions: FrictionPoint[],
   debateHistories?: DebateHistory[],
 ): Synthesis {
   const compromises: string[] = [];

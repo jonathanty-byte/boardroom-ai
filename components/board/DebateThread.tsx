@@ -1,6 +1,5 @@
 "use client";
 
-import type { BoardMemberRole } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import type { DebateThreadState } from "@/lib/hooks/useAnalysisState";
 import { MEMBER_COLORS } from "@/lib/utils/constants";
