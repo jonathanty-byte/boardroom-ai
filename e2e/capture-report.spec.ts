@@ -106,21 +106,21 @@ test.describe("Capture — Full Pipeline Analysis", () => {
       events.push(`Collective verdict: ${collectiveVerdict}`);
 
       // Capture consensus/compromises/impasses
-      const consensus = await page
+      const consensus = (await page
         .locator("text=CONSENSUS")
         .locator("..")
         .textContent()
-        .catch(() => "");
-      const compromises = await page
+        .catch(() => "")) ?? "";
+      const compromises = (await page
         .locator("text=COMPROMISES")
         .locator("..")
         .textContent()
-        .catch(() => "");
-      const impasses = await page
+        .catch(() => "")) ?? "";
+      const impasses = (await page
         .locator("text=IMPASSES")
         .locator("..")
         .textContent()
-        .catch(() => "");
+        .catch(() => "")) ?? "";
       events.push(`Consensus section: ${consensus.slice(0, 300)}`);
       events.push(`Compromises section: ${compromises.slice(0, 300)}`);
       events.push(`Impasses section: ${impasses.slice(0, 300)}`);
