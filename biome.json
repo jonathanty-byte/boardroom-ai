@@ -1,7 +1,17 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.2/schema.json",
   "files": {
-    "includes": ["**", "!.next", "!node_modules", "!dist", "!.vercel"]
+    "includes": [
+      "**",
+      "!.next",
+      "!node_modules",
+      "!dist",
+      "!.vercel",
+      "!video-demo",
+      "!playwright-report",
+      "!test-results",
+      "!e2e"
+    ]
   },
   "assist": {
     "actions": {
