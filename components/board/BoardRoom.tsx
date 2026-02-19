@@ -29,14 +29,14 @@ export function BoardRoom({
   return (
     <div className="w-full max-w-5xl flex flex-col gap-6">
       {/* Phase tracker */}
-      <PhaseTracker phase={phase} />
+      <PhaseTracker phase={phase} data-testid="phase-tracker" />
 
       {/* Board members grid - RPG battle formation style */}
       <div>
         <div className="stat-label mb-2 text-center text-[var(--color-dbz-gold)]">
           BOARDROOM AI MEMBERS
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div data-testid="member-grid" className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {ROLES.map((role) => (
             <MemberCard key={role} role={role} state={members[role]} />
           ))}
@@ -154,9 +154,14 @@ export function BoardRoom({
           </div>
 
           {/* Collective Verdict - Big center display */}
-          <div className="text-center mb-4 py-4">
+          <div data-testid="synthesis-section" className="text-center mb-4 py-4">
             <div className="stat-label mb-2">COLLECTIVE VERDICT</div>
-            <VerdictBadge verdict={synthesis.collectiveVerdict} animated={true} size="lg" />
+            <VerdictBadge
+              verdict={synthesis.collectiveVerdict}
+              animated={true}
+              size="lg"
+              data-testid="collective-verdict"
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -201,6 +206,22 @@ export function BoardRoom({
                 ))}
               </div>
             )}
+
+            {synthesis.unresolvedConcerns && synthesis.unresolvedConcerns.length > 0 && (
+              <div className="dialogue-box p-3">
+                <div className="stat-label mb-2 text-[var(--color-dbz-orange)]">
+                  UNRESOLVED CONCERNS
+                </div>
+                {synthesis.unresolvedConcerns.map((c, i) => (
+                  <p
+                    key={i}
+                    className="font-[family-name:var(--font-terminal)] text-base text-gray-300 mb-1"
+                  >
+                    {c}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -208,7 +229,7 @@ export function BoardRoom({
   );
 }
 
-function PhaseTracker({ phase }: { phase: string }) {
+function PhaseTracker({ phase, ...rest }: { phase: string; "data-testid"?: string }) {
   const phases = [
     { key: "round1", label: "RND 1", icon: "I" },
     { key: "frictions", label: "SCAN", icon: "II" },
@@ -220,7 +241,7 @@ function PhaseTracker({ phase }: { phase: string }) {
   const currentIndex = phases.findIndex((p) => p.key === phase);
 
   return (
-    <div className="pixel-border p-3">
+    <div className="pixel-border p-3" {...rest}>
       <div className="stat-label mb-2 text-center">BATTLE PHASE</div>
       <div className="flex items-center justify-between gap-1">
         {phases.map((p, i) => {

@@ -1,5 +1,7 @@
-import { BOARD_MEMBER_NAMES } from "./types";
+import { getSentiment } from "./friction";
+import { StreamingAgentRunner } from "./runner-streaming";
 import type {
+  BoardMemberRole,
   BoardroomReport,
   CEOFinalVerdict,
   CEOFollowUpQuestion,
@@ -7,7 +9,7 @@ import type {
   Round1Result,
   SSEEvent,
 } from "./types";
-import { StreamingAgentRunner } from "./runner-streaming";
+import { BOARD_MEMBER_NAMES } from "./types";
 
 /**
  * Extract follow-up questions for the CEO when debates are unresolved.
@@ -25,8 +27,21 @@ export function extractCEOFollowUp(
     return [];
   }
 
-  const questions: CEOFollowUpQuestion[] = [];
+  const MAX_DEBATER_QUESTIONS = 3;
+  const MAX_SILENT_QUESTIONS = 2;
+  const MAX_TOTAL = 5;
+
+  const debaterQuestions: CEOFollowUpQuestion[] = [];
+  const silentQuestions: CEOFollowUpQuestion[] = [];
   let nextId = 1;
+
+  // Collect all debating member roles
+  const debatingRoles = new Set<BoardMemberRole>();
+  for (const debate of debateHistories) {
+    for (const role of debate.friction.members) {
+      debatingRoles.add(role);
+    }
+  }
 
   // Collect from unresolved debates, ordered by severity (IMPASSE first)
   const sorted = [...unresolvedDebates].sort((a, b) => {
@@ -34,18 +49,19 @@ export function extractCEOFollowUp(
     return (priority[a.outcome] ?? 2) - (priority[b.outcome] ?? 2);
   });
 
+  // Step 1: Collect challenge questions from debating members (max 3)
   for (const debate of sorted) {
-    const involvedRoles = debate.friction.members;
+    for (const role of debate.friction.members) {
+      if (debaterQuestions.length >= MAX_DEBATER_QUESTIONS) break;
 
-    // Add challenges from involved members
-    for (const role of involvedRoles) {
       const memberResult = round1Results.find((r) => r.output.role === role);
       if (!memberResult) continue;
 
       for (const challenge of memberResult.output.challenges) {
-        if (isDuplicate(questions, challenge)) continue;
+        if (debaterQuestions.length >= MAX_DEBATER_QUESTIONS) break;
+        if (isDuplicate([...debaterQuestions, ...silentQuestions], challenge)) continue;
 
-        questions.push({
+        debaterQuestions.push({
           id: nextId++,
           question: challenge,
           source: "challenge",
@@ -54,25 +70,73 @@ export function extractCEOFollowUp(
         });
       }
     }
+  }
 
-    // Add a contextual question from the debate outcome summary
-    if (debate.outcomeSummary) {
-      const contextQ = `The board could not reach agreement: "${debate.outcomeSummary}" — What is your position on this?`;
-      if (!isDuplicate(questions, contextQ)) {
-        // Attribute to the first member in the friction
-        questions.push({
-          id: nextId++,
-          question: contextQ,
-          source: "debate_unresolved",
-          fromMember: involvedRoles[0],
-          frictionIndex: debate.frictionIndex,
-        });
+  // Step 2: Collect questions from non-debating members with negative sentiment (max 2)
+  for (const result of round1Results) {
+    if (silentQuestions.length >= MAX_SILENT_QUESTIONS) break;
+    if (debatingRoles.has(result.output.role)) continue;
+    if (getSentiment(result.output.verdict) >= 0) continue;
+
+    for (const challenge of result.output.challenges) {
+      if (silentQuestions.length >= MAX_SILENT_QUESTIONS) break;
+      if (isDuplicate([...debaterQuestions, ...silentQuestions], challenge)) continue;
+
+      silentQuestions.push({
+        id: nextId++,
+        question: challenge,
+        source: "challenge",
+        fromMember: result.output.role,
+      });
+    }
+  }
+
+  // Step 3: Fill remaining slots with contextual debate questions and overflow challenges
+  const combined = [...debaterQuestions, ...silentQuestions];
+  if (combined.length < MAX_TOTAL) {
+    // First add contextual questions from unresolved debate summaries
+    for (const debate of sorted) {
+      if (combined.length >= MAX_TOTAL) break;
+      if (debate.outcomeSummary) {
+        const contextQ = `The board could not reach agreement: "${debate.outcomeSummary}" — What is your position on this?`;
+        if (!isDuplicate(combined, contextQ)) {
+          combined.push({
+            id: nextId++,
+            question: contextQ,
+            source: "debate_unresolved",
+            fromMember: debate.friction.members[0],
+            frictionIndex: debate.frictionIndex,
+          });
+        }
+      }
+    }
+
+    // Then fill with more debater challenges
+    for (const debate of sorted) {
+      if (combined.length >= MAX_TOTAL) break;
+      for (const role of debate.friction.members) {
+        if (combined.length >= MAX_TOTAL) break;
+        const memberResult = round1Results.find((r) => r.output.role === role);
+        if (!memberResult) continue;
+
+        for (const challenge of memberResult.output.challenges) {
+          if (combined.length >= MAX_TOTAL) break;
+          if (isDuplicate(combined, challenge)) continue;
+
+          combined.push({
+            id: nextId++,
+            question: challenge,
+            source: "challenge",
+            fromMember: role,
+            frictionIndex: debate.frictionIndex,
+          });
+        }
       }
     }
   }
 
-  // Limit to 5 max
-  return questions.slice(0, 5);
+  // Re-number IDs sequentially
+  return combined.slice(0, MAX_TOTAL).map((q, i) => ({ ...q, id: i + 1 }));
 }
 
 /**
@@ -137,6 +201,11 @@ export async function runFinalVerdictFlow(
   if (report.synthesis.impasses.length > 0) {
     contextParts.push(`Impasses: ${report.synthesis.impasses.join("; ")}`);
   }
+  if (report.synthesis.unresolvedConcerns && report.synthesis.unresolvedConcerns.length > 0) {
+    contextParts.push(
+      `Unresolved Concerns from silent members: ${report.synthesis.unresolvedConcerns.join("; ")}`,
+    );
+  }
   contextParts.push("");
 
   // CEO answers
@@ -148,9 +217,8 @@ export async function runFinalVerdictFlow(
     "Based on ALL the above — the board's analyses, debates, unresolved points, AND the CEO's clarifications — deliver your FINAL VERDICT. Be decisive and pragmatic. The CEO needs concrete actions, not more questions.",
   );
 
-  const verdict = await runner.runFinalVerdictStreaming(
-    contextParts.join("\n"),
-    (chunk) => send({ type: "final_verdict_chunk", chunk }),
+  const verdict = await runner.runFinalVerdictStreaming(contextParts.join("\n"), (chunk) =>
+    send({ type: "final_verdict_chunk", chunk }),
   );
 
   send({ type: "final_verdict_complete", verdict });

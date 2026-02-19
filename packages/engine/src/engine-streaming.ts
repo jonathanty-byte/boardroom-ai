@@ -72,7 +72,7 @@ export async function runAnalysis(
 
     // Synthesis
     send({ type: "state_change", state: "SYNTHESIZING" });
-    const synthesis = synthesize(round1Results, round2Results, frictions);
+    const synthesis = synthesize(round1Results, round2Results, frictions, debateHistories);
     send({ type: "synthesis_complete", synthesis });
 
     // CEO follow-up questions (only if debates were unresolved)

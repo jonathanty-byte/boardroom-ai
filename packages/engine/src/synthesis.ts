@@ -1,9 +1,19 @@
-import type { FrictionPoint, Round1Result, Round2Result, Synthesis } from "./types";
+import { getSentiment } from "./friction";
+import type {
+  BoardMemberRole,
+  DebateHistory,
+  FrictionPoint,
+  Round1Result,
+  Round2Result,
+  Synthesis,
+} from "./types";
+import { BOARD_MEMBER_NAMES } from "./types";
 
 export function synthesize(
   round1: Round1Result[],
   round2: Round2Result[],
   frictions: FrictionPoint[],
+  debateHistories?: DebateHistory[],
 ): Synthesis {
   const compromises: string[] = [];
   const impasses: string[] = [];
@@ -62,10 +72,36 @@ export function synthesize(
   else if (avg >= -0.3) collectiveVerdict = "GO_WITH_CHANGES";
   else collectiveVerdict = "RETHINK";
 
+  // Collect unresolved concerns from non-debating members with negative sentiment
+  const unresolvedConcerns: string[] = [];
+  if (debateHistories && debateHistories.length > 0) {
+    const debatingRoles = new Set<BoardMemberRole>();
+    for (const debate of debateHistories) {
+      for (const role of debate.friction.members) {
+        debatingRoles.add(role);
+      }
+    }
+
+    for (const r of round1) {
+      if (debatingRoles.has(r.output.role)) continue;
+      if (getSentiment(r.output.verdict) > 0) continue;
+
+      const name = BOARD_MEMBER_NAMES[r.output.role] ?? r.output.role;
+      const detail =
+        r.output.verdictDetails.risqueCritique ||
+        r.output.verdictDetails.questionNonResolue ||
+        r.output.verdictDetails.recommandationConcrete ||
+        r.output.analysis.slice(0, 150);
+
+      unresolvedConcerns.push(`${name} (${r.output.verdict}): ${detail}`);
+    }
+  }
+
   return {
     consensus: allRecommendations,
     compromises,
     impasses,
     collectiveVerdict,
+    ...(unresolvedConcerns.length > 0 ? { unresolvedConcerns } : {}),
   };
 }

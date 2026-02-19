@@ -77,6 +77,7 @@ export interface Synthesis {
   compromises: string[];
   impasses: string[];
   collectiveVerdict: CollectiveVerdict;
+  unresolvedConcerns?: string[];
 }
 
 export interface AnalysisInput {

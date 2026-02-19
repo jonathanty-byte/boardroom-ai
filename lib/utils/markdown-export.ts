@@ -92,8 +92,7 @@ export function formatBoardroomReport(report: BoardroomReport): string {
         const addressedNames = turn.addressedTo
           .map((r) => BOARD_MEMBER_NAMES[r] ?? r.toUpperCase())
           .filter(Boolean);
-        const addressed =
-          addressedNames.length > 0 ? ` → ${addressedNames.join(", ")}` : "";
+        const addressed = addressedNames.length > 0 ? ` → ${addressedNames.join(", ")}` : "";
         lines.push(`**${name}** [${turn.type}${addressed}]:`);
         if (turn.quotedFrom) {
           lines.push(`> ${turn.quotedFrom}`);
@@ -148,6 +147,12 @@ export function formatBoardroomReport(report: BoardroomReport): string {
     lines.push("");
   }
 
+  if (report.synthesis.unresolvedConcerns && report.synthesis.unresolvedConcerns.length > 0) {
+    lines.push("### Unresolved Concerns (silent members)");
+    report.synthesis.unresolvedConcerns.forEach((c) => lines.push(`- ${c}`));
+    lines.push("");
+  }
+
   // CEO Follow-Up Questions & Answers
   if (report.ceoFollowUp && report.ceoFollowUp.length > 0) {
     lines.push("---");
@@ -156,7 +161,9 @@ export function formatBoardroomReport(report: BoardroomReport): string {
     lines.push("");
     for (const q of report.ceoFollowUp) {
       const name = BOARD_MEMBER_NAMES[q.fromMember as BoardMemberRole] ?? q.fromMember;
-      lines.push(`${q.id}. **${name}** (${q.source === "challenge" ? "Round 1" : "Debate"}): ${q.question}`);
+      lines.push(
+        `${q.id}. **${name}** (${q.source === "challenge" ? "Round 1" : "Debate"}): ${q.question}`,
+      );
     }
     lines.push("");
 

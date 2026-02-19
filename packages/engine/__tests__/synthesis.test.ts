@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { synthesize } from "../src/synthesis";
-import { makeFriction, makeRound1Result, makeRound2Result } from "./fixtures";
+import { makeDebateHistory, makeFriction, makeRound1Result, makeRound2Result } from "./fixtures";
 
 describe("synthesize", () => {
   it("returns GO when all verdicts are positive (avg > 0.3)", () => {
@@ -136,5 +136,70 @@ describe("synthesize", () => {
 
     const result = synthesize(round1, [], []);
     expect(result.consensus).toHaveLength(0);
+  });
+
+  it("collects unresolvedConcerns from non-debating negative members", () => {
+    const round1 = [
+      makeRound1Result({ role: "cpo", verdict: "GO" }),
+      makeRound1Result({ role: "cfo", verdict: "NOT_VIABLE" }),
+      makeRound1Result({
+        role: "cto",
+        name: "Trunks",
+        verdict: "UNREALISTIC",
+        verdictDetails: { risqueCritique: "Cannot be built in 6 months" },
+      }),
+      makeRound1Result({
+        role: "cro",
+        name: "Whis",
+        verdict: "HYPOTHESIS_ONLY",
+        verdictDetails: { questionNonResolue: "No evidence of product-market fit" },
+      }),
+    ];
+    const debates = [
+      makeDebateHistory({
+        outcome: "IMPASSE",
+        friction: makeFriction({ members: ["cpo", "cfo"] }),
+      }),
+    ];
+
+    const result = synthesize(round1, [], [], debates);
+    expect(result.unresolvedConcerns).toBeDefined();
+    expect(result.unresolvedConcerns!.length).toBe(2);
+    expect(result.unresolvedConcerns!.some((c) => c.includes("Trunks"))).toBe(true);
+    expect(result.unresolvedConcerns!.some((c) => c.includes("Whis"))).toBe(true);
+    expect(result.unresolvedConcerns!.some((c) => c.includes("Cannot be built"))).toBe(true);
+  });
+
+  it("does NOT include unresolvedConcerns for positive non-debating members", () => {
+    const round1 = [
+      makeRound1Result({ role: "cpo", verdict: "GO" }),
+      makeRound1Result({ role: "cfo", verdict: "NOT_VIABLE" }),
+      makeRound1Result({
+        role: "cmo",
+        name: "Bulma",
+        verdict: "GO",
+        verdictDetails: { risqueCritique: "None" },
+      }),
+    ];
+    const debates = [
+      makeDebateHistory({
+        outcome: "IMPASSE",
+        friction: makeFriction({ members: ["cpo", "cfo"] }),
+      }),
+    ];
+
+    const result = synthesize(round1, [], [], debates);
+    expect(result.unresolvedConcerns).toBeUndefined();
+  });
+
+  it("backward compatible: works without debateHistories parameter", () => {
+    const round1 = [
+      makeRound1Result({ verdict: "GO" }),
+      makeRound1Result({ role: "cfo", verdict: "NOT_VIABLE" }),
+    ];
+
+    const result = synthesize(round1, [], []);
+    expect(result.unresolvedConcerns).toBeUndefined();
+    expect(result.collectiveVerdict).toBeDefined();
   });
 });

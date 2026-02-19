@@ -10,7 +10,7 @@ export { flattenDebatesToRound2, runDebateForFriction } from "./debate-engine";
 export { runAnalysis } from "./engine-streaming";
 
 // Engine functions
-export { identifyFrictions } from "./friction";
+export { getSentiment, identifyFrictions } from "./friction";
 export {
   buildDebateSystemPrompt,
   buildDebateTurnPrompt,
@@ -27,9 +27,9 @@ export type {
   BoardMemberConfig,
   BoardMemberRole,
   BoardroomReport,
+  CcoVerdict,
   CEOFinalVerdict,
   CEOFollowUpQuestion,
-  CcoVerdict,
   CfoVerdict,
   CmoVerdict,
   CollectiveVerdict,

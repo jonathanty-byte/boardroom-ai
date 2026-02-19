@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { buildModeratorNextActionPrompt, buildModeratorOpeningPrompt } from "../src/moderator";
+import {
+  buildDebateSystemPrompt,
+  buildDebateTurnPrompt,
+  buildModeratorNextActionPrompt,
+  buildModeratorOpeningPrompt,
+  MODERATOR_SYSTEM_PROMPT,
+} from "../src/moderator";
 import { StreamingAgentRunner } from "../src/runner-streaming";
 import { makeDebateTurn, makeFriction, makeRound1Result } from "./fixtures";
 
@@ -185,5 +191,86 @@ describe("buildModeratorNextActionPrompt", () => {
     expect(prompt).toContain("Market is ready.");
     expect(prompt).toContain("Position shifts detected: NO");
     expect(prompt).toContain("Turns remaining: 4");
+  });
+
+  it("includes concession nudge when turnsRemaining <= 2 and no concessions", () => {
+    const friction = makeFriction();
+    const round1Results = [
+      makeRound1Result({ role: "cpo" }),
+      makeRound1Result({ role: "cfo", name: "Piccolo" }),
+    ];
+    const turns = [
+      makeDebateTurn({ turnNumber: 1, speaker: "cpo" }),
+      makeDebateTurn({ turnNumber: 2, speaker: "cfo" }),
+      makeDebateTurn({ turnNumber: 3, speaker: "cpo" }),
+    ];
+    const signals = {
+      hasPositionShift: false,
+      allUnchanged: false,
+      concessionCount: 0,
+      turnsRemaining: 2,
+      argumentsRepeating: false,
+    };
+    const prompt = buildModeratorNextActionPrompt(friction, round1Results, turns, signals);
+    expect(prompt).toContain("No concessions yet");
+    expect(prompt).toContain("concrete trade-off");
+  });
+
+  it("does NOT include concession nudge when concessions exist", () => {
+    const friction = makeFriction();
+    const round1Results = [
+      makeRound1Result({ role: "cpo" }),
+      makeRound1Result({ role: "cfo", name: "Piccolo" }),
+    ];
+    const turns = [makeDebateTurn({ turnNumber: 1, speaker: "cpo" })];
+    const signals = {
+      hasPositionShift: true,
+      allUnchanged: false,
+      concessionCount: 1,
+      turnsRemaining: 2,
+      argumentsRepeating: false,
+    };
+    const prompt = buildModeratorNextActionPrompt(friction, round1Results, turns, signals);
+    expect(prompt).not.toContain("No concessions yet");
+  });
+});
+
+describe("P2 — prompt softening", () => {
+  it("MODERATOR_SYSTEM_PROMPT uses 'productive' not 'adversarial'", () => {
+    expect(MODERATOR_SYSTEM_PROMPT).toContain("productive debate");
+    expect(MODERATOR_SYSTEM_PROMPT).not.toContain("adversarial");
+  });
+
+  it("MODERATOR_SYSTEM_PROMPT includes compromise and condition rules", () => {
+    expect(MODERATOR_SYSTEM_PROMPT).toContain("suggest compromises");
+    expect(MODERATOR_SYSTEM_PROMPT).toContain("What specific condition would change your position");
+  });
+
+  it("buildDebateSystemPrompt uses 'direct but fair' instead of 'heated'", () => {
+    const prompt = buildDebateSystemPrompt("Vegeta", "Chief Product Officer");
+    expect(prompt).toContain("direct but fair");
+    expect(prompt).not.toContain("heated");
+    expect(prompt).not.toContain("argue like your career depends on it");
+    expect(prompt).toContain("open to concessions");
+  });
+
+  it("buildDebateTurnPrompt acknowledges valid points and adds late-game nudge", () => {
+    const turns = [
+      makeDebateTurn({ turnNumber: 1 }),
+      makeDebateTurn({ turnNumber: 2 }),
+      makeDebateTurn({ turnNumber: 3 }),
+    ];
+    const prompt = buildDebateTurnPrompt("GO", "Analysis text", turns, "Question?", ["cfo"]);
+    expect(prompt).toContain("acknowledge it");
+    expect(prompt).toContain("compromise");
+    expect(prompt).not.toContain("don't be polite for nothing");
+    expect(prompt).not.toContain("be aggressive");
+  });
+
+  it("buildDebateTurnPrompt does NOT add late-game nudge for early turns", () => {
+    const turns = [makeDebateTurn({ turnNumber: 1 })];
+    const prompt = buildDebateTurnPrompt("GO", "Analysis text", turns, "Question?", ["cfo"]);
+    expect(prompt).toContain("acknowledge it");
+    expect(prompt).not.toContain("nearing its end");
   });
 });

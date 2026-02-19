@@ -141,6 +141,123 @@ describe("extractCEOFollowUp", () => {
     expect(questions[0].fromMember).toMatch(/^(cpo|cfo)$/);
   });
 
+  it("includes questions from non-debating members with negative sentiment", () => {
+    const round1 = [
+      makeRound1Result({
+        role: "cpo",
+        name: "Vegeta",
+        challenges: ["CPO challenge?"],
+      }),
+      makeRound1Result({
+        role: "cfo",
+        name: "Piccolo",
+        challenges: ["CFO challenge?"],
+      }),
+      // Non-debating member with negative verdict
+      makeRound1Result({
+        role: "cto",
+        name: "Trunks",
+        verdict: "UNREALISTIC",
+        challenges: ["Is the tech stack viable at this scale?"],
+      }),
+      // Non-debating member with negative verdict
+      makeRound1Result({
+        role: "cro",
+        name: "Whis",
+        verdict: "HYPOTHESIS_ONLY",
+        challenges: ["Where is the evidence for market demand?"],
+      }),
+    ];
+    const debates = [
+      makeDebateHistory({
+        outcome: "IMPASSE",
+        outcomeSummary: "Disagreement on viability.",
+        friction: makeFriction({ members: ["cpo", "cfo"] }),
+      }),
+    ];
+
+    const questions = extractCEOFollowUp(round1, debates);
+    // Should include questions from non-debating negative members
+    expect(questions.some((q) => q.fromMember === "cto")).toBe(true);
+    expect(questions.some((q) => q.fromMember === "cro")).toBe(true);
+  });
+
+  it("excludes non-debating members with positive sentiment", () => {
+    const round1 = [
+      makeRound1Result({
+        role: "cpo",
+        name: "Vegeta",
+        challenges: ["CPO question?"],
+      }),
+      makeRound1Result({
+        role: "cfo",
+        name: "Piccolo",
+        challenges: ["CFO question?"],
+      }),
+      // Non-debating member with positive verdict — should be excluded
+      makeRound1Result({
+        role: "cmo",
+        name: "Bulma",
+        verdict: "GO",
+        challenges: ["Marketing question?"],
+      }),
+    ];
+    const debates = [
+      makeDebateHistory({
+        outcome: "IMPASSE",
+        outcomeSummary: "Disagreement.",
+        friction: makeFriction({ members: ["cpo", "cfo"] }),
+      }),
+    ];
+
+    const questions = extractCEOFollowUp(round1, debates);
+    // CMO is positive (GO), so should NOT contribute silent-member questions
+    const cmoQuestions = questions.filter((q) => q.fromMember === "cmo");
+    expect(cmoQuestions.length).toBe(0);
+  });
+
+  it("respects max 3 debater + max 2 silent-member split", () => {
+    const round1 = [
+      makeRound1Result({
+        role: "cpo",
+        name: "Vegeta",
+        challenges: ["D1?", "D2?", "D3?", "D4?"],
+      }),
+      makeRound1Result({
+        role: "cfo",
+        name: "Piccolo",
+        challenges: ["D5?", "D6?"],
+      }),
+      makeRound1Result({
+        role: "cto",
+        name: "Trunks",
+        verdict: "UNREALISTIC",
+        challenges: ["S1?", "S2?", "S3?"],
+      }),
+      makeRound1Result({
+        role: "cro",
+        name: "Whis",
+        verdict: "HYPOTHESIS_ONLY",
+        challenges: ["S4?", "S5?"],
+      }),
+    ];
+    const debates = [
+      makeDebateHistory({
+        outcome: "IMPASSE",
+        outcomeSummary: "Total disagreement.",
+        friction: makeFriction({ members: ["cpo", "cfo"] }),
+      }),
+    ];
+
+    const questions = extractCEOFollowUp(round1, debates);
+    const silentQs = questions.filter((q) => q.fromMember === "cto" || q.fromMember === "cro");
+    // Silent questions should be at most 2
+    expect(silentQs.length).toBeLessThanOrEqual(2);
+    expect(questions.length).toBeLessThanOrEqual(5);
+    // Should have at least one silent member question
+    expect(silentQs.length).toBeGreaterThanOrEqual(1);
+  });
+
   it("deduplicates questions with identical prefixes", () => {
     const round1 = [
       makeRound1Result({
