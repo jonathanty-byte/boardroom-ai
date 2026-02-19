@@ -87,9 +87,30 @@ Two endpoints, both Edge Runtime, SSE over POST (not EventSource):
 1. **Detailed brief**: All debates converge → no CEO questions → report immediately
 2. **Vague brief**: Debates hit IMPASSE/MAX_TURNS → CEO follow-up questions → CEO answers → Final Arbiter verdict → report
 
+## Demo Mode
+
+- **Server env var**: `OPENROUTER_API_KEY` in `.env.local` enables demo mode (no client key needed)
+- **`GET /api/demo-status`**: Returns `{ available: true/false }` — frontend checks on mount
+- **Rate limiting**: `lib/rate-limit.ts` — in-memory, 50 requests/day/IP (approximate, per Edge instance)
+- **Model lock**: Demo mode forces DeepSeek V3.2 (cheapest). Both `/api/analyze` and `/api/finalize` enforce this server-side.
+- **UI**: Model selector hidden in demo mode, replaced with locked display + BYOK encouragement link to OpenRouter
+
+## Deployment
+
+- **Production**: https://comex-board-web.vercel.app (Vercel, Edge Runtime)
+- **Env vars on Vercel**: `OPENROUTER_API_KEY` set for production + preview
+- **Deploy command**: `npx vercel --prod`
+
+## Video Assets
+
+- `e2e/record-demo.spec.ts` — Playwright script that records a full demo session (real LLM calls)
+- `scripts/convert-demo-video.sh` — Converts WebM to MP4 at 1x/2x/3x/4x speeds
+- `video-demo/` — Remotion project for 60s animated marketing video
+- `launch/` — Launch content drafts (X thread, LinkedIn post, video storyboard)
+
 ## Conventions
 
-- **BYOK model**: No server-side env vars required. API key is entered via browser UI, sent per-request. Default model: `deepseek/deepseek-v3.2`
+- **BYOK + Demo**: Users can bring their own OpenRouter key OR use demo mode (server key, rate-limited, model-locked). Default model: `deepseek/deepseek-v3.2`
 - Engine uses OpenAI SDK pointed at OpenRouter's base URL
 - Frontend state management: `useReducer` pattern, no external state lib
 - CSS: Tailwind 4 + custom RPG theme in `globals.css` (pixel-border, stat-label, rpg-title, char-card classes)

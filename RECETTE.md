@@ -1,7 +1,7 @@
 # Cahier de Recette — BoardRoom AI
 
 **Date** : 2026-02-19
-**Version** : V0.4
+**Version** : V0.5
 **Exécuteur** : Claude Code (automated)
 
 ---
@@ -477,3 +477,57 @@ PASS  npm run lint            — 0 erreur
 PASS  npm test                — 88/88 tests
 PASS  npm run build           — 3 routes API (analyze, finalize, demo-status)
 ```
+
+---
+
+## Changelog V0.5 — Phase 3 : Lancement (2026-02-19)
+
+### Déploiement
+
+| Tâche | Statut |
+|-------|--------|
+| Déploiement Vercel production | DONE — https://comex-board-web.vercel.app |
+| OPENROUTER_API_KEY configurée (prod + preview) | DONE |
+| Demo mode vérifié en production (demo-status → available: true) | DONE |
+
+### UI / Branding
+
+| Tâche | Fichiers modifiés | Statut |
+|-------|-------------------|--------|
+| Verrouiller modèle en mode démo (UI + server-side) | `AnalysisForm.tsx`, `page.tsx`, `analyze/route.ts`, `finalize/route.ts` | DONE |
+| Agrandir titres synthesis + sous-titres contextuels | `BoardRoom.tsx` | DONE |
+| Consensus affiche le verdict collectif dans le titre | `BoardRoom.tsx` | DONE |
+| Footer/hero : "evolved monkey" au lieu de nom complet | `page.tsx` | DONE |
+
+### Vidéo démo
+
+| Tâche | Fichiers créés | Statut |
+|-------|----------------|--------|
+| Script Playwright enregistrement auto | `e2e/record-demo.spec.ts` | DONE |
+| Script conversion FFmpeg (1x/2x/3x/4x) | `scripts/convert-demo-video.sh` | DONE |
+| Vidéo Remotion marketing animée (60s) | `video-demo/src/DemoVideo.tsx` + projet complet | DONE |
+
+### Vidéos générées
+
+| Fichier | Type | Durée | Taille |
+|---------|------|-------|--------|
+| `videos/demo-marketing.mp4` | Remotion (animé) | 60s | 3.6 Mo |
+| `videos/demo-4x.mp4` | Playwright (screen record 4x) | 55s | 8.6 Mo |
+| `videos/demo-2x.mp4` | Playwright (screen record 2x) | 1m50 | 12 Mo |
+| `videos/demo-1x.mp4` | Playwright (screen record 1x) | 3m39 | 19 Mo |
+
+### Contenus de lancement
+
+| Fichier | Description |
+|---------|-------------|
+| `launch/thread-x.md` | Thread X — 7 tweets techniques |
+| `launch/post-linkedin.md` | Post LinkedIn — founder story (~1450 chars) |
+| `launch/script-video-90s.md` | Storyboard vidéo démo 90s (9 scènes) |
+
+### Documentation mise à jour
+
+| Fichier | Modifications |
+|---------|--------------|
+| `README.md` | Ajout live demo link, demo mode setup, video recording, Remotion, file structure updated, "evolved monkey" |
+| `CLAUDE.md` | Ajout sections Demo Mode, Deployment, Video Assets |
+| `RECETTE.md` | Version V0.5, Changelog Phase 3 |

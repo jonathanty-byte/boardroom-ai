@@ -93,12 +93,12 @@ export default function Home() {
             <p className="font-[family-name:var(--font-terminal)] text-base text-gray-500">
               Built by{" "}
               <a
-                href="https://github.com/jonathanty-byte"
+                href="https://x.com/evolved_monkey"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] transition-colors"
               >
-                Jonathan Ty
+                evolved monkey
               </a>
             </p>
           </div>
@@ -255,12 +255,12 @@ export default function Home() {
         <div className="stat-label text-gray-600">
           BOARDROOM AI by{" "}
           <a
-            href="https://github.com/jonathanty-byte"
+            href="https://x.com/evolved_monkey"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-500 hover:text-[var(--color-dbz-orange)] transition-colors"
           >
-            JONATHAN TY
+            EVOLVED MONKEY
           </a>{" "}
           — POWERED BY OPENROUTER
         </div>

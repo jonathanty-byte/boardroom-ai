@@ -58,6 +58,12 @@ Final Arbiter (single LLM call) — Definitive verdict incorporating CEO input
 - **Linter**: Biome
 - **Tests**: Vitest + Playwright (e2e)
 
+## Live demo
+
+**[boardroom-ai.vercel.app](https://comex-board-web.vercel.app)** — Try it now, no account needed (demo mode).
+
+Bring your own [OpenRouter API key](https://openrouter.ai/keys) to unlock premium models (Claude, GPT, Gemini).
+
 ## Quick start
 
 ```bash
@@ -67,7 +73,18 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000), enter your OpenRouter API key, and submit a project briefing.
+Open [http://localhost:3000](http://localhost:3000) and submit a project briefing. Demo mode works out of the box if `OPENROUTER_API_KEY` is set in `.env.local`.
+
+### Demo mode (optional)
+
+Set a server-side API key to let visitors try without BYOK:
+
+```bash
+cp .env.example .env.local
+# Edit .env.local with your OpenRouter key
+```
+
+Demo mode locks the model to DeepSeek V3.2 (cheapest) and rate-limits to 50 requests/day/IP.
 
 ## Architecture
 
@@ -98,7 +115,11 @@ boardroom-ai/
 │   └── report/                    # ExportButton, ShareImage
 ├── lib/
 │   ├── hooks/                     # useAnalysisState (15+ SSE event types), useBoardroomAnalysis
-│   └── utils/                     # constants, markdown-export
+│   ├── utils/                     # constants, markdown-export
+│   └── rate-limit.ts              # In-memory rate limiter for demo mode
+├── e2e/                           # Playwright E2E tests + demo video recorder
+├── video-demo/                    # Remotion marketing video (60s animated)
+├── launch/                        # Launch content drafts (X thread, LinkedIn, video script)
 └── public/avatars/                # SVG character avatars
 ```
 
@@ -126,16 +147,30 @@ Two endpoints, both Edge Runtime, SSE over POST:
 ## Testing
 
 ```bash
-npm test               # Run all unit tests (vitest)
+npm test               # Run all unit tests (88 tests, vitest)
 npm run test:watch     # Watch mode
 npx tsc --noEmit       # TypeScript type check
 npm run lint           # Biome linter
 npm run build          # Production build
+npm run test:e2e       # Playwright E2E tests (12 tests)
+```
+
+### Demo video recording
+
+```bash
+npx playwright test e2e/record-demo.spec.ts --headed   # Records full pipeline
+bash scripts/convert-demo-video.sh                       # Convert to MP4 (1x, 2x, 3x, 4x)
+```
+
+A Remotion-based marketing video (60s, animated) is also available in `video-demo/`:
+
+```bash
+cd video-demo && npx remotion render src/index.ts BoardroomDemo ../videos/demo-marketing.mp4
 ```
 
 ## Built by
 
-[Jonathan Ty](https://github.com/jonathanty-byte) — Built with [Claude Code](https://claude.ai/code)
+[evolved monkey](https://x.com/evolved_monkey) — Built with [Claude Code](https://claude.ai/code)
 
 ## License
 
