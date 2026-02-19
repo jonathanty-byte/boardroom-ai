@@ -251,7 +251,34 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="mt-auto pt-12 text-center">
+      <footer className="mt-auto pt-12 text-center space-y-3">
+        {/* Feedback CTA */}
+        <div className="pixel-border-sm inline-block px-5 py-3 max-w-lg">
+          <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-400 leading-relaxed">
+            Built by a non-dev consultant learning to code in public.
+            <br />
+            Feedback, roasts, ideas — all welcome.
+          </p>
+          <div className="flex justify-center gap-4 mt-2">
+            <a
+              href="https://x.com/evolved_monkey"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="stat-label text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] transition-colors"
+            >
+              DM ME ON X →
+            </a>
+            <a
+              href="https://github.com/jonathanty-byte/boardroom-ai/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="stat-label text-gray-500 hover:text-[var(--color-dbz-orange)] transition-colors"
+            >
+              OPEN AN ISSUE →
+            </a>
+          </div>
+        </div>
+
         <div className="stat-label text-gray-600">
           BOARDROOM AI by{" "}
           <a
