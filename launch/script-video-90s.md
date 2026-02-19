@@ -26,7 +26,7 @@ BOARDROOM AI
 6 AI executives. Real debates. Sharper decisions.
 ```
 
-URL en bas: `boardroom.ai`
+URL en bas: `boardroomai.app`
 
 Cut dur vers l'app.
 
@@ -199,7 +199,7 @@ Retour carte sombre. Logo centre:
 BOARDROOM AI
 Your executive team. Always available. Never vague.
 
-boardroom.ai
+boardroomai.app
 Try demo mode — no account needed
 ```
 

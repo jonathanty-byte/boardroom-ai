@@ -97,7 +97,7 @@ Two endpoints, both Edge Runtime, SSE over POST (not EventSource):
 
 ## Deployment
 
-- **Production**: https://comex-board-web.vercel.app (Vercel, Edge Runtime)
+- **Production**: https://boardroomai.app (Vercel, Edge Runtime)
 - **Env vars on Vercel**: `OPENROUTER_API_KEY` set for production + preview
 - **Deploy command**: `npx vercel --prod`
 

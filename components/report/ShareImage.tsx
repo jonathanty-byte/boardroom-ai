@@ -184,9 +184,9 @@ export function ShareImage({ report }: ShareImageProps) {
               marginTop: 8,
             }}
           >
-            <div style={{ fontSize: 14, color: "#4a4a8a" }}>boardroom-ai.vercel.app</div>
+            <div style={{ fontSize: 14, color: "#4a4a8a" }}>boardroomai.app</div>
             <div style={{ fontSize: 14, color: "#4a4a8a" }}>
-              Built by Jonathan Ty — github.com/jonathanty-byte
+              Built by evolved monkey — x.com/evolved_monkey_
             </div>
           </div>
         </div>

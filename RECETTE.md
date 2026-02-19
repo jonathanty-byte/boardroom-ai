@@ -486,7 +486,7 @@ PASS  npm run build           — 3 routes API (analyze, finalize, demo-status)
 
 | Tâche | Statut |
 |-------|--------|
-| Déploiement Vercel production | DONE — https://comex-board-web.vercel.app |
+| Déploiement Vercel production | DONE — https://boardroomai.app |
 | OPENROUTER_API_KEY configurée (prod + preview) | DONE |
 | Demo mode vérifié en production (demo-status → available: true) | DONE |
 

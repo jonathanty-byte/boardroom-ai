@@ -60,7 +60,7 @@ Final Arbiter (single LLM call) — Definitive verdict incorporating CEO input
 
 ## Live demo
 
-**[boardroom-ai.vercel.app](https://comex-board-web.vercel.app)** — Try it now, no account needed (demo mode).
+**[boardroomai.app](https://boardroomai.app)** — Try it now, no account needed (demo mode).
 
 Bring your own [OpenRouter API key](https://openrouter.ai/keys) to unlock premium models (Claude, GPT, Gemini).
 
