@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://boardroomai.app"),
   title: "BoardRoom AI — Multi-Agent Decision Engine",
   description:
     "6 AI board members analyze your project, debate disagreements, and deliver a structured decision report. Powered by LLMs.",
@@ -9,6 +10,16 @@ export const metadata: Metadata = {
     title: "BoardRoom AI — Multi-Agent Decision Engine",
     description:
       "Your AI-powered executive committee. Submit a decision, watch 6 board members debate in real-time.",
+    url: "https://boardroomai.app",
+    siteName: "BoardRoom AI",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BoardRoom AI — Multi-Agent Decision Engine",
+    description:
+      "Your AI-powered executive committee. Submit a decision, watch 6 board members debate in real-time.",
+    creator: "@evolved_monkey_",
   },
 };
 
