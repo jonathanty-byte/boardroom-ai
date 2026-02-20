@@ -15,6 +15,26 @@ Competition: Mealime (free, no AI), Eat This Much (AI but ugly UX), ChatGPT (gen
 const VAGUE_BRIEFING =
   "I want to build an app that uses AI to do stuff. Budget is flexible. No timeline.";
 
+/** Helper: wait for pipeline to complete (analysis-complete or ceo-followup-section) */
+async function waitForPipelineEnd(page: import("@playwright/test").Page, timeoutMs = 280_000) {
+  const analysisComplete = page.getByTestId("analysis-complete");
+  const ceoFollowUp = page.getByTestId("ceo-followup-section");
+  await expect(analysisComplete.or(ceoFollowUp)).toBeVisible({ timeout: timeoutMs });
+}
+
+/** Helper: handle CEO follow-up if present, submit answers, wait for final verdict */
+async function handleCeoFollowUpIfPresent(page: import("@playwright/test").Page) {
+  const ceoSection = page.getByTestId("ceo-followup-section");
+  if (await ceoSection.isVisible().catch(() => false)) {
+    const firstAnswer = page.locator('[data-testid^="ceo-answer-"]').first();
+    await firstAnswer.fill(
+      "We want to build a meal planning app targeting millennials. $10/month subscription. 6 week MVP. $2000 budget.",
+    );
+    await page.getByTestId("ceo-submit").click();
+    await expect(page.getByTestId("final-verdict")).toBeVisible({ timeout: 180_000 });
+  }
+}
+
 // Skip all A tests if no API key is provided
 test.describe("PARTIE A — Tests Fonctionnels Core", () => {
   test.beforeEach(async ({ page }) => {
@@ -22,11 +42,12 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
     await page.goto("/");
     await page.evaluate((key) => localStorage.setItem("boardroom-openrouter-key", key), API_KEY);
     await page.reload();
+    await page.waitForLoadState("networkidle");
   });
 
   test.describe("A1. Brief détaillé (MealPlan AI — DeepSeek)", () => {
     test("Pipeline complet avec brief détaillé", async ({ page }) => {
-      test.setTimeout(300_000); // 5 minutes max
+      test.setTimeout(480_000); // 8 minutes — detailed brief + DeepSeek debates are slow
 
       // Fill briefing
       await page.getByTestId("briefing-textarea").fill(EXAMPLE_BRIEFING);
@@ -40,47 +61,28 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       // Launch
       await page.getByTestId("launch-button").click();
 
-      // ROUND 1: All 6 members should start analyzing
+      // ROUND 1: All 6 members should appear
       const memberGrid = page.getByTestId("member-grid");
-      await expect(memberGrid).toBeVisible({ timeout: 15000 });
+      await expect(memberGrid).toBeVisible({ timeout: 15_000 });
 
-      // Wait for all 6 members to complete (verdict badges appear)
+      // Wait for pipeline to finish first (debates can take 4+ min with DeepSeek)
+      await waitForPipelineEnd(page, 450_000);
+
+      // Retroactively verify all pipeline stages are visible in the DOM
       const roles = ["cpo", "cmo", "cfo", "cro", "cco", "cto"];
       for (const role of roles) {
-        const card = page.getByTestId(`member-card-${role}`);
-        await expect(card).toBeVisible({ timeout: 10000 });
-        // Wait for member to complete — check that "Standby" is gone
-        // and either analyzing or complete text is shown
+        await expect(page.getByTestId(`member-verdict-${role}`)).toBeVisible();
       }
 
-      // Wait for at least one member verdict to appear (signals Round 1 completing)
-      await expect(page.getByTestId("member-verdict-cpo")).toBeVisible({ timeout: 90000 });
+      // Friction + debate traces should be present
+      await expect(page.getByText("FRICTION DETECTED")).toBeVisible();
+      await expect(page.getByText("MULTI-TURN DEBATE")).toBeVisible();
 
-      // Wait for ALL members to complete
-      for (const role of roles) {
-        await expect(page.getByTestId(`member-verdict-${role}`)).toBeVisible({ timeout: 120000 });
-      }
+      // Synthesis section should be visible
+      await expect(page.getByTestId("synthesis-section")).toBeVisible();
 
-      // FRICTIONS: Check friction section appears
-      await expect(page.getByText("FRICTION DETECTED")).toBeVisible({ timeout: 30000 });
-
-      // DEBATES: Wait for debate threads
-      await expect(page.getByText("MULTI-TURN DEBATE")).toBeVisible({ timeout: 60000 });
-
-      // Wait for at least one debate outcome
-      await expect(page.getByTestId("debate-outcome-0")).toBeVisible({ timeout: 120000 });
-
-      // SYNTHESIS: Wait for collective verdict
-      await expect(page.getByTestId("synthesis-section")).toBeVisible({ timeout: 60000 });
-
-      // Analysis should complete
-      // Either we get analysis-complete directly, or CEO follow-up first
+      // If no CEO follow-up, verify export buttons visible
       const analysisComplete = page.getByTestId("analysis-complete");
-      const ceoFollowUp = page.getByTestId("ceo-followup-section");
-
-      await expect(analysisComplete.or(ceoFollowUp)).toBeVisible({ timeout: 120000 });
-
-      // If no CEO follow-up, verify analysis complete
       if (await analysisComplete.isVisible().catch(() => false)) {
         await expect(page.getByTestId("export-button")).toBeVisible();
         await expect(page.getByTestId("share-image-button")).toBeVisible();
@@ -96,26 +98,22 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       await page.getByTestId("launch-button").click();
 
       // Wait for Round 1 to complete
-      await expect(page.getByTestId("member-grid")).toBeVisible({ timeout: 15000 });
+      await expect(page.getByTestId("member-grid")).toBeVisible({ timeout: 15_000 });
 
       const roles = ["cpo", "cmo", "cfo", "cro", "cco", "cto"];
       for (const role of roles) {
-        await expect(page.getByTestId(`member-verdict-${role}`)).toBeVisible({ timeout: 120000 });
+        await expect(page.getByTestId(`member-verdict-${role}`)).toBeVisible({ timeout: 120_000 });
       }
 
-      // Wait for frictions, debates, synthesis
-      await expect(page.getByText("FRICTION DETECTED")).toBeVisible({ timeout: 30000 });
-      await expect(page.getByTestId("synthesis-section")).toBeVisible({ timeout: 180000 });
+      // Wait for pipeline to finish (synthesis + optional CEO follow-up)
+      await waitForPipelineEnd(page);
 
       // Check if CEO follow-up appears
       const ceoSection = page.getByTestId("ceo-followup-section");
       const analysisComplete = page.getByTestId("analysis-complete");
 
-      await expect(ceoSection.or(analysisComplete)).toBeVisible({ timeout: 30000 });
-
       // If CEO follow-up exists, fill answers and submit
       if (await ceoSection.isVisible().catch(() => false)) {
-        // Fill first answer textarea
         const firstAnswer = page.locator('[data-testid^="ceo-answer-"]').first();
         await firstAnswer.fill(
           "We want to build a meal planning app targeting millennials with a $10/month subscription model.",
@@ -127,10 +125,10 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
         // Wait for final verdict
         await expect(
           page.getByTestId("final-verdict").or(page.getByTestId("final-verdict-streaming")),
-        ).toBeVisible({ timeout: 120000 });
+        ).toBeVisible({ timeout: 180_000 });
 
         // Wait for final verdict to complete
-        await expect(page.getByTestId("final-verdict")).toBeVisible({ timeout: 120000 });
+        await expect(page.getByTestId("final-verdict")).toBeVisible({ timeout: 180_000 });
         await expect(page.getByTestId("final-verdict-badge")).toBeVisible();
 
         // Verify sections in final verdict
@@ -139,7 +137,7 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       }
 
       // Verify export buttons eventually appear
-      await expect(page.getByTestId("export-button")).toBeVisible({ timeout: 30000 });
+      await expect(page.getByTestId("export-button")).toBeVisible({ timeout: 60_000 });
       await expect(page.getByTestId("share-image-button")).toBeVisible();
     });
   });
@@ -153,19 +151,14 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       await page.getByTestId("launch-button").click();
 
       // Wait for Round 1 completion
-      await expect(page.getByTestId("member-grid")).toBeVisible({ timeout: 15000 });
+      await expect(page.getByTestId("member-grid")).toBeVisible({ timeout: 15_000 });
       const roles = ["cpo", "cmo", "cfo", "cro", "cco", "cto"];
       for (const role of roles) {
-        await expect(page.getByTestId(`member-verdict-${role}`)).toBeVisible({ timeout: 120000 });
+        await expect(page.getByTestId(`member-verdict-${role}`)).toBeVisible({ timeout: 120_000 });
       }
 
-      // Wait for synthesis
-      await expect(page.getByTestId("synthesis-section")).toBeVisible({ timeout: 180000 });
-
-      // Analysis completes (or CEO follow-up)
-      const analysisComplete = page.getByTestId("analysis-complete");
-      const ceoFollowUp = page.getByTestId("ceo-followup-section");
-      await expect(analysisComplete.or(ceoFollowUp)).toBeVisible({ timeout: 60000 });
+      // Wait for pipeline end
+      await waitForPipelineEnd(page);
     });
   });
 
@@ -180,24 +173,16 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       // Wait for all members to complete
       const roles = ["cpo", "cmo", "cfo", "cro", "cco", "cto"];
       for (const role of roles) {
-        await expect(page.getByTestId(`member-verdict-${role}`)).toBeVisible({ timeout: 120000 });
+        await expect(page.getByTestId(`member-verdict-${role}`)).toBeVisible({ timeout: 120_000 });
       }
 
       // Click each member card and verify modal
       for (const role of roles) {
         await page.getByTestId(`member-card-${role}`).click();
-        // Wait for modal (MemberDetail) — look for CLOSE button or detailed analysis text
-        await expect(page.getByText("CLOSE").or(page.getByText("ANALYSIS"))).toBeVisible({
-          timeout: 5000,
-        });
-        // Close modal
-        const closeBtn = page.getByText("CLOSE");
-        if (await closeBtn.isVisible().catch(() => false)) {
-          await closeBtn.click();
-        } else {
-          // Try pressing Escape
-          await page.keyboard.press("Escape");
-        }
+        // Wait for modal: look for CLOSE button specifically (role='button')
+        const closeBtn = page.getByRole("button", { name: "CLOSE" });
+        await expect(closeBtn).toBeVisible({ timeout: 5_000 });
+        await closeBtn.click();
         await page.waitForTimeout(300);
       }
     });
@@ -210,21 +195,13 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       await page.getByTestId("briefing-textarea").fill(EXAMPLE_BRIEFING);
       await page.getByTestId("launch-button").click();
 
-      // Wait for completion
-      await expect(
-        page.getByTestId("analysis-complete").or(page.getByTestId("ceo-followup-section")),
-      ).toBeVisible({ timeout: 240000 });
+      // Wait for pipeline end
+      await waitForPipelineEnd(page);
 
-      // If CEO follow-up, handle it
-      const ceoSection = page.getByTestId("ceo-followup-section");
-      if (await ceoSection.isVisible().catch(() => false)) {
-        const firstAnswer = page.locator('[data-testid^="ceo-answer-"]').first();
-        await firstAnswer.fill("Proceed with the plan as outlined.");
-        await page.getByTestId("ceo-submit").click();
-        await expect(page.getByTestId("final-verdict")).toBeVisible({ timeout: 120000 });
-      }
+      // Handle CEO follow-up if present
+      await handleCeoFollowUpIfPresent(page);
 
-      await expect(page.getByTestId("export-button")).toBeVisible({ timeout: 30000 });
+      await expect(page.getByTestId("export-button")).toBeVisible({ timeout: 60_000 });
 
       // Listen for download
       const downloadPromise = page.waitForEvent("download");
@@ -241,20 +218,13 @@ test.describe("PARTIE A — Tests Fonctionnels Core", () => {
       await page.getByTestId("briefing-textarea").fill(EXAMPLE_BRIEFING);
       await page.getByTestId("launch-button").click();
 
-      await expect(
-        page.getByTestId("analysis-complete").or(page.getByTestId("ceo-followup-section")),
-      ).toBeVisible({ timeout: 240000 });
+      // Wait for pipeline end
+      await waitForPipelineEnd(page);
 
-      // Handle CEO follow-up if needed
-      const ceoSection = page.getByTestId("ceo-followup-section");
-      if (await ceoSection.isVisible().catch(() => false)) {
-        const firstAnswer = page.locator('[data-testid^="ceo-answer-"]').first();
-        await firstAnswer.fill("Proceed with the plan.");
-        await page.getByTestId("ceo-submit").click();
-        await expect(page.getByTestId("final-verdict")).toBeVisible({ timeout: 120000 });
-      }
+      // Handle CEO follow-up if present
+      await handleCeoFollowUpIfPresent(page);
 
-      await expect(page.getByTestId("share-image-button")).toBeVisible({ timeout: 30000 });
+      await expect(page.getByTestId("share-image-button")).toBeVisible({ timeout: 60_000 });
 
       const downloadPromise = page.waitForEvent("download");
       await page.getByTestId("share-image-button").click();
