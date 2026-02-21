@@ -16,13 +16,7 @@ import { RetroButton } from "@/components/ui/RetroButton";
 import { useApiKey } from "@/lib/hooks/useApiKey";
 import { useBoardroomAnalysis } from "@/lib/hooks/useBoardroomAnalysis";
 import { LanguageProvider, useT } from "@/lib/i18n/LanguageContext";
-import {
-  EXAMPLE_BRIEFING,
-  EXAMPLE_CEO_VISION,
-  MEMBER_AVATARS,
-  MEMBER_COLORS,
-  RECOMMENDED_MODELS,
-} from "@/lib/utils/constants";
+import { MEMBER_AVATARS, MEMBER_COLORS, RECOMMENDED_MODELS } from "@/lib/utils/constants";
 
 export default function Home() {
   return (
@@ -148,8 +142,8 @@ function HomeContent() {
                     className="text-[9px] text-gray-500 hover:text-[var(--color-dbz-gold)]
                       tracking-wider transition-colors uppercase"
                     onClick={() => {
-                      setHeroContent(EXAMPLE_BRIEFING);
-                      setCeoVision(EXAMPLE_CEO_VISION);
+                      setHeroContent(t("hero.exampleBriefing"));
+                      setCeoVision(t("hero.exampleCeoVision"));
                     }}
                   >
                     {t("hero.tryExample")}

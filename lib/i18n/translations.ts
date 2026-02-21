@@ -17,6 +17,16 @@ export const translations: Record<Locale, Record<string, string>> = {
     "hero.advancedOptions": "ADVANCED OPTIONS",
     "hero.tryExample": "TRY AN EXAMPLE",
     "hero.faceTheBoard": "FACE THE BOARD \u2192",
+    "hero.exampleBriefing": `We're building "MealPlan AI" — a mobile-first SaaS that generates personalized weekly meal plans using AI. The user inputs dietary preferences, allergies, budget, and cooking skill level. The AI generates a 7-day plan with recipes, a grocery list, and estimated costs.
+
+Target audience: health-conscious millennials (25-40) who want to eat better but hate planning meals. They currently use a mix of Pinterest, random recipe apps, and impulse grocery shopping.
+
+Monetization: freemium model. Free tier = 1 plan/week with ads. Pro tier at $9.99/month = unlimited plans, nutritional tracking, grocery delivery integration.
+
+Tech stack: React Native, Node.js backend, OpenAI API for recipe generation. MVP timeline: 6 weeks. Budget: $2,000 (API costs + design).
+
+Competition: Mealime (free, no AI), Eat This Much (AI but ugly UX), ChatGPT (generic, no structure). Our edge: beautiful UX + structured output + grocery integration.`,
+    "hero.exampleCeoVision": "Focus on go-to-market strategy and unit economics",
 
     // Advanced options
     "options.ceoVision": "CEO VISION (OPTIONAL)",
@@ -203,6 +213,16 @@ export const translations: Record<Locale, Record<string, string>> = {
     "hero.advancedOptions": "OPTIONS AVANCEES",
     "hero.tryExample": "ESSAYER UN EXEMPLE",
     "hero.faceTheBoard": "AFFRONTER LE CONSEIL \u2192",
+    "hero.exampleBriefing": `On construit "MealPlan AI" — un SaaS mobile-first qui genere des plans de repas hebdomadaires personnalises grace a l'IA. L'utilisateur entre ses preferences alimentaires, allergies, budget et niveau en cuisine. L'IA genere un plan sur 7 jours avec recettes, liste de courses et couts estimes.
+
+Cible : millennials soucieux de leur sante (25-40 ans) qui veulent mieux manger mais detestent planifier leurs repas. Ils utilisent actuellement un mix de Pinterest, d'apps de recettes et font leurs courses au feeling.
+
+Monetisation : modele freemium. Gratuit = 1 plan/semaine avec pubs. Pro a 9,99€/mois = plans illimites, suivi nutritionnel, integration livraison courses.
+
+Stack technique : React Native, backend Node.js, API OpenAI pour la generation de recettes. Delai MVP : 6 semaines. Budget : 2 000€ (couts API + design).
+
+Concurrence : Mealime (gratuit, sans IA), Eat This Much (IA mais UX moche), ChatGPT (generique, pas structure). Notre avantage : UX soignee + output structure + integration courses.`,
+    "hero.exampleCeoVision": "Focus sur la strategie go-to-market et l'unit economics",
 
     // Advanced options
     "options.ceoVision": "VISION DU CEO (OPTIONNEL)",
