@@ -284,9 +284,9 @@ Concurrence : Mealime (gratuit, sans IA), Eat This Much (IA mais UX moche), Chat
     "role.cto": "Directeur Technique",
 
     // Phase tracker
-    "phase.round1": "RND 1",
-    "phase.frictions": "SCAN",
-    "phase.round2": "RND 2",
+    "phase.round1": "TOUR 1",
+    "phase.frictions": "FRICT.",
+    "phase.round2": "TOUR 2",
     "phase.synthesis": "SYNTH",
     "phase.complete": "FIN",
 
