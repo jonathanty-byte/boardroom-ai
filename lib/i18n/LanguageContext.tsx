@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { type Locale, translations } from "./translations";
 
 interface LanguageContextType {
@@ -58,9 +66,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     [locale],
   );
 
-  return (
-    <LanguageContext.Provider value={{ locale, setLocale, t }}>{children}</LanguageContext.Provider>
-  );
+  const value = useMemo(() => ({ locale, setLocale, t }), [locale, setLocale, t]);
+
+  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
 export function useT() {

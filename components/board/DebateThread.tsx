@@ -1,6 +1,7 @@
 "use client";
 
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
+import { useMemo } from "react";
 import type { DebateThreadState } from "@/lib/hooks/useAnalysisState";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { MEMBER_COLORS } from "@/lib/utils/constants";
@@ -11,26 +12,35 @@ interface DebateThreadProps {
 }
 
 export function DebateThread({ thread, frictionDescription }: DebateThreadProps) {
-  const { t } = useT();
+  const { t, locale } = useT();
 
-  const TURN_TYPE_LABELS: Record<string, { label: string; color: string }> = {
-    CHALLENGE: { label: t("debate.challenge"), color: "#ef4444" },
-    RESPONSE: { label: t("debate.response"), color: "#3b82f6" },
-    COUNTER: { label: t("debate.counter"), color: "#f59e0b" },
-    CONCESSION: { label: t("debate.concession"), color: "#22c55e" },
-  };
+  const TURN_TYPE_LABELS = useMemo<Record<string, { label: string; color: string }>>(
+    () => ({
+      CHALLENGE: { label: t("debate.challenge"), color: "#ef4444" },
+      RESPONSE: { label: t("debate.response"), color: "#3b82f6" },
+      COUNTER: { label: t("debate.counter"), color: "#f59e0b" },
+      CONCESSION: { label: t("debate.concession"), color: "#22c55e" },
+    }),
+    [locale, t],
+  );
 
-  const POSITION_SHIFT_LABELS: Record<string, { label: string; color: string }> = {
-    UNCHANGED: { label: t("debate.holds"), color: "#6b7280" },
-    SOFTENED: { label: t("debate.softened"), color: "#f59e0b" },
-    REVERSED: { label: t("debate.reversed"), color: "#22c55e" },
-  };
+  const POSITION_SHIFT_LABELS = useMemo<Record<string, { label: string; color: string }>>(
+    () => ({
+      UNCHANGED: { label: t("debate.holds"), color: "#6b7280" },
+      SOFTENED: { label: t("debate.softened"), color: "#f59e0b" },
+      REVERSED: { label: t("debate.reversed"), color: "#22c55e" },
+    }),
+    [locale, t],
+  );
 
-  const OUTCOME_STYLES: Record<string, { label: string; color: string }> = {
-    CONVERGED: { label: t("debate.converged"), color: "#22c55e" },
-    IMPASSE: { label: t("debate.impasse"), color: "#ef4444" },
-    MAX_TURNS_REACHED: { label: t("debate.maxTurns"), color: "#f59e0b" },
-  };
+  const OUTCOME_STYLES = useMemo<Record<string, { label: string; color: string }>>(
+    () => ({
+      CONVERGED: { label: t("debate.converged"), color: "#22c55e" },
+      IMPASSE: { label: t("debate.impasse"), color: "#ef4444" },
+      MAX_TURNS_REACHED: { label: t("debate.maxTurns"), color: "#f59e0b" },
+    }),
+    [locale, t],
+  );
 
   return (
     <div data-testid={`debate-thread-${thread.frictionIndex}`} className="dialogue-box p-4 mb-4">

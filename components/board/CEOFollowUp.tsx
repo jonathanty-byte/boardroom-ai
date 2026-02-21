@@ -2,7 +2,7 @@
 
 import type { CEOFollowUpQuestion } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { MEMBER_COLORS } from "@/lib/utils/constants";
@@ -14,15 +14,18 @@ interface CEOFollowUpProps {
 }
 
 export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProps) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const [answers, setAnswers] = useState<Record<number, string>>({});
 
   const filledCount = Object.values(answers).filter((a) => a.trim().length > 0).length;
 
-  const sourceLabels: Record<CEOFollowUpQuestion["source"], string> = {
-    challenge: t("ceo.sourceChallenge"),
-    debate_unresolved: t("ceo.sourceDebate"),
-  };
+  const sourceLabels = useMemo<Record<CEOFollowUpQuestion["source"], string>>(
+    () => ({
+      challenge: t("ceo.sourceChallenge"),
+      debate_unresolved: t("ceo.sourceDebate"),
+    }),
+    [locale, t],
+  );
 
   const handleSubmit = () => {
     const parts: string[] = [];
