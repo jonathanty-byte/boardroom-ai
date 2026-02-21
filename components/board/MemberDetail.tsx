@@ -1,7 +1,7 @@
 "use client";
 
 import type { BoardMemberRole, Round1Output } from "@boardroom/engine";
-import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import { useT } from "@/lib/i18n/LanguageContext";
 import { MEMBER_AVATARS, MEMBER_COLORS } from "@/lib/utils/constants";
 import { VerdictBadge } from "./VerdictBadge";
@@ -43,7 +43,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
               <h2 className="text-[11px] font-bold" style={{ color }}>
                 {BOARD_MEMBER_NAMES[role]}
               </h2>
-              <p className="stat-label">{BOARD_MEMBER_TITLES[role]}</p>
+              <p className="stat-label">{t(`role.${role}`)}</p>
             </div>
           </div>
           <button

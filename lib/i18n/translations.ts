@@ -58,6 +58,27 @@ Competition: Mealime (free, no AI), Eat This Much (AI but ugly UX), ChatGPT (gen
     "footer.evolvedMonkey": "EVOLVED MONKEY",
     "footer.poweredBy": "\u2014 POWERED BY OPENROUTER",
 
+    // Role titles
+    "role.cpo": "Chief Product Officer",
+    "role.cmo": "Chief Marketing Officer",
+    "role.cfo": "Chief Financial Officer",
+    "role.cro": "Chief Research Officer",
+    "role.cco": "Chief Creative Officer",
+    "role.cto": "Chief Technology Officer",
+
+    // Phase tracker
+    "phase.round1": "RND 1",
+    "phase.frictions": "SCAN",
+    "phase.round2": "RND 2",
+    "phase.synthesis": "SYNTH",
+    "phase.complete": "DONE",
+
+    // ShareImage
+    "shareImage.button": "SHARE IMAGE",
+    "shareImage.subtitle": "MULTI-AGENT DECISION ENGINE",
+    "shareImage.collectiveVerdict": "COLLECTIVE VERDICT",
+    "shareImage.footer": "Built by evolved monkey \u2014 x.com/evolved_monkey_",
+
     // BoardRoom
     "boardroom.members": "BOARDROOM AI MEMBERS",
     "boardroom.frictionDetected": "FRICTION DETECTED",
@@ -253,6 +274,27 @@ Concurrence : Mealime (gratuit, sans IA), Eat This Much (IA mais UX moche), Chat
     "footer.credit": "BOARDROOM AI par",
     "footer.evolvedMonkey": "EVOLVED MONKEY",
     "footer.poweredBy": "\u2014 PROPULSE PAR OPENROUTER",
+
+    // Role titles
+    "role.cpo": "Directeur Produit",
+    "role.cmo": "Directeur Marketing",
+    "role.cfo": "Directeur Financier",
+    "role.cro": "Directeur Recherche",
+    "role.cco": "Directeur Creatif",
+    "role.cto": "Directeur Technique",
+
+    // Phase tracker
+    "phase.round1": "RND 1",
+    "phase.frictions": "SCAN",
+    "phase.round2": "RND 2",
+    "phase.synthesis": "SYNTH",
+    "phase.complete": "FIN",
+
+    // ShareImage
+    "shareImage.button": "PARTAGER L'IMAGE",
+    "shareImage.subtitle": "MOTEUR DE DECISION MULTI-AGENTS",
+    "shareImage.collectiveVerdict": "VERDICT COLLECTIF",
+    "shareImage.footer": "Cree par evolved monkey \u2014 x.com/evolved_monkey_",
 
     // BoardRoom
     "boardroom.members": "MEMBRES DU CONSEIL",

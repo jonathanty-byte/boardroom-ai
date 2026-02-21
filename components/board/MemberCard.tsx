@@ -1,7 +1,7 @@
 "use client";
 
 import type { BoardMemberRole } from "@boardroom/engine";
-import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import { useState } from "react";
 import { StreamingText } from "@/components/analysis/StreamingText";
 import type { MemberState } from "@/lib/hooks/useAnalysisState";
@@ -20,7 +20,7 @@ export function MemberCard({ role, state }: MemberCardProps) {
   const [showDetail, setShowDetail] = useState(false);
   const [imgError, setImgError] = useState(false);
   const name = BOARD_MEMBER_NAMES[role];
-  const title = BOARD_MEMBER_TITLES[role];
+  const title = t(`role.${role}`);
   const color = MEMBER_COLORS[role];
 
   const isAnalyzing = state.status === "analyzing";

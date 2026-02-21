@@ -1,10 +1,11 @@
 "use client";
 
 import type { BoardMemberRole, BoardroomReport } from "@boardroom/engine";
-import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import html2canvas from "html2canvas";
 import { useCallback, useRef } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { getVerdictColor, MEMBER_COLORS } from "@/lib/utils/constants";
 
 interface ShareImageProps {
@@ -12,6 +13,7 @@ interface ShareImageProps {
 }
 
 export function ShareImage({ report }: ShareImageProps) {
+  const { t } = useT();
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleCapture = useCallback(async () => {
@@ -76,7 +78,7 @@ export function ShareImage({ report }: ShareImageProps) {
                 BOARDROOM AI
               </div>
               <div style={{ fontSize: 14, color: "#8888aa", letterSpacing: 2, marginTop: 4 }}>
-                MULTI-AGENT DECISION ENGINE
+                {t("shareImage.subtitle")}
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
@@ -131,7 +133,9 @@ export function ShareImage({ report }: ShareImageProps) {
                       marginBottom: 8,
                     }}
                   >
-                    {BOARD_MEMBER_TITLES[role].replace("Chief ", "").toUpperCase()}
+                    {t(`role.${role}`)
+                      .replace(/^(Chief |Directeur )/, "")
+                      .toUpperCase()}
                   </div>
                   <div
                     style={{
@@ -160,7 +164,7 @@ export function ShareImage({ report }: ShareImageProps) {
             }}
           >
             <div style={{ fontSize: 14, color: "#8888aa", letterSpacing: 3, marginBottom: 8 }}>
-              COLLECTIVE VERDICT
+              {t("shareImage.collectiveVerdict")}
             </div>
             <div
               style={{
@@ -185,16 +189,14 @@ export function ShareImage({ report }: ShareImageProps) {
             }}
           >
             <div style={{ fontSize: 14, color: "#4a4a8a" }}>boardroomai.app</div>
-            <div style={{ fontSize: 14, color: "#4a4a8a" }}>
-              Built by evolved monkey — x.com/evolved_monkey_
-            </div>
+            <div style={{ fontSize: 14, color: "#4a4a8a" }}>{t("shareImage.footer")}</div>
           </div>
         </div>
       </div>
 
       {/* Button */}
       <RetroButton data-testid="share-image-button" onClick={handleCapture} variant="secondary">
-        SHARE IMAGE
+        {t("shareImage.button")}
       </RetroButton>
     </>
   );

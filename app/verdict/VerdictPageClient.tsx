@@ -1,7 +1,7 @@
 "use client";
 
 import type { BoardMemberRole, ViabilityScore } from "@boardroom/engine";
-import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
+import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import Link from "next/link";
 import { VerdictBadge } from "@/components/board/VerdictBadge";
 import { ViabilityScoreDisplay } from "@/components/board/ViabilityScore";
@@ -97,7 +97,7 @@ function VerdictPageContent({ encodedData }: VerdictPageClientProps) {
                 <div className="text-[9px] font-bold mb-1" style={{ color: MEMBER_COLORS[role] }}>
                   {BOARD_MEMBER_NAMES[role]}
                 </div>
-                <div className="stat-label mb-2">{BOARD_MEMBER_TITLES[role]}</div>
+                <div className="stat-label mb-2">{t(`role.${role}`)}</div>
                 <VerdictBadge verdict={memberVerdict} size="sm" animated={false} />
               </div>
             );

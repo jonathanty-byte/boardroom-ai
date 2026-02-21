@@ -215,11 +215,11 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
 function PhaseTracker({ phase, ...rest }: { phase: string; "data-testid"?: string }) {
   const { t } = useT();
   const phases = [
-    { key: "round1", label: "RND 1", icon: "I" },
-    { key: "frictions", label: "SCAN", icon: "II" },
-    { key: "round2", label: "RND 2", icon: "III" },
-    { key: "synthesis", label: "SYNTH", icon: "IV" },
-    { key: "complete", label: "DONE", icon: "V" },
+    { key: "round1", label: t("phase.round1"), icon: "I" },
+    { key: "frictions", label: t("phase.frictions"), icon: "II" },
+    { key: "round2", label: t("phase.round2"), icon: "III" },
+    { key: "synthesis", label: t("phase.synthesis"), icon: "IV" },
+    { key: "complete", label: t("phase.complete"), icon: "V" },
   ];
 
   const currentIndex = phases.findIndex((p) => p.key === phase);
