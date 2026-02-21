@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { getLocalStats } from "@/lib/utils/verdict-storage";
 
 const TIER_COLORS: Record<string, string> = {
@@ -16,6 +17,7 @@ interface CounterData {
 }
 
 export function LiveCounters() {
+  const { t } = useT();
   const [data, setData] = useState<CounterData | null>(null);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export function LiveCounters() {
       <div className="text-center">
         <span className="rpg-title text-sm text-[var(--color-dbz-gold)]">{data.totalIdeas}</span>
         <span className="stat-label text-gray-500 ml-2">
-          {data.totalIdeas === 1 ? "IDEA DEBATED" : "IDEAS DEBATED"}
+          {data.totalIdeas === 1 ? t("counter.ideaDebated") : t("counter.ideasDebated")}
         </span>
       </div>
 
@@ -47,7 +49,7 @@ export function LiveCounters() {
                 className="pixel-border-sm p-3 min-w-[180px] max-w-[260px] shrink-0"
               >
                 <div className="font-[family-name:var(--font-terminal)] text-sm text-gray-400 truncate">
-                  {idea.preview || "Unnamed idea"}
+                  {idea.preview || t("counter.unnamed")}
                 </div>
                 <div
                   className="stat-label mt-1"

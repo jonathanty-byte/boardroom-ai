@@ -2,6 +2,7 @@
 
 import type { BoardMemberRole, Round1Output } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { MEMBER_AVATARS, MEMBER_COLORS } from "@/lib/utils/constants";
 import { VerdictBadge } from "./VerdictBadge";
 
@@ -12,6 +13,7 @@ interface MemberDetailProps {
 }
 
 export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
+  const { t } = useT();
   const color = MEMBER_COLORS[role];
 
   return (
@@ -48,7 +50,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
             onClick={onClose}
             className="text-gray-500 hover:text-white text-[10px] px-2 py-1 pixel-border-sm"
           >
-            CLOSE
+            {t("detail.close")}
           </button>
         </div>
 
@@ -56,14 +58,14 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
         <div className="overflow-y-auto p-4 flex flex-col gap-4">
           {/* Verdict */}
           <div className="flex items-center gap-3">
-            <span className="stat-label">VERDICT:</span>
+            <span className="stat-label">{t("detail.verdict")}</span>
             <VerdictBadge verdict={result.verdict} animated={false} size="lg" />
           </div>
 
           {/* Analysis */}
           <div className="dialogue-box p-4">
             <div className="stat-label mb-2" style={{ color }}>
-              ANALYSIS
+              {t("detail.analysis")}
             </div>
             <p className="font-[family-name:var(--font-terminal)] text-lg text-gray-200 whitespace-pre-wrap leading-relaxed">
               {result.analysis}
@@ -73,7 +75,9 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
           {/* Challenges */}
           {result.challenges.length > 0 && (
             <div>
-              <div className="stat-label mb-2 text-[var(--color-dbz-red)]">CHALLENGES FOR CEO</div>
+              <div className="stat-label mb-2 text-[var(--color-dbz-red)]">
+                {t("detail.challenges")}
+              </div>
               <div className="space-y-2">
                 {result.challenges.map((c, i) => (
                   <div
@@ -90,7 +94,7 @@ export function MemberDetail({ role, result, onClose }: MemberDetailProps) {
 
           {/* Verdict Details */}
           <div>
-            <div className="stat-label mb-2">VERDICT DETAILS</div>
+            <div className="stat-label mb-2">{t("detail.verdictDetails")}</div>
             <div className="space-y-2">
               {Object.entries(result.verdictDetails).map(([key, value]) =>
                 value ? (

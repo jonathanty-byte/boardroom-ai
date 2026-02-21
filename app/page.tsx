@@ -10,10 +10,12 @@ import { ExportButton } from "@/components/report/ExportButton";
 import { ShareButton } from "@/components/report/ShareButton";
 import { ShareImage } from "@/components/report/ShareImage";
 import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { LiveCounters } from "@/components/ui/LiveCounters";
 import { RetroButton } from "@/components/ui/RetroButton";
 import { useApiKey } from "@/lib/hooks/useApiKey";
 import { useBoardroomAnalysis } from "@/lib/hooks/useBoardroomAnalysis";
+import { LanguageProvider, useT } from "@/lib/i18n/LanguageContext";
 import {
   EXAMPLE_BRIEFING,
   EXAMPLE_CEO_VISION,
@@ -23,6 +25,15 @@ import {
 } from "@/lib/utils/constants";
 
 export default function Home() {
+  return (
+    <LanguageProvider>
+      <HomeContent />
+    </LanguageProvider>
+  );
+}
+
+function HomeContent() {
+  const { t } = useT();
   const { apiKey, saveKey, loaded, hasKey } = useApiKey();
   const { state, analyze, finalize, reset } = useBoardroomAnalysis();
   const [finalizing, setFinalizing] = useState(false);
@@ -62,10 +73,11 @@ export default function Home() {
       {/* Header */}
       <header className="w-full max-w-5xl flex items-center justify-between mb-8">
         <div>
-          <h1 className="rpg-title text-lg text-[var(--color-dbz-orange)]">BOARDROOM AI</h1>
-          <p className="stat-label text-gray-500">AI EXECUTIVE DECISION ENGINE</p>
+          <h1 className="rpg-title text-lg text-[var(--color-dbz-orange)]">{t("header.title")}</h1>
+          <p className="stat-label text-gray-500">{t("header.subtitle")}</p>
         </div>
         <div className="flex items-center gap-4">
+          <LanguageToggle />
           {state.phase !== "idle" && (
             <RetroButton
               data-testid="new-analysis-button"
@@ -77,7 +89,7 @@ export default function Home() {
               }}
               variant="secondary"
             >
-              NEW ANALYSIS
+              {t("header.newAnalysis")}
             </RetroButton>
           )}
         </div>
@@ -96,14 +108,14 @@ export default function Home() {
           {/* Hero headline */}
           <div className="text-center">
             <h2 className="rpg-title text-xs sm:text-sm md:text-base text-[var(--color-dbz-orange)] mb-4 leading-relaxed">
-              YOUR IDEA JUST ENTERED THE BOARDROOM.
+              {t("hero.headline1")}
               <br />
-              NOT EVERYONE SURVIVES.
+              {t("hero.headline2")}
             </h2>
             <p className="font-[family-name:var(--font-terminal)] text-lg sm:text-xl text-gray-400 leading-relaxed">
-              Pitch your startup idea. 6 AI executives will debate it live.
+              {t("hero.subtext1")}
               <br />
-              Free. No signup.
+              {t("hero.subtext2")}
             </p>
           </div>
 
@@ -113,7 +125,7 @@ export default function Home() {
               data-testid="briefing-textarea"
               value={heroContent}
               onChange={(e) => setHeroContent(e.target.value)}
-              placeholder="Describe your startup idea in 2-3 sentences..."
+              placeholder={t("hero.placeholder")}
               rows={4}
               className="w-full bg-transparent text-gray-200 px-3 py-2 resize-none
                 font-[family-name:var(--font-terminal)] text-lg
@@ -127,7 +139,7 @@ export default function Home() {
                     tracking-wider transition-colors uppercase"
                   onClick={() => setShowAdvanced(!showAdvanced)}
                 >
-                  {showAdvanced ? "HIDE OPTIONS" : "ADVANCED OPTIONS"}
+                  {showAdvanced ? t("hero.hideOptions") : t("hero.advancedOptions")}
                 </button>
                 {!heroContent.trim() && (
                   <button
@@ -140,7 +152,7 @@ export default function Home() {
                       setCeoVision(EXAMPLE_CEO_VISION);
                     }}
                   >
-                    TRY AN EXAMPLE
+                    {t("hero.tryExample")}
                   </button>
                 )}
               </div>
@@ -149,7 +161,7 @@ export default function Home() {
                 onClick={handleSubmit}
                 disabled={!canSubmit || !heroContent.trim() || isRunning}
               >
-                FACE THE BOARD &rarr;
+                {t("hero.faceTheBoard")}
               </RetroButton>
             </div>
           </div>
@@ -159,14 +171,14 @@ export default function Home() {
             <div className="w-full flex flex-col gap-4">
               {/* CEO Vision */}
               <div>
-                <label className="stat-label block mb-2">CEO VISION (OPTIONAL)</label>
+                <label className="stat-label block mb-2">{t("options.ceoVision")}</label>
                 <div className="pixel-border-sm">
                   <input
                     data-testid="ceo-vision-input"
                     type="text"
                     value={ceoVision}
                     onChange={(e) => setCeoVision(e.target.value)}
-                    placeholder="Focus: e.g. 'Unit economics' or 'Go-to-market strategy'"
+                    placeholder={t("options.ceoVisionPlaceholder")}
                     className="w-full bg-transparent text-gray-200 px-3 py-2 focus:outline-none placeholder:text-gray-600"
                   />
                 </div>
@@ -174,23 +186,14 @@ export default function Home() {
 
               {/* Model selector */}
               <div>
-                <label className="stat-label block mb-2">AI MODEL</label>
+                <label className="stat-label block mb-2">{t("options.aiModel")}</label>
                 {isDemoMode ? (
                   <div>
                     <div className="pixel-border-sm px-3 py-2 text-gray-400 font-[family-name:var(--font-terminal)]">
                       {RECOMMENDED_MODELS[0].name} — {RECOMMENDED_MODELS[0].description}
                     </div>
                     <p className="text-[9px] text-gray-500 mt-1 tracking-wide">
-                      DEMO MODE — Bring your own{" "}
-                      <a
-                        href="https://openrouter.ai/keys"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] underline"
-                      >
-                        OpenRouter API key
-                      </a>{" "}
-                      to unlock Claude, GPT, Gemini and more.
+                      {t("options.demoMode")}
                     </p>
                   </div>
                 ) : (
@@ -221,8 +224,8 @@ export default function Home() {
           {/* Demo mode badge */}
           {isDemoMode && (
             <div className="text-center">
-              <span className="stat-label text-[var(--color-dbz-green)]">DEMO MODE</span>
-              <span className="stat-label text-gray-500 ml-2">— Free, no key needed</span>
+              <span className="stat-label text-[var(--color-dbz-green)]">{t("demo.badge")}</span>
+              <span className="stat-label text-gray-500 ml-2">{t("demo.free")}</span>
             </div>
           )}
 
@@ -231,7 +234,7 @@ export default function Home() {
 
           {/* Board member preview */}
           <div className="w-full max-w-3xl">
-            <div className="stat-label text-center mb-3">THE BOARD</div>
+            <div className="stat-label text-center mb-3">{t("board.theBoard")}</div>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
               {(["cpo", "cmo", "cfo", "cro", "cco", "cto"] as const).map((role) => (
                 <div
@@ -300,7 +303,9 @@ export default function Home() {
               data-testid="analysis-complete"
               className="rpg-title text-[10px] text-[var(--color-dbz-green)]"
             >
-              ANALYSIS COMPLETE — {(state.report.totalDurationMs / 1000).toFixed(1)}s
+              {t("complete.duration", {
+                duration: (state.report.totalDurationMs / 1000).toFixed(1),
+              })}
             </div>
             <div className="flex gap-3 flex-wrap justify-center">
               <ExportButton report={state.report} />
@@ -316,7 +321,9 @@ export default function Home() {
           className="mt-6 pixel-border p-4 max-w-2xl"
           style={{ borderColor: "var(--color-dbz-red)" }}
         >
-          <h3 className="rpg-title text-[10px] text-[var(--color-dbz-red)] mb-2">ERROR DETECTED</h3>
+          <h3 className="rpg-title text-[10px] text-[var(--color-dbz-red)] mb-2">
+            {t("error.title")}
+          </h3>
           <p
             data-testid="error-message"
             className="font-[family-name:var(--font-terminal)] text-base text-red-300"
@@ -338,7 +345,7 @@ export default function Home() {
             variant="secondary"
             className="mt-4"
           >
-            RETRY
+            {t("error.retry")}
           </RetroButton>
         </div>
       )}
@@ -348,9 +355,7 @@ export default function Home() {
         {/* Feedback CTA */}
         <div className="pixel-border-sm inline-block px-5 py-3 max-w-lg">
           <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-400 leading-relaxed">
-            Built by a non-dev consultant learning to code in public.
-            <br />
-            Feedback, roasts, ideas — all welcome.
+            {t("footer.builtBy")}
           </p>
           <div className="flex justify-center gap-4 mt-2">
             <a
@@ -359,28 +364,28 @@ export default function Home() {
               rel="noopener noreferrer"
               className="stat-label text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] transition-colors"
             >
-              DM ME ON X →
+              {t("footer.dmX")}
             </a>
             <a
               href="mailto:jonathan.jooty@gmail.com?subject=BoardRoom AI Feedback"
               className="stat-label text-gray-500 hover:text-[var(--color-dbz-orange)] transition-colors"
             >
-              EMAIL ME →
+              {t("footer.email")}
             </a>
           </div>
         </div>
 
         <div className="stat-label text-gray-600">
-          BOARDROOM AI by{" "}
+          {t("footer.credit")}{" "}
           <a
             href="https://x.com/evolved_monkey_"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-500 hover:text-[var(--color-dbz-orange)] transition-colors"
           >
-            EVOLVED MONKEY
+            {t("footer.evolvedMonkey")}
           </a>{" "}
-          — POWERED BY OPENROUTER
+          {t("footer.poweredBy")}
         </div>
       </footer>
     </main>

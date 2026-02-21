@@ -4,12 +4,8 @@ import type { CEOFollowUpQuestion } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import { useState } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { MEMBER_COLORS } from "@/lib/utils/constants";
-
-const SOURCE_LABELS: Record<CEOFollowUpQuestion["source"], string> = {
-  challenge: "Round 1 challenge",
-  debate_unresolved: "Unresolved debate",
-};
 
 interface CEOFollowUpProps {
   questions: CEOFollowUpQuestion[];
@@ -18,9 +14,15 @@ interface CEOFollowUpProps {
 }
 
 export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProps) {
+  const { t } = useT();
   const [answers, setAnswers] = useState<Record<number, string>>({});
 
   const filledCount = Object.values(answers).filter((a) => a.trim().length > 0).length;
+
+  const sourceLabels: Record<CEOFollowUpQuestion["source"], string> = {
+    challenge: t("ceo.sourceChallenge"),
+    debate_unresolved: t("ceo.sourceDebate"),
+  };
 
   const handleSubmit = () => {
     const parts: string[] = [];
@@ -39,10 +41,13 @@ export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProp
       {/* Header */}
       <div className="text-center mb-4">
         <div className="stat-label text-[var(--color-dbz-gold)] mb-1">
-          THE BOARD NEEDS YOUR INPUT
+          {t("ceo.boardNeedsInput")}
         </div>
         <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500">
-          {questions.length} unresolved question{questions.length > 1 ? "s" : ""} from the debate
+          {t("ceo.unresolvedQuestions", {
+            count: questions.length,
+            s: questions.length > 1 ? "s" : "",
+          })}
         </p>
       </div>
 
@@ -64,7 +69,7 @@ export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProp
                   {name}
                 </span>
                 <span className="text-[7px] font-bold px-1.5 py-0.5 tracking-wider bg-[#2a2a4a] text-gray-400">
-                  {SOURCE_LABELS[q.source]}
+                  {sourceLabels[q.source]}
                 </span>
               </div>
 
@@ -78,7 +83,7 @@ export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProp
                 data-testid={`ceo-answer-${q.id}`}
                 className="w-full bg-[#0a0a1a] border border-[#3a3a6a] text-gray-200 font-[family-name:var(--font-terminal)] text-sm p-2 resize-none focus:border-[var(--color-dbz-gold)] focus:outline-none transition-colors"
                 rows={2}
-                placeholder="Your answer..."
+                placeholder={t("ceo.answerPlaceholder")}
                 value={answers[q.id] ?? ""}
                 disabled={disabled}
                 onChange={(e) => setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))}
@@ -96,10 +101,10 @@ export function CEOFollowUp({ questions, onFinalize, disabled }: CEOFollowUpProp
           disabled={filledCount === 0 || disabled}
           variant="primary"
         >
-          GET FINAL VERDICT ({filledCount}/{questions.length})
+          {t("ceo.getFinalVerdict", { filled: filledCount, total: questions.length })}
         </RetroButton>
         <p className="font-[family-name:var(--font-terminal)] text-[10px] text-gray-600 mt-2">
-          Answer at least 1 question — the board will deliver a definitive verdict
+          {t("ceo.answerHint")}
         </p>
       </div>
     </div>

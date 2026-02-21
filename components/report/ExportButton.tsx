@@ -2,6 +2,8 @@
 
 import type { BoardroomReport } from "@boardroom/engine";
 import { RetroButton } from "@/components/ui/RetroButton";
+import { useT } from "@/lib/i18n/LanguageContext";
+import type { Locale } from "@/lib/i18n/translations";
 import { formatBoardroomReport } from "@/lib/utils/markdown-export";
 
 interface ExportButtonProps {
@@ -9,8 +11,10 @@ interface ExportButtonProps {
 }
 
 export function ExportButton({ report }: ExportButtonProps) {
+  const { t, locale } = useT();
+
   const handleExport = () => {
-    const markdown = formatBoardroomReport(report);
+    const markdown = formatBoardroomReport(report, locale as Locale);
     const blob = new Blob([markdown], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -22,7 +26,7 @@ export function ExportButton({ report }: ExportButtonProps) {
 
   return (
     <RetroButton data-testid="export-button" onClick={handleExport} variant="primary">
-      ⬇ DOWNLOAD BOARDROOM REPORT ⬇
+      {t("export.download")}
     </RetroButton>
   );
 }

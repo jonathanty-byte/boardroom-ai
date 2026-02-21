@@ -5,6 +5,7 @@ import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 import { useState } from "react";
 import { StreamingText } from "@/components/analysis/StreamingText";
 import type { MemberState } from "@/lib/hooks/useAnalysisState";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { MEMBER_AVATARS, MEMBER_COLORS } from "@/lib/utils/constants";
 import { MemberDetail } from "./MemberDetail";
 import { VerdictBadge } from "./VerdictBadge";
@@ -15,6 +16,7 @@ interface MemberCardProps {
 }
 
 export function MemberCard({ role, state }: MemberCardProps) {
+  const { t } = useT();
   const [showDetail, setShowDetail] = useState(false);
   const [imgError, setImgError] = useState(false);
   const name = BOARD_MEMBER_NAMES[role];
@@ -68,7 +70,7 @@ export function MemberCard({ role, state }: MemberCardProps) {
         {/* Power Bar (shows during analysis) */}
         {isAnalyzing && (
           <div>
-            <div className="stat-label mb-1">ANALYZING...</div>
+            <div className="stat-label mb-1">{t("member.analyzing")}</div>
             <div className="power-bar-track">
               <div
                 className="power-bar-fill"
@@ -85,7 +87,7 @@ export function MemberCard({ role, state }: MemberCardProps) {
               data-testid={`member-status-${role}`}
               className="text-[8px] text-gray-600 tracking-widest uppercase"
             >
-              Standby
+              {t("member.standby")}
             </span>
           </div>
         )}
@@ -103,7 +105,7 @@ export function MemberCard({ role, state }: MemberCardProps) {
               {state.result.analysis.slice(0, 120)}...
             </p>
             <span className="text-[7px] text-gray-600 tracking-wider mt-auto">
-              CLICK TO INSPECT
+              {t("member.clickToInspect")}
             </span>
           </div>
         )}

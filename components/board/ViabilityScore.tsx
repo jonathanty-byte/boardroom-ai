@@ -2,6 +2,7 @@
 
 import type { ViabilityScore } from "@boardroom/engine";
 import { useEffect, useState } from "react";
+import { useT } from "@/lib/i18n/LanguageContext";
 
 const TIER_COLORS: Record<ViabilityScore["tier"], string> = {
   green: "#22c55e",
@@ -23,6 +24,7 @@ interface ViabilityScoreProps {
 }
 
 export function ViabilityScoreDisplay({ viabilityScore, animate = true }: ViabilityScoreProps) {
+  const { t } = useT();
   const [displayScore, setDisplayScore] = useState(animate ? 0 : viabilityScore.score);
   const color = TIER_COLORS[viabilityScore.tier];
   const emoji = TIER_EMOJI[viabilityScore.tier];
@@ -49,9 +51,14 @@ export function ViabilityScoreDisplay({ viabilityScore, animate = true }: Viabil
     return () => clearInterval(interval);
   }, [viabilityScore.score, animate]);
 
+  const translatedOneLiner =
+    t(`ceoOneLiner.${viabilityScore.ceoOneLiner}`) !== `ceoOneLiner.${viabilityScore.ceoOneLiner}`
+      ? t(`ceoOneLiner.${viabilityScore.ceoOneLiner}`)
+      : viabilityScore.ceoOneLiner;
+
   return (
     <div className="pixel-border p-6 text-center" data-testid="viability-score">
-      <div className="stat-label mb-2">VIABILITY SCORE</div>
+      <div className="stat-label mb-2">{t("viability.label")}</div>
       <div
         className="rpg-title text-4xl md:text-5xl mb-3 verdict-appear"
         style={{ color, textShadow: `0 0 20px ${color}40` }}
@@ -63,7 +70,7 @@ export function ViabilityScoreDisplay({ viabilityScore, animate = true }: Viabil
         className="font-[family-name:var(--font-terminal)] text-xl md:text-2xl"
         style={{ color }}
       >
-        {emoji} {viabilityScore.ceoOneLiner}
+        {emoji} {translatedOneLiner}
       </div>
     </div>
   );

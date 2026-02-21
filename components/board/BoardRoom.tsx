@@ -3,6 +3,7 @@
 import type { BoardMemberRole, FrictionPoint, Synthesis } from "@boardroom/engine";
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import type { DebateThreadState, MemberState } from "@/lib/hooks/useAnalysisState";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { DebateThread } from "./DebateThread";
 import { MemberCard } from "./MemberCard";
 import { VerdictBadge } from "./VerdictBadge";
@@ -18,6 +19,8 @@ interface BoardRoomProps {
 const ROLES: BoardMemberRole[] = ["cpo", "cmo", "cfo", "cro", "cco", "cto"];
 
 export function BoardRoom({ members, frictions, debateThreads, synthesis, phase }: BoardRoomProps) {
+  const { t } = useT();
+
   return (
     <div className="w-full max-w-5xl flex flex-col gap-6">
       {/* Phase tracker */}
@@ -26,7 +29,7 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
       {/* Board members grid - RPG battle formation style */}
       <div>
         <div className="stat-label mb-2 text-center text-[var(--color-dbz-gold)]">
-          BOARDROOM AI MEMBERS
+          {t("boardroom.members")}
         </div>
         <div data-testid="member-grid" className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {ROLES.map((role) => (
@@ -41,7 +44,7 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
           <div className="flex items-center gap-2 mb-3">
             <span className="friction-spark text-[var(--color-dbz-red)] text-sm">⚡</span>
             <span className="text-[10px] text-[var(--color-dbz-red)] font-bold tracking-wider">
-              FRICTION DETECTED
+              {t("boardroom.frictionDetected")}
             </span>
             <span className="friction-spark text-[var(--color-dbz-red)] text-sm">⚡</span>
           </div>
@@ -75,10 +78,10 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
             <div className="w-1 h-6 bg-[var(--color-dbz-gold)] rounded-sm animate-pulse" />
             <div>
               <span className="text-[10px] font-bold text-[var(--color-dbz-gold)] tracking-wider">
-                MODERATOR
+                {t("boardroom.moderator")}
               </span>
               <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse">
-                Analyzing friction points...
+                {t("boardroom.analyzingFriction")}
               </p>
             </div>
           </div>
@@ -88,7 +91,9 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
       {/* Multi-turn Debate */}
       {debateThreads.length > 0 && (
         <div className="pixel-border p-4">
-          <div className="stat-label mb-3 text-[var(--color-dbz-purple)]">MULTI-TURN DEBATE</div>
+          <div className="stat-label mb-3 text-[var(--color-dbz-purple)]">
+            {t("boardroom.multiTurnDebate")}
+          </div>
           {debateThreads.map((thread) => (
             <DebateThread
               key={thread.frictionIndex}
@@ -106,12 +111,12 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
       {synthesis && (
         <div className="pixel-border p-4">
           <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">
-            SYNTHESIS — FINAL JUDGMENT
+            {t("boardroom.synthesisFinalJudgment")}
           </div>
 
           {/* Collective Verdict - Big center display */}
           <div data-testid="synthesis-section" className="text-center mb-4 py-4">
-            <div className="stat-label mb-2">COLLECTIVE VERDICT</div>
+            <div className="stat-label mb-2">{t("boardroom.collectiveVerdict")}</div>
             <VerdictBadge
               verdict={synthesis.collectiveVerdict}
               animated={true}
@@ -124,11 +129,14 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
             {synthesis.consensus.length > 0 && (
               <div className="dialogue-box p-3">
                 <div className="rpg-title text-[11px] mb-1 text-[var(--color-dbz-green)]">
-                  CONSENSUS — {synthesis.collectiveVerdict.replace(/_/g, " ")}
+                  {t("boardroom.consensus", {
+                    verdict: synthesis.collectiveVerdict.replace(/_/g, " "),
+                  })}
                 </div>
                 <div className="text-[8px] tracking-wider text-gray-500 mb-2 uppercase">
-                  The board converged on {synthesis.collectiveVerdict.replace(/_/g, " ")} — key
-                  recommendations from each member
+                  {t("boardroom.consensusDesc", {
+                    verdict: synthesis.collectiveVerdict.replace(/_/g, " "),
+                  })}
                 </div>
                 {synthesis.consensus.map((c, i) => (
                   <p
@@ -144,10 +152,10 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
             {synthesis.compromises.length > 0 && (
               <div className="dialogue-box p-3">
                 <div className="rpg-title text-[11px] mb-1 text-[var(--color-dbz-gold)]">
-                  COMPROMISES
+                  {t("boardroom.compromises")}
                 </div>
                 <div className="text-[8px] tracking-wider text-gray-500 mb-2 uppercase">
-                  Agreements reached during debate
+                  {t("boardroom.compromisesDesc")}
                 </div>
                 {synthesis.compromises.map((c, i) => (
                   <p
@@ -163,10 +171,10 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
             {synthesis.impasses.length > 0 && (
               <div className="dialogue-box p-3">
                 <div className="rpg-title text-[11px] mb-1 text-[var(--color-dbz-red)]">
-                  IMPASSES
+                  {t("boardroom.impasses")}
                 </div>
                 <div className="text-[8px] tracking-wider text-gray-500 mb-2 uppercase">
-                  Unresolved disagreements after debate
+                  {t("boardroom.impassesDesc")}
                 </div>
                 {synthesis.impasses.map((c, i) => (
                   <p
@@ -182,10 +190,10 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
             {synthesis.unresolvedConcerns && synthesis.unresolvedConcerns.length > 0 && (
               <div className="dialogue-box p-3">
                 <div className="rpg-title text-[11px] mb-1 text-[var(--color-dbz-orange)]">
-                  UNRESOLVED CONCERNS
+                  {t("boardroom.unresolvedConcerns")}
                 </div>
                 <div className="text-[8px] tracking-wider text-gray-500 mb-2 uppercase">
-                  Issues raised by non-debating members
+                  {t("boardroom.unresolvedConcernsDesc")}
                 </div>
                 {synthesis.unresolvedConcerns.map((c, i) => (
                   <p
@@ -205,6 +213,7 @@ export function BoardRoom({ members, frictions, debateThreads, synthesis, phase 
 }
 
 function PhaseTracker({ phase, ...rest }: { phase: string; "data-testid"?: string }) {
+  const { t } = useT();
   const phases = [
     { key: "round1", label: "RND 1", icon: "I" },
     { key: "frictions", label: "SCAN", icon: "II" },
@@ -217,7 +226,7 @@ function PhaseTracker({ phase, ...rest }: { phase: string; "data-testid"?: strin
 
   return (
     <div className="pixel-border p-3" {...rest}>
-      <div className="stat-label mb-2 text-center">BATTLE PHASE</div>
+      <div className="stat-label mb-2 text-center">{t("boardroom.battlePhase")}</div>
       <div className="flex items-center justify-between gap-1">
         {phases.map((p, i) => {
           const isActive = i === currentIndex;

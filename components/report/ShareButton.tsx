@@ -3,6 +3,7 @@
 import type { BoardroomReport } from "@boardroom/engine";
 import { useState } from "react";
 import { RetroButton } from "@/components/ui/RetroButton";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { encodeVerdict } from "@/lib/utils/verdict-encoding";
 import { generateVerdictId, saveVerdictLocal } from "@/lib/utils/verdict-storage";
 
@@ -11,6 +12,7 @@ interface ShareButtonProps {
 }
 
 export function ShareButton({ report }: ShareButtonProps) {
+  const { t } = useT();
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -39,7 +41,7 @@ export function ShareButton({ report }: ShareButtonProps) {
     return (
       <div className="flex flex-col items-center gap-3">
         <div className="stat-label text-[var(--color-dbz-green)]">
-          {copied ? "LINK COPIED!" : "SHARE YOUR VERDICT"}
+          {copied ? t("share.linkCopied") : t("share.shareVerdict")}
         </div>
         <div className="flex gap-2 flex-wrap justify-center">
           <a
@@ -47,14 +49,14 @@ export function ShareButton({ report }: ShareButtonProps) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <RetroButton variant="secondary">SHARE ON X</RetroButton>
+            <RetroButton variant="secondary">{t("share.shareX")}</RetroButton>
           </a>
           <a
             href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <RetroButton variant="secondary">SHARE ON LINKEDIN</RetroButton>
+            <RetroButton variant="secondary">{t("share.shareLinkedIn")}</RetroButton>
           </a>
           <RetroButton
             variant="secondary"
@@ -68,7 +70,7 @@ export function ShareButton({ report }: ShareButtonProps) {
               }
             }}
           >
-            {copied ? "COPIED!" : "COPY LINK"}
+            {copied ? t("share.copied") : t("share.copyLink")}
           </RetroButton>
         </div>
       </div>
@@ -77,7 +79,7 @@ export function ShareButton({ report }: ShareButtonProps) {
 
   return (
     <RetroButton onClick={handleShare} variant="primary">
-      SHARE YOUR VERDICT
+      {t("share.shareVerdict")}
     </RetroButton>
   );
 }

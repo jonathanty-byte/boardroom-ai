@@ -1,6 +1,7 @@
 "use client";
 
 import type { CEOFinalVerdict } from "@boardroom/engine";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { VerdictBadge } from "./VerdictBadge";
 
 interface FinalVerdictProps {
@@ -9,11 +10,15 @@ interface FinalVerdictProps {
 }
 
 export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
+  const { t } = useT();
+
   // Streaming state
   if (!verdict && streamedText) {
     return (
       <div className="pixel-border p-4">
-        <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">FINAL DELIBERATION</div>
+        <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">
+          {t("finalVerdict.deliberation")}
+        </div>
         <div data-testid="final-verdict-streaming" className="flex gap-3">
           <div className="w-1 flex-shrink-0 rounded-sm bg-[var(--color-dbz-gold)] animate-pulse" />
           <p className="font-[family-name:var(--font-terminal)] text-base text-gray-400">
@@ -28,9 +33,11 @@ export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
   if (!verdict) {
     return (
       <div className="pixel-border p-4">
-        <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">FINAL DELIBERATION</div>
+        <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">
+          {t("finalVerdict.deliberation")}
+        </div>
         <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse text-center">
-          The Final Arbiter is weighing all perspectives...
+          {t("finalVerdict.weighing")}
         </p>
       </div>
     );
@@ -39,7 +46,7 @@ export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
   // Complete state
   return (
     <div data-testid="final-verdict" className="pixel-border p-4">
-      <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">FINAL VERDICT</div>
+      <div className="stat-label mb-3 text-[var(--color-dbz-gold)]">{t("finalVerdict.title")}</div>
 
       {/* Big verdict badge */}
       <div className="text-center mb-4 py-3">
@@ -53,7 +60,7 @@ export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
 
       {/* Reasoning */}
       <div className="dialogue-box p-3 mb-3">
-        <div className="stat-label mb-2 text-gray-400">REASONING</div>
+        <div className="stat-label mb-2 text-gray-400">{t("finalVerdict.reasoning")}</div>
         <p className="font-[family-name:var(--font-terminal)] text-base text-gray-300 whitespace-pre-line">
           {verdict.reasoning}
         </p>
@@ -63,7 +70,9 @@ export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
         {/* Key actions */}
         {verdict.keyActions.length > 0 && (
           <div className="dialogue-box p-3">
-            <div className="stat-label mb-2 text-[var(--color-dbz-green)]">KEY ACTIONS</div>
+            <div className="stat-label mb-2 text-[var(--color-dbz-green)]">
+              {t("finalVerdict.keyActions")}
+            </div>
             {verdict.keyActions.map((a, i) => (
               <p
                 key={i}
@@ -78,7 +87,9 @@ export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
         {/* Risks */}
         {verdict.risks.length > 0 && (
           <div className="dialogue-box p-3">
-            <div className="stat-label mb-2 text-[var(--color-dbz-red)]">ACKNOWLEDGED RISKS</div>
+            <div className="stat-label mb-2 text-[var(--color-dbz-red)]">
+              {t("finalVerdict.risks")}
+            </div>
             {verdict.risks.map((r, i) => (
               <p
                 key={i}
@@ -93,7 +104,9 @@ export function FinalVerdict({ verdict, streamedText }: FinalVerdictProps) {
         {/* Next steps */}
         {verdict.nextSteps.length > 0 && (
           <div className="dialogue-box p-3">
-            <div className="stat-label mb-2 text-[var(--color-dbz-gold)]">NEXT STEPS</div>
+            <div className="stat-label mb-2 text-[var(--color-dbz-gold)]">
+              {t("finalVerdict.nextSteps")}
+            </div>
             {verdict.nextSteps.map((s, i) => (
               <p
                 key={i}

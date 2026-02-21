@@ -5,7 +5,9 @@ import { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "@boardroom/engine";
 import Link from "next/link";
 import { VerdictBadge } from "@/components/board/VerdictBadge";
 import { ViabilityScoreDisplay } from "@/components/board/ViabilityScore";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import { RetroButton } from "@/components/ui/RetroButton";
+import { LanguageProvider, useT } from "@/lib/i18n/LanguageContext";
 import { MEMBER_COLORS } from "@/lib/utils/constants";
 import {
   decodeVerdict,
@@ -20,18 +22,29 @@ interface VerdictPageClientProps {
 }
 
 export function VerdictPageClient({ encodedData }: VerdictPageClientProps) {
+  return (
+    <LanguageProvider>
+      <VerdictPageContent encodedData={encodedData} />
+    </LanguageProvider>
+  );
+}
+
+function VerdictPageContent({ encodedData }: VerdictPageClientProps) {
+  const { t } = useT();
   const verdict = decodeVerdict(encodedData);
 
   if (!verdict) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8 star-bg">
         <div className="pixel-border p-8 text-center">
-          <h1 className="rpg-title text-sm text-[var(--color-dbz-red)] mb-4">VERDICT NOT FOUND</h1>
+          <h1 className="rpg-title text-sm text-[var(--color-dbz-red)] mb-4">
+            {t("verdict.notFound")}
+          </h1>
           <p className="font-[family-name:var(--font-terminal)] text-gray-400">
-            This verdict link is invalid or expired.
+            {t("verdict.invalidLink")}
           </p>
           <Link href="/">
-            <RetroButton className="mt-4">GO TO BOARDROOM AI</RetroButton>
+            <RetroButton className="mt-4">{t("verdict.goHome")}</RetroButton>
           </Link>
         </div>
       </main>
@@ -52,10 +65,13 @@ export function VerdictPageClient({ encodedData }: VerdictPageClientProps) {
       <header className="w-full max-w-3xl flex items-center justify-between mb-8">
         <Link href="/">
           <div>
-            <h1 className="rpg-title text-lg text-[var(--color-dbz-orange)]">BOARDROOM AI</h1>
-            <p className="stat-label text-gray-500">AI EXECUTIVE DECISION ENGINE</p>
+            <h1 className="rpg-title text-lg text-[var(--color-dbz-orange)]">
+              {t("header.title")}
+            </h1>
+            <p className="stat-label text-gray-500">{t("header.subtitle")}</p>
           </div>
         </Link>
+        <LanguageToggle />
       </header>
 
       {/* Viability Score */}
@@ -65,13 +81,13 @@ export function VerdictPageClient({ encodedData }: VerdictPageClientProps) {
 
       {/* Idea Preview */}
       <div className="w-full max-w-3xl mb-6 pixel-border p-4">
-        <div className="stat-label mb-2">THE IDEA</div>
+        <div className="stat-label mb-2">{t("verdict.theIdea")}</div>
         <p className="font-[family-name:var(--font-terminal)] text-lg text-gray-300">{verdict.i}</p>
       </div>
 
       {/* Individual Verdicts */}
       <div className="w-full max-w-3xl mb-6">
-        <div className="stat-label text-center mb-3">BOARD VERDICTS</div>
+        <div className="stat-label text-center mb-3">{t("verdict.boardVerdicts")}</div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {ROLES.map((role, idx) => {
             const memberVerdict = verdict.v[idx];
@@ -91,31 +107,31 @@ export function VerdictPageClient({ encodedData }: VerdictPageClientProps) {
 
       {/* Collective Verdict */}
       <div className="w-full max-w-3xl mb-8 pixel-border p-4 text-center">
-        <div className="stat-label mb-2">COLLECTIVE VERDICT</div>
+        <div className="stat-label mb-2">{t("verdict.collectiveVerdict")}</div>
         <VerdictBadge verdict={verdict.c} size="lg" animated={false} />
       </div>
 
       {/* CTA */}
       <div className="text-center">
         <Link href="/">
-          <RetroButton variant="primary">FACE THE BOARD YOURSELF</RetroButton>
+          <RetroButton variant="primary">{t("verdict.faceTheBoard")}</RetroButton>
         </Link>
         <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 mt-3">
-          Free. No signup. 6 AI executives debate your idea live.
+          {t("verdict.cta")}
         </p>
       </div>
 
       {/* Footer */}
       <footer className="mt-auto pt-12 text-center">
         <div className="stat-label text-gray-600">
-          BOARDROOM AI by{" "}
+          {t("footer.credit")}{" "}
           <a
             href="https://x.com/evolved_monkey_"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-500 hover:text-[var(--color-dbz-orange)] transition-colors"
           >
-            EVOLVED MONKEY
+            {t("footer.evolvedMonkey")}
           </a>
         </div>
       </footer>

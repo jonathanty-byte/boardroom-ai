@@ -2,26 +2,8 @@
 
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import type { DebateThreadState } from "@/lib/hooks/useAnalysisState";
+import { useT } from "@/lib/i18n/LanguageContext";
 import { MEMBER_COLORS } from "@/lib/utils/constants";
-
-const TURN_TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  CHALLENGE: { label: "CHALLENGE", color: "#ef4444" },
-  RESPONSE: { label: "RESPONSE", color: "#3b82f6" },
-  COUNTER: { label: "COUNTER", color: "#f59e0b" },
-  CONCESSION: { label: "CONCESSION", color: "#22c55e" },
-};
-
-const POSITION_SHIFT_LABELS: Record<string, { label: string; color: string }> = {
-  UNCHANGED: { label: "HOLDS", color: "#6b7280" },
-  SOFTENED: { label: "SOFTENED", color: "#f59e0b" },
-  REVERSED: { label: "REVERSED", color: "#22c55e" },
-};
-
-const OUTCOME_STYLES: Record<string, { label: string; color: string }> = {
-  CONVERGED: { label: "CONVERGENCE REACHED", color: "#22c55e" },
-  IMPASSE: { label: "IMPASSE — CEO MUST DECIDE", color: "#ef4444" },
-  MAX_TURNS_REACHED: { label: "MAX TURNS — NO RESOLUTION", color: "#f59e0b" },
-};
 
 interface DebateThreadProps {
   thread: DebateThreadState;
@@ -29,6 +11,27 @@ interface DebateThreadProps {
 }
 
 export function DebateThread({ thread, frictionDescription }: DebateThreadProps) {
+  const { t } = useT();
+
+  const TURN_TYPE_LABELS: Record<string, { label: string; color: string }> = {
+    CHALLENGE: { label: t("debate.challenge"), color: "#ef4444" },
+    RESPONSE: { label: t("debate.response"), color: "#3b82f6" },
+    COUNTER: { label: t("debate.counter"), color: "#f59e0b" },
+    CONCESSION: { label: t("debate.concession"), color: "#22c55e" },
+  };
+
+  const POSITION_SHIFT_LABELS: Record<string, { label: string; color: string }> = {
+    UNCHANGED: { label: t("debate.holds"), color: "#6b7280" },
+    SOFTENED: { label: t("debate.softened"), color: "#f59e0b" },
+    REVERSED: { label: t("debate.reversed"), color: "#22c55e" },
+  };
+
+  const OUTCOME_STYLES: Record<string, { label: string; color: string }> = {
+    CONVERGED: { label: t("debate.converged"), color: "#22c55e" },
+    IMPASSE: { label: t("debate.impasse"), color: "#ef4444" },
+    MAX_TURNS_REACHED: { label: t("debate.maxTurns"), color: "#f59e0b" },
+  };
+
   return (
     <div data-testid={`debate-thread-${thread.frictionIndex}`} className="dialogue-box p-4 mb-4">
       {/* Friction header */}
@@ -131,7 +134,7 @@ export function DebateThread({ thread, frictionDescription }: DebateThreadProps)
               </p>
             ) : (
               <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse">
-                is thinking...
+                {t("debate.thinking")}
               </p>
             )}
           </div>
@@ -147,10 +150,10 @@ export function DebateThread({ thread, frictionDescription }: DebateThreadProps)
             <div className="w-1 flex-shrink-0 rounded-sm bg-[var(--color-dbz-gold)] animate-pulse" />
             <div className="flex-1 min-w-0">
               <span className="text-[10px] font-bold text-[var(--color-dbz-gold)] tracking-wider">
-                MODERATOR
+                {t("debate.moderator")}
               </span>
               <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-500 animate-pulse">
-                Evaluating arguments...
+                {t("debate.evaluating")}
               </p>
             </div>
           </div>
@@ -184,12 +187,13 @@ export function DebateThread({ thread, frictionDescription }: DebateThreadProps)
 }
 
 function ModeratorBubble({ text }: { text: string }) {
+  const { t } = useT();
   return (
     <div className="flex gap-3 mb-3">
       <div className="w-1 flex-shrink-0 rounded-sm bg-[var(--color-dbz-gold)]" />
       <div className="flex-1 min-w-0">
         <span className="text-[10px] font-bold text-[var(--color-dbz-gold)] tracking-wider">
-          MODERATOR
+          {t("debate.moderator")}
         </span>
         <p className="font-[family-name:var(--font-terminal)] text-base text-gray-400 italic">
           {text}
