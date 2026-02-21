@@ -257,6 +257,91 @@ select {
   background: #4a4a8a;
 }
 
+/* ── Avatar Animations ── */
+@keyframes avatar-idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes avatar-analyzing {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-4px) scale(1.03);
+  }
+  50% {
+    transform: translateY(0) scale(1);
+  }
+  75% {
+    transform: translateY(-2px) scale(1.01);
+  }
+}
+
+@keyframes avatar-complete {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes avatar-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes avatar-aura {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.15);
+  }
+}
+
+.avatar-idle {
+  animation: avatar-idle 3s ease-in-out infinite;
+}
+
+.avatar-analyzing {
+  animation: avatar-analyzing 0.8s ease-in-out infinite;
+}
+
+.avatar-complete {
+  animation: avatar-complete 0.6s ease-out forwards;
+}
+
+.avatar-float {
+  animation: avatar-float 4s ease-in-out infinite;
+}
+
+.avatar-aura {
+  position: absolute;
+  inset: -4px;
+  border-radius: 4px;
+  pointer-events: none;
+  animation: avatar-aura 2s ease-in-out infinite;
+}
+
 /* ── Star background ── */
 .star-bg {
   background-image:

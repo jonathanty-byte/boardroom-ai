@@ -230,14 +230,17 @@ function HomeContent() {
           <div className="w-full max-w-3xl">
             <div className="stat-label text-center mb-3">{t("board.theBoard")}</div>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-              {(["cpo", "cmo", "cfo", "cro", "cco", "cto"] as const).map((role) => (
+              {(["cpo", "cmo", "cfo", "cro", "cco", "cto"] as const).map((role, i) => (
                 <div
                   key={role}
                   className="char-card p-3 text-center opacity-60 hover:opacity-100 transition-opacity"
                 >
                   <div
-                    className="w-16 h-16 mx-auto pixel-border-sm overflow-hidden mb-2"
-                    style={{ borderColor: MEMBER_COLORS[role] }}
+                    className="w-16 h-16 mx-auto pixel-border-sm overflow-hidden mb-2 avatar-float"
+                    style={{
+                      borderColor: MEMBER_COLORS[role],
+                      animationDelay: `${i * 0.5}s`,
+                    }}
                   >
                     <img
                       src={MEMBER_AVATARS[role]}

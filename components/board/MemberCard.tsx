@@ -40,9 +40,12 @@ export function MemberCard({ role, state }: MemberCardProps) {
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div
-            className="w-14 h-14 flex-shrink-0 pixel-border-sm flex items-center justify-center overflow-hidden"
+            className={`w-14 h-14 flex-shrink-0 pixel-border-sm flex items-center justify-center overflow-hidden relative ${
+              isAnalyzing ? "avatar-analyzing" : isComplete ? "" : "avatar-idle"
+            }`}
             style={{ borderColor: color }}
           >
+            {isAnalyzing && <div className="avatar-aura" style={{ background: color }} />}
             {imgError ? (
               <span style={{ color, fontSize: 16, fontFamily: "var(--font-retro)" }}>
                 {name[0]}
@@ -51,7 +54,7 @@ export function MemberCard({ role, state }: MemberCardProps) {
               <img
                 src={MEMBER_AVATARS[role]}
                 alt={name}
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover ${isComplete ? "avatar-complete" : ""}`}
                 onError={() => setImgError(true)}
               />
             )}
