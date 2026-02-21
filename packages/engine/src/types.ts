@@ -73,6 +73,7 @@ export interface AnalysisInput {
   ceoVision?: string;
   apiKey: string;
   model?: string;
+  locale?: string;
 }
 
 export interface ViabilityScore {

@@ -15,12 +15,23 @@ const DEFAULT_MODEL = "deepseek/deepseek-v3.2";
 
 export class StreamingAgentRunner {
   private model: string;
+  private locale: string;
 
   constructor(
     private apiKey: string,
     model?: string,
+    locale?: string,
   ) {
     this.model = model ?? DEFAULT_MODEL;
+    this.locale = locale ?? "en";
+  }
+
+  /** Append a language instruction to system prompts when locale is not English. */
+  private localizePrompt(systemPrompt: string): string {
+    if (this.locale === "fr") {
+      return `${systemPrompt}\n\nIMPORTANT: You MUST write ALL your analysis, reasoning, arguments, and text content in French. Keep JSON field names, verdict values (GO, GO_WITH_CHANGES, RETHINK, VIABLE, NOT_VIABLE, etc.), type values (CHALLENGE, RESPONSE, COUNTER, CONCESSION), positionShift values (UNCHANGED, SOFTENED, REVERSED), role codes (cpo, cmo, etc.), and character names (Vegeta, Bulma, Piccolo, Whis, Gohan, Trunks) in English. Only translate the natural language content within JSON string values.`;
+    }
+    return systemPrompt;
   }
 
   private createClient(): OpenAI {
@@ -49,7 +60,7 @@ export class StreamingAgentRunner {
       temperature: config.temperature,
       stream: true,
       messages: [
-        { role: "system", content: config.systemPrompt },
+        { role: "system", content: this.localizePrompt(config.systemPrompt) },
         {
           role: "user",
           content: `Here is the project briefing and CEO vision. Analyze it from your perspective.\n\n${briefing}`,
@@ -121,7 +132,7 @@ export class StreamingAgentRunner {
       temperature: MODERATOR_CONFIG.temperature,
       stream: true,
       messages: [
-        { role: "system", content: MODERATOR_SYSTEM_PROMPT },
+        { role: "system", content: this.localizePrompt(MODERATOR_SYSTEM_PROMPT) },
         { role: "user", content: userPrompt },
       ],
     });
@@ -153,7 +164,7 @@ export class StreamingAgentRunner {
       temperature: config.temperature,
       stream: true,
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: this.localizePrompt(systemPrompt) },
         { role: "user", content: userPrompt },
       ],
     });
@@ -261,7 +272,7 @@ Respond ONLY with JSON. No markdown fences, no preamble.`;
       temperature: 0.6,
       stream: true,
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: this.localizePrompt(systemPrompt) },
         { role: "user", content: contextPrompt },
       ],
     });

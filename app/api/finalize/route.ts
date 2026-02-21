@@ -6,11 +6,12 @@ export const runtime = "edge";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { report, ceoAnswers, apiKey, model } = body as {
+  const { report, ceoAnswers, apiKey, model, locale } = body as {
     report?: BoardroomReport;
     ceoAnswers?: string;
     apiKey?: string;
     model?: string;
+    locale?: string;
   };
 
   const effectiveKey = apiKey || process.env.OPENROUTER_API_KEY;
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
       try {
         // Force default model in demo mode to control costs
         const effectiveModel = !apiKey && effectiveKey ? undefined : model;
-        await runFinalVerdictFlow(report, ceoAnswers, effectiveKey, effectiveModel, send);
+        await runFinalVerdictFlow(report, ceoAnswers, effectiveKey, effectiveModel, send, locale);
       } catch (error) {
         send({
           type: "error",

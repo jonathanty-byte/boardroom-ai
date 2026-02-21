@@ -22,7 +22,7 @@ export async function runAnalysis(
   send: (event: SSEEvent) => void,
 ): Promise<void> {
   const startTime = performance.now();
-  const runner = new StreamingAgentRunner(input.apiKey, input.model);
+  const runner = new StreamingAgentRunner(input.apiKey, input.model, input.locale);
 
   try {
     // Build briefing

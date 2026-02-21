@@ -6,11 +6,12 @@ export const runtime = "edge";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { content, ceoVision, apiKey, model } = body as {
+  const { content, ceoVision, apiKey, model, locale } = body as {
     content?: string;
     ceoVision?: string;
     apiKey?: string;
     model?: string;
+    locale?: string;
   };
 
   const effectiveKey = apiKey || process.env.OPENROUTER_API_KEY;
@@ -47,7 +48,10 @@ export async function POST(req: Request) {
 
       // Force default model in demo mode to control costs
       const effectiveModel = !apiKey && effectiveKey ? undefined : model;
-      await runAnalysis({ content, ceoVision, apiKey: effectiveKey, model: effectiveModel }, send);
+      await runAnalysis(
+        { content, ceoVision, apiKey: effectiveKey, model: effectiveModel, locale },
+        send,
+      );
       controller.close();
     },
   });

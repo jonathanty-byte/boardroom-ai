@@ -63,10 +63,16 @@ export function useBoardroomAnalysis() {
   );
 
   const analyze = useCallback(
-    async (content: string, apiKey: string, ceoVision?: string, model?: string) => {
+    async (
+      content: string,
+      apiKey: string,
+      ceoVision?: string,
+      model?: string,
+      locale?: string,
+    ) => {
       start();
       try {
-        await streamSSE("/api/analyze", { content, ceoVision, apiKey, model });
+        await streamSSE("/api/analyze", { content, ceoVision, apiKey, model, locale });
       } catch (err) {
         handleEvent({
           type: "error",
@@ -78,10 +84,16 @@ export function useBoardroomAnalysis() {
   );
 
   const finalize = useCallback(
-    async (report: BoardroomReport, ceoAnswers: string, apiKey: string, model?: string) => {
+    async (
+      report: BoardroomReport,
+      ceoAnswers: string,
+      apiKey: string,
+      model?: string,
+      locale?: string,
+    ) => {
       startFinalize(ceoAnswers);
       try {
-        await streamSSE("/api/finalize", { report, ceoAnswers, apiKey, model });
+        await streamSSE("/api/finalize", { report, ceoAnswers, apiKey, model, locale });
       } catch (err) {
         handleEvent({
           type: "error",

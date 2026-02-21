@@ -27,7 +27,7 @@ export default function Home() {
 }
 
 function HomeContent() {
-  const { t } = useT();
+  const { t, locale } = useT();
   const { apiKey, saveKey, loaded, hasKey } = useApiKey();
   const { state, analyze, finalize, reset } = useBoardroomAnalysis();
   const [finalizing, setFinalizing] = useState(false);
@@ -51,13 +51,13 @@ function HomeContent() {
 
   const handleSubmit = () => {
     if (!canSubmit || !heroContent.trim()) return;
-    analyze(heroContent, apiKey ?? "", ceoVision, model);
+    analyze(heroContent, apiKey ?? "", ceoVision, model, locale);
   };
 
   const handleFinalize = (ceoAnswers: string) => {
     if (!canSubmit || !state.report) return;
     setFinalizing(true);
-    finalize(state.report, ceoAnswers, apiKey ?? "");
+    finalize(state.report, ceoAnswers, apiKey ?? "", model, locale);
   };
 
   if (!loaded) return null;

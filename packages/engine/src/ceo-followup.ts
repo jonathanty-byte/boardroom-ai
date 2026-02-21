@@ -159,8 +159,9 @@ export async function runFinalVerdictFlow(
   apiKey: string,
   model: string | undefined,
   send: (event: SSEEvent) => void,
+  locale?: string,
 ): Promise<CEOFinalVerdict> {
-  const runner = new StreamingAgentRunner(apiKey, model);
+  const runner = new StreamingAgentRunner(apiKey, model, locale);
 
   send({ type: "final_verdict_start" });
 
