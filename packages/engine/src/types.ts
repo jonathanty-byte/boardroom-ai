@@ -75,14 +75,22 @@ export interface AnalysisInput {
   model?: string;
 }
 
+export interface ViabilityScore {
+  score: number;
+  tier: "green" | "yellow" | "orange" | "red";
+  ceoOneLiner: string;
+}
+
 export interface BoardroomReport {
   projectName: string;
   timestamp: string;
   ceoVision: string;
+  content?: string;
   round1: Round1Result[];
   frictions: FrictionPoint[];
   synthesis: Synthesis;
   totalDurationMs: number;
+  viabilityScore?: ViabilityScore;
   debates?: DebateHistory[];
   ceoFollowUp?: CEOFollowUpQuestion[];
   finalVerdict?: CEOFinalVerdict;

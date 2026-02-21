@@ -14,6 +14,13 @@ export function formatBoardroomReport(report: BoardroomReport): string {
   lines.push(report.ceoVision || "(Not specified)");
   lines.push("");
 
+  // Viability Score
+  if (report.viabilityScore) {
+    lines.push(`## Viability Score: ${report.viabilityScore.score}/10`);
+    lines.push(report.viabilityScore.ceoOneLiner);
+    lines.push("");
+  }
+
   // Individual verdicts summary
   lines.push("## Individual Verdicts");
   lines.push("");

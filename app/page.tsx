@@ -2,23 +2,35 @@
 
 import { BOARD_MEMBER_NAMES } from "@boardroom/engine";
 import { useEffect, useState } from "react";
-import { AnalysisForm } from "@/components/analysis/AnalysisForm";
 import { BoardRoom } from "@/components/board/BoardRoom";
 import { CEOFollowUp } from "@/components/board/CEOFollowUp";
 import { FinalVerdict } from "@/components/board/FinalVerdict";
+import { ViabilityScoreDisplay } from "@/components/board/ViabilityScore";
 import { ExportButton } from "@/components/report/ExportButton";
+import { ShareButton } from "@/components/report/ShareButton";
 import { ShareImage } from "@/components/report/ShareImage";
 import { ApiKeyInput } from "@/components/settings/ApiKeyInput";
+import { LiveCounters } from "@/components/ui/LiveCounters";
 import { RetroButton } from "@/components/ui/RetroButton";
 import { useApiKey } from "@/lib/hooks/useApiKey";
 import { useBoardroomAnalysis } from "@/lib/hooks/useBoardroomAnalysis";
-import { MEMBER_AVATARS, MEMBER_COLORS } from "@/lib/utils/constants";
+import {
+  EXAMPLE_BRIEFING,
+  EXAMPLE_CEO_VISION,
+  MEMBER_AVATARS,
+  MEMBER_COLORS,
+  RECOMMENDED_MODELS,
+} from "@/lib/utils/constants";
 
 export default function Home() {
   const { apiKey, saveKey, loaded, hasKey } = useApiKey();
   const { state, analyze, finalize, reset } = useBoardroomAnalysis();
   const [finalizing, setFinalizing] = useState(false);
   const [demoAvailable, setDemoAvailable] = useState(false);
+  const [heroContent, setHeroContent] = useState("");
+  const [ceoVision, setCeoVision] = useState("");
+  const [model, setModel] = useState(RECOMMENDED_MODELS[0].id);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Check if demo mode is available (server has OPENROUTER_API_KEY)
   useEffect(() => {
@@ -30,10 +42,11 @@ export default function Home() {
 
   const isRunning = state.phase !== "idle" && state.phase !== "complete" && state.phase !== "error";
   const canSubmit = hasKey || demoAvailable;
+  const isDemoMode = demoAvailable && !hasKey;
 
-  const handleSubmit = (content: string, ceoVision: string, model: string) => {
-    if (!canSubmit) return;
-    analyze(content, apiKey ?? "", ceoVision, model);
+  const handleSubmit = () => {
+    if (!canSubmit || !heroContent.trim()) return;
+    analyze(heroContent, apiKey ?? "", ceoVision, model);
   };
 
   const handleFinalize = (ceoAnswers: string) => {
@@ -59,6 +72,8 @@ export default function Home() {
               onClick={() => {
                 reset();
                 setFinalizing(false);
+                setHeroContent("");
+                setCeoVision("");
               }}
               variant="secondary"
             >
@@ -75,70 +90,144 @@ export default function Home() {
         </div>
       )}
 
-      {/* Main content - Idle state */}
+      {/* Main content - Idle state: NEW HERO */}
       {state.phase === "idle" && (
-        <div className="flex flex-col items-center gap-8">
-          {/* Hero */}
-          <div className="text-center max-w-2xl pixel-border p-6">
-            <h2 className="rpg-title text-sm text-[var(--color-dbz-orange)] mb-4">
-              SUBMIT YOUR DECISION TO THE BOARD
+        <div className="flex flex-col items-center gap-6 w-full max-w-3xl">
+          {/* Hero headline */}
+          <div className="text-center">
+            <h2 className="rpg-title text-xs sm:text-sm md:text-base text-[var(--color-dbz-orange)] mb-4 leading-relaxed">
+              YOUR IDEA JUST ENTERED THE BOARDROOM.
+              <br />
+              NOT EVERYONE SURVIVES.
             </h2>
-            <p className="font-[family-name:var(--font-terminal)] text-xl text-gray-300 leading-relaxed mb-3">
-              6 AI executives debate your strategy.
+            <p className="font-[family-name:var(--font-terminal)] text-lg sm:text-xl text-gray-400 leading-relaxed">
+              Pitch your startup idea. 6 AI executives will debate it live.
               <br />
-              Real friction. Real compromise.
-              <br />
-              One structured decision report.
-            </p>
-            <p className="font-[family-name:var(--font-terminal)] text-base text-gray-500">
-              Built by{" "}
-              <a
-                href="https://x.com/evolved_monkey_"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] transition-colors"
-              >
-                evolved monkey
-              </a>
+              Free. No signup.
             </p>
           </div>
 
-          {/* Demo mode banner */}
-          {demoAvailable && !hasKey && (
-            <div className="w-full max-w-2xl text-center pixel-border p-4">
-              <div className="rpg-title text-[9px] text-[var(--color-dbz-green)] mb-2">
-                DEMO MODE ACTIVE
-              </div>
-              <p className="font-[family-name:var(--font-terminal)] text-sm text-gray-400">
-                Try it now — no API key needed. Or{" "}
+          {/* Direct input */}
+          <div className="w-full pixel-border p-5">
+            <textarea
+              data-testid="briefing-textarea"
+              value={heroContent}
+              onChange={(e) => setHeroContent(e.target.value)}
+              placeholder="Describe your startup idea in 2-3 sentences..."
+              rows={4}
+              className="w-full bg-transparent text-gray-200 px-3 py-2 resize-none
+                font-[family-name:var(--font-terminal)] text-lg
+                focus:outline-none placeholder:text-gray-600"
+            />
+            <div className="flex items-center justify-between mt-4 gap-3">
+              <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  className="text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] underline transition-colors"
-                  onClick={() => {
-                    const el = document.getElementById("api-key-section");
-                    el?.scrollIntoView({ behavior: "smooth" });
-                  }}
+                  className="text-[9px] text-gray-500 hover:text-[var(--color-dbz-gold)]
+                    tracking-wider transition-colors uppercase"
+                  onClick={() => setShowAdvanced(!showAdvanced)}
                 >
-                  bring your own key
-                </button>{" "}
-                for unlimited use.
-              </p>
+                  {showAdvanced ? "HIDE OPTIONS" : "ADVANCED OPTIONS"}
+                </button>
+                {!heroContent.trim() && (
+                  <button
+                    type="button"
+                    data-testid="example-button"
+                    className="text-[9px] text-gray-500 hover:text-[var(--color-dbz-gold)]
+                      tracking-wider transition-colors uppercase"
+                    onClick={() => {
+                      setHeroContent(EXAMPLE_BRIEFING);
+                      setCeoVision(EXAMPLE_CEO_VISION);
+                    }}
+                  >
+                    TRY AN EXAMPLE
+                  </button>
+                )}
+              </div>
+              <RetroButton
+                data-testid="launch-button"
+                onClick={handleSubmit}
+                disabled={!canSubmit || !heroContent.trim() || isRunning}
+              >
+                FACE THE BOARD &rarr;
+              </RetroButton>
+            </div>
+          </div>
+
+          {/* Collapsible advanced options */}
+          {showAdvanced && (
+            <div className="w-full flex flex-col gap-4">
+              {/* CEO Vision */}
+              <div>
+                <label className="stat-label block mb-2">CEO VISION (OPTIONAL)</label>
+                <div className="pixel-border-sm">
+                  <input
+                    data-testid="ceo-vision-input"
+                    type="text"
+                    value={ceoVision}
+                    onChange={(e) => setCeoVision(e.target.value)}
+                    placeholder="Focus: e.g. 'Unit economics' or 'Go-to-market strategy'"
+                    className="w-full bg-transparent text-gray-200 px-3 py-2 focus:outline-none placeholder:text-gray-600"
+                  />
+                </div>
+              </div>
+
+              {/* Model selector */}
+              <div>
+                <label className="stat-label block mb-2">AI MODEL</label>
+                {isDemoMode ? (
+                  <div>
+                    <div className="pixel-border-sm px-3 py-2 text-gray-400 font-[family-name:var(--font-terminal)]">
+                      {RECOMMENDED_MODELS[0].name} — {RECOMMENDED_MODELS[0].description}
+                    </div>
+                    <p className="text-[9px] text-gray-500 mt-1 tracking-wide">
+                      DEMO MODE — Bring your own{" "}
+                      <a
+                        href="https://openrouter.ai/keys"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[var(--color-dbz-gold)] hover:text-[var(--color-dbz-orange)] underline"
+                      >
+                        OpenRouter API key
+                      </a>{" "}
+                      to unlock Claude, GPT, Gemini and more.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="pixel-border-sm">
+                    <select
+                      data-testid="model-select"
+                      value={model}
+                      onChange={(e) => setModel(e.target.value)}
+                      className="w-full bg-[var(--color-surface)] text-gray-200 px-3 py-2 focus:outline-none"
+                    >
+                      {RECOMMENDED_MODELS.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.name} — {m.description}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* API Key */}
+              <div id="api-key-section">
+                <ApiKeyInput apiKey={apiKey} onSave={saveKey} />
+              </div>
             </div>
           )}
 
-          {/* API key inline — collapsible in demo mode */}
-          {(hasKey || demoAvailable) && (
-            <div id="api-key-section" className="w-full max-w-2xl">
-              <ApiKeyInput apiKey={apiKey} onSave={saveKey} />
+          {/* Demo mode badge */}
+          {isDemoMode && (
+            <div className="text-center">
+              <span className="stat-label text-[var(--color-dbz-green)]">DEMO MODE</span>
+              <span className="stat-label text-gray-500 ml-2">— Free, no key needed</span>
             </div>
           )}
 
-          {/* Form */}
-          <AnalysisForm
-            onSubmit={handleSubmit}
-            disabled={!canSubmit || isRunning}
-            demoMode={demoAvailable && !hasKey}
-          />
+          {/* Live counters */}
+          <LiveCounters />
 
           {/* Board member preview */}
           <div className="w-full max-w-3xl">
@@ -203,16 +292,20 @@ export default function Home() {
       {state.phase === "complete" &&
         state.report &&
         (state.ceoFollowUp.length === 0 || state.finalVerdict) && (
-          <div className="mt-6 flex flex-col items-center gap-4">
+          <div className="mt-6 flex flex-col items-center gap-4 w-full max-w-5xl">
+            {state.report.viabilityScore && (
+              <ViabilityScoreDisplay viabilityScore={state.report.viabilityScore} />
+            )}
             <div
               data-testid="analysis-complete"
               className="rpg-title text-[10px] text-[var(--color-dbz-green)]"
             >
               ANALYSIS COMPLETE — {(state.report.totalDurationMs / 1000).toFixed(1)}s
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap justify-center">
               <ExportButton report={state.report} />
               <ShareImage report={state.report} />
+              <ShareButton report={state.report} />
             </div>
           </div>
         )}

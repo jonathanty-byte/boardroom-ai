@@ -44,6 +44,8 @@ export type {
   Round1Result,
   SSEEvent,
   Synthesis,
+  ViabilityScore,
 } from "./types";
 // Constants
 export { BOARD_MEMBER_NAMES, BOARD_MEMBER_TITLES } from "./types";
+export { calculateViabilityScore } from "./viability";

@@ -11,6 +11,7 @@ import type {
   Round1Result,
   SSEEvent,
 } from "./types";
+import { calculateViabilityScore } from "./viability";
 
 /**
  * Streaming BoardRoom AI Decision Engine.
@@ -78,16 +79,21 @@ export async function runAnalysis(
       send({ type: "ceo_followup", questions: ceoFollowUp });
     }
 
+    // Calculate viability score
+    const viabilityScore = calculateViabilityScore(round1Results);
+
     // Build final report
     const totalDurationMs = Math.round(performance.now() - startTime);
     const report: BoardroomReport = {
       projectName: "BoardRoom AI Analysis",
       timestamp: new Date().toISOString(),
       ceoVision: input.ceoVision ?? "",
+      content: input.content,
       round1: round1Results,
       frictions,
       synthesis,
       totalDurationMs,
+      viabilityScore,
       debates: debateHistories.length > 0 ? debateHistories : undefined,
       ceoFollowUp: ceoFollowUp.length > 0 ? ceoFollowUp : undefined,
     };
